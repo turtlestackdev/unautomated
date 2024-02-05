@@ -34,3 +34,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# database
+# These two files are automatically generated and should be managed through CI/CD
+src/database/schema.ts
+src/database/enum.ts
+# Don't save any sqllite databases
+prisma/**/*.db
+prisma/**/*.db-journal

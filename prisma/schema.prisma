@@ -2,7 +2,12 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider            = "prisma-kysely"
+  output              = "../src/database"
+  fileName            = "schema.ts"
+  enumFileName        = "enums.ts"
+  decimalTypeOverride = "number"
+  bigIntTypeOverride  = "number"
 }
 
 datasource db {
