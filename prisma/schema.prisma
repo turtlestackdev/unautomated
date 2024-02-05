@@ -1,0 +1,151 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int                @id @default(autoincrement())
+  email              String             @unique
+  name               String?
+  phone              String?
+  pronouns           String?
+  links              UserLinks[]
+  resume_title       ResumeTitle[]
+  resume_objective   ResumeObjective[]
+  employment_history JobTitle[]
+  skills             Skills[]
+  schhol_enrollment  SchoolEnrollment[]
+
+  @@map("users")
+}
+
+model UserLinks {
+  id      Int     @id @default(autoincrement())
+  user_id Int
+  user    User    @relation(fields: [user_id], references: [id])
+  url     String
+  type    String?
+
+  @@map("user_links")
+}
+
+model ResumeTitle {
+  id         Int     @id @default(autoincrement())
+  user_id    Int
+  user       User    @relation(fields: [user_id], references: [id])
+  title      String
+  is_default Boolean @default(false)
+
+  @@map("resume_titles")
+}
+
+model ResumeObjective {
+  id         Int     @id @default(autoincrement())
+  user_id    Int
+  user       User    @relation(fields: [user_id], references: [id])
+  objective  String
+  is_default Boolean @default(false)
+
+  @@map("resume_objectives")
+}
+
+model Company {
+  id               Int        @id @default(autoincrement())
+  name             String
+  description      String
+  industry         String
+  employee_history JobTitle[]
+
+  @@map("companies")
+}
+
+model JobTitle {
+  id                  Int                        @id @default(autoincrement())
+  user_id             Int
+  user                User                       @relation(fields: [user_id], references: [id])
+  title               String
+  company_id          Int
+  company             Company                    @relation(fields: [company_id], references: [id])
+  start_date          DateTime
+  end_date            DateTime?
+  is_current_position Boolean                    @default(false)
+  responibilities     Responibility[]
+  achievements        ProfessionalAchievements[]
+
+  @@index([start_date])
+  @@index([end_date])
+  @@index([is_current_position])
+  @@map("job_titles")
+}
+
+model Responibility {
+  id          Int      @id @default(autoincrement())
+  job_id      Int
+  job         JobTitle @relation(fields: [job_id], references: [id])
+  description String
+
+  @@map("responsibilites")
+}
+
+model ProfessionalAchievements {
+  id          Int      @id @default(autoincrement())
+  job_id      Int
+  job         JobTitle @relation(fields: [job_id], references: [id])
+  description String
+
+  @@map("professional_achievements")
+}
+
+model School {
+  id          Int                @id @default(autoincrement())
+  name        String
+  description String
+  enrollment  SchoolEnrollment[]
+
+  @@map("schools")
+}
+
+model SchoolEnrollment {
+  id                    Int                      @id @default(autoincrement())
+  user_id               Int
+  user                  User                     @relation(fields: [user_id], references: [id])
+  degree                String
+  gpa                   Float
+  school_id             Int
+  school                School                   @relation(fields: [school_id], references: [id])
+  start_date            DateTime
+  end_date              DateTime?
+  is_currently_enrolled Boolean                  @default(false)
+  achievements          ScholasticAchievements[]
+
+  @@index([start_date])
+  @@index([end_date])
+  @@index([is_currently_enrolled])
+  @@map("school_enrollment")
+}
+
+model ScholasticAchievements {
+  id            Int              @id @default(autoincrement())
+  enrollment_id Int
+  enrollment    SchoolEnrollment @relation(fields: [enrollment_id], references: [id])
+  description   String
+
+  @@map("scholastic_achievements")
+}
+
+model Skills {
+  id          Int    @id @default(autoincrement())
+  user_id     Int
+  user        User   @relation(fields: [user_id], references: [id])
+  description String
+  level       Int    @default(3)
+
+  @@map("skills")
+}
