@@ -16,8 +16,10 @@ datasource db {
 }
 
 model User {
-  id                 Int                @id @default(autoincrement())
+  id                 String             @id
   email              String             @unique
+  github_id          String             @unique
+  github_username    String             @unique
   name               String?
   phone              String?
   pronouns           String?
@@ -27,13 +29,23 @@ model User {
   employment_history JobTitle[]
   skills             Skills[]
   schhol_enrollment  SchoolEnrollment[]
+  sessions           Session[]
 
   @@map("users")
 }
 
+model Session {
+  id         String @id
+  expires_at Int
+  user_id    String
+  user       User   @relation(fields: [user_id], references: [id])
+
+  @@map("sessions")
+}
+
 model UserLinks {
   id      Int     @id @default(autoincrement())
-  user_id Int
+  user_id String
   user    User    @relation(fields: [user_id], references: [id])
   url     String
   type    String?
@@ -43,7 +55,7 @@ model UserLinks {
 
 model ResumeTitle {
   id         Int     @id @default(autoincrement())
-  user_id    Int
+  user_id    String
   user       User    @relation(fields: [user_id], references: [id])
   title      String
   is_default Boolean @default(false)
@@ -53,7 +65,7 @@ model ResumeTitle {
 
 model ResumeObjective {
   id         Int     @id @default(autoincrement())
-  user_id    Int
+  user_id    String
   user       User    @relation(fields: [user_id], references: [id])
   objective  String
   is_default Boolean @default(false)
@@ -73,7 +85,7 @@ model Company {
 
 model JobTitle {
   id                  Int                        @id @default(autoincrement())
-  user_id             Int
+  user_id             String
   user                User                       @relation(fields: [user_id], references: [id])
   title               String
   company_id          Int
@@ -119,7 +131,7 @@ model School {
 
 model SchoolEnrollment {
   id                    Int                      @id @default(autoincrement())
-  user_id               Int
+  user_id               String
   user                  User                     @relation(fields: [user_id], references: [id])
   degree                String
   gpa                   Float
@@ -147,7 +159,7 @@ model ScholasticAchievements {
 
 model Skills {
   id          Int    @id @default(autoincrement())
-  user_id     Int
+  user_id     String
   user        User   @relation(fields: [user_id], references: [id])
   description String
   level       Int    @default(3)
