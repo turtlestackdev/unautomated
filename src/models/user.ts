@@ -1,41 +1,43 @@
 import { db } from '@/database/client';
 import type { Selectable, Insertable } from 'kysely';
 import type { User } from '@/database/schema';
+import { gravatar } from '@/ui/Avatar';
 
 export async function create(
-  user: Omit<Insertable<User>, 'id'>,
+  user: Omit<Insertable<User>, 'id' | 'avatar_id'>
 ): Promise<Selectable<User>> {
   return await db
     .insertInto('users')
-    .values({ id: crypto.randomUUID(), ...user })
+    .values({ ...user, id: crypto.randomUUID() })
     .returningAll()
     .executeTakeFirstOrThrow();
 }
 
 type ReadProps =
   | {
-  id: string;
-  email?: never;
-  github_id?: never;
-  github_username?: never;
-}
+      id: string;
+      email?: never;
+      github_id?: never;
+      github_username?: never;
+    }
   | {
-  id?: never;
-  email: string;
-  github_id?: never;
-  github_username?: never;
-}
+      id?: never;
+      email: string;
+      github_id?: never;
+      github_username?: never;
+    }
   | {
-  id?: never;
-  email?: never;
-  github_id: string;
-  github_username?: never;
-} | {
-  id?: never;
-  email?: never;
-  github_id?: never;
-  github_username: string;
-};
+      id?: never;
+      email?: never;
+      github_id: string;
+      github_username?: never;
+    }
+  | {
+      id?: never;
+      email?: never;
+      github_id?: never;
+      github_username: string;
+    };
 
 export async function read(props: ReadProps): Promise<Selectable<User> | null> {
   const where = readField(props);

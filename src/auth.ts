@@ -1,4 +1,4 @@
-import type { Session , User as LuciaUser } from 'lucia';
+import type { Session, User as LuciaUser } from 'lucia';
 import { Lucia } from 'lucia';
 import { BetterSqlite3Adapter } from '@lucia-auth/adapter-sqlite';
 import { sqliteDatabase } from '@/database/client';
@@ -7,7 +7,8 @@ import type { User } from '@/database/schema';
 import { GitHub } from 'arctic';
 import { cookies } from 'next/headers';
 import { cache } from 'react';
-
+import * as uploads from '@/models/file-upload';
+import { gravatar } from '@/ui/Avatar';
 
 const adapter = new BetterSqlite3Adapter(sqliteDatabase, { user: 'users', session: 'sessions' });
 
@@ -23,15 +24,34 @@ export const lucia = new Lucia(adapter, {
   },
   getUserAttributes: (attributes) => {
     return {
-      // attributes has the type of DatabaseUserAttributes
-      githubId: attributes.github_id,
-      username: attributes.github_username,
+      id: attributes.id,
+      name: attributes.name,
+      email: attributes.email,
+      github_id: attributes.github_id,
+      github_username: attributes.github_username,
+      phone: attributes.phone,
+      pronouns: attributes.pronouns,
+      avatar_id: attributes.avatar_id,
+      avatar: attributes.avatar ?? null,
+      initials: attributes.initials ?? null,
     };
   },
 });
 
+export type SessionUser = LuciaUser & { avatar: null | string; initials: null | string };
+/*const avatar = result.user.avatar_id
+  ? (await uploads.read(result.user.avatar_id)).path
+  : await gravatar(result.user.email);
+
+const initials = result.user.name
+  ? result.user.name
+    .split(' ')
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join()
+  : null;*/
 export const validateRequest = cache(
-  async (): Promise<{ user: LuciaUser; session: Session } | { user: null; session: null }> => {
+  async (): Promise<{ user: SessionUser; session: Session } | { user: null; session: null }> => {
     const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
     if (!sessionId) {
       return {
@@ -40,7 +60,8 @@ export const validateRequest = cache(
       };
     }
 
-    const result = await lucia.validateSession(sessionId);
+    let result: { user: SessionUser; session: Session } | { user: null; session: null } =
+      await lucia.validateSession(sessionId);
 
     try {
       if (result.session && result.session.fresh) {
@@ -54,10 +75,29 @@ export const validateRequest = cache(
     } catch {
       // next.js throws when you attempt to set cookie when rendering page
     }
-    return result;
-  },
-);
 
+    if (result.user && result.session) {
+      const avatar = result.user.avatar_id
+        ? (await uploads.read(result.user.avatar_id)).path
+        : await gravatar(result.user.email);
+
+      const initials = result.user.name
+        ? result.user.name
+            .split(' ')
+            .map((n) => n[0])
+            .slice(0, 2)
+            .join()
+        : null;
+
+      result = {
+        session: { ...result.session },
+        user: { ...result.user, avatar: avatar, initials: initials },
+      };
+    }
+
+    return result;
+  }
+);
 
 export const github = new GitHub(process.env.GITHUB_CLIENT_ID!, process.env.GITHUB_CLIENT_SECRET!);
 
@@ -65,6 +105,6 @@ export const github = new GitHub(process.env.GITHUB_CLIENT_ID!, process.env.GITH
 declare module 'lucia' {
   interface Register {
     Lucia: typeof lucia;
-    DatabaseUserAttributes: Selectable<User>;
+    DatabaseUserAttributes: Selectable<User> & { initials: null | string; avatar: null | string };
   }
 }

@@ -23,6 +23,8 @@ model User {
   name               String?
   phone              String?
   pronouns           String?
+  avatar_id          String?
+  avatar             FileUpload?        @relation(name: "Avatar", fields: [avatar_id], references: [id])
   links              UserLinks[]
   resume_title       ResumeTitle[]
   resume_objective   ResumeObjective[]
@@ -30,6 +32,7 @@ model User {
   skills             Skills[]
   schhol_enrollment  SchoolEnrollment[]
   sessions           Session[]
+  file_upload        FileUpload[]       @relation("UploadedBy")
 
   @@map("users")
 }
@@ -41,6 +44,25 @@ model Session {
   user       User   @relation(fields: [user_id], references: [id])
 
   @@map("sessions")
+}
+
+model FileUpload {
+  id             String @id
+  name           String
+  ext            String
+  path           String
+  uploaded_by_id String
+  uploaded_by    User   @relation(name: "UploadedBy", fields: [uploaded_by_id], references: [id])
+  type           String
+  description    String
+  mime_type      String
+  size           Int
+  height         Int?
+  width          Int?
+  avatar_users   User[] @relation("Avatar")
+
+  @@index([type])
+  @@map("file_uploads")
 }
 
 model UserLinks {

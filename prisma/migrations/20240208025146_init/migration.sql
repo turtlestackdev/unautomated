@@ -6,7 +6,9 @@ CREATE TABLE "users" (
     "github_username" TEXT NOT NULL,
     "name" TEXT,
     "phone" TEXT,
-    "pronouns" TEXT
+    "pronouns" TEXT,
+    "avatar_id" TEXT,
+    CONSTRAINT "users_avatar_id_fkey" FOREIGN KEY ("avatar_id") REFERENCES "file_uploads" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -15,6 +17,22 @@ CREATE TABLE "sessions" (
     "expires_at" INTEGER NOT NULL,
     "user_id" TEXT NOT NULL,
     CONSTRAINT "sessions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "file_uploads" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "ext" TEXT NOT NULL,
+    "path" TEXT NOT NULL,
+    "uploaded_by_id" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "mime_type" TEXT NOT NULL,
+    "size" INTEGER NOT NULL,
+    "height" INTEGER,
+    "width" INTEGER,
+    CONSTRAINT "file_uploads_uploaded_by_id_fkey" FOREIGN KEY ("uploaded_by_id") REFERENCES "users" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -127,6 +145,9 @@ CREATE UNIQUE INDEX "users_github_id_key" ON "users"("github_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_github_username_key" ON "users"("github_username");
+
+-- CreateIndex
+CREATE INDEX "file_uploads_type_idx" ON "file_uploads"("type");
 
 -- CreateIndex
 CREATE INDEX "job_titles_start_date_idx" ON "job_titles"("start_date");
