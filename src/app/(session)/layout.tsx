@@ -14,13 +14,6 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  // The session check should live in the middleware.
-  // Unfortunately, Next.js forces us to use the Edge runtime for middleware which has limited functionality.
-  const { session } = await validateRequest();
-  if (!session) {
-    const requestUrl = headers().get('x-request-path') ?? '/dashboard';
-    redirect('/login?redirect=' + encodeURIComponent(requestUrl));
-  }
   return (
     <html lang="en" className={'h-full'}>
       <body className={`${inter.className} h-full bg-gray-100`}>{children}</body>

@@ -7,8 +7,8 @@ import type { User } from '@/database/schema';
 import { GitHub } from 'arctic';
 import { cookies } from 'next/headers';
 import { cache } from 'react';
-import * as uploads from '@/models/file-upload';
 import { gravatar } from '@/ui/Avatar';
+import { SESSION_COOKIE_NAME } from '@/settings';
 
 const adapter = new BetterSqlite3Adapter(sqliteDatabase, { user: 'users', session: 'sessions' });
 
@@ -17,6 +17,7 @@ export const lucia = new Lucia(adapter, {
     // this sets cookies with super long expiration
     // since Next.js doesn't allow Lucia to extend cookie expiration when rendering pages
     expires: false,
+    name: SESSION_COOKIE_NAME,
     attributes: {
       // set to `true` when using HTTPS
       secure: process.env.NODE_ENV === 'production',

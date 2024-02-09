@@ -5,19 +5,14 @@ import clsx from 'clsx';
 import type { SessionUser } from '@/auth';
 import { Avatar } from '@/ui/Avatar';
 
-const userNavigation = [
-  { name: 'My Profile', href: '/profile' },
-  { name: 'Sign out', href: '/logout' },
-];
-
 function links(publicFacing: boolean) {
   const pages = [
-    { name: 'My Profile', href: '/profile' },
+    { name: 'My Profile', href: '/un/profile' },
     { name: 'Sign out', href: '/logout' },
   ];
 
   if (publicFacing) {
-    pages.unshift({ name: 'Dashboard', href: '/dashboard' });
+    pages.unshift({ name: 'Dashboard', href: '/un/dashboard' });
   }
 
   return pages;

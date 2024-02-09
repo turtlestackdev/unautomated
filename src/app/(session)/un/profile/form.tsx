@@ -10,7 +10,7 @@ import { WindowIcon } from '@heroicons/react/20/solid';
 import { Select } from '@/ui/Select';
 import { US_STATES } from '@/models/locale/state';
 import { useState } from 'react';
-import { update_profile } from '@/app/(session)/profile/actions';
+import { update_profile } from '@/app/(session)/un/profile/actions';
 import { useFormStatus } from 'react-dom';
 
 export function ProfileForm({
@@ -136,7 +136,7 @@ export function ProfileForm({
             </Field>
 
             <Field>
-              <Label className={'inline h-5 w-5 fill-[#1f2328]'}>
+              <Label className={'flex items-center gap-1'}>
                 <WindowIcon className={'inline h-5 w-5 fill-brand-500'} /> Personal site
               </Label>
               <Input

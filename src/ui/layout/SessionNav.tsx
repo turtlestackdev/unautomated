@@ -8,9 +8,9 @@ import type { SessionUser } from '@/auth';
 import { Link } from '@/ui/Link';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', current: true },
-  { name: 'Resume', href: '/resume', current: false },
-  { name: 'Job Tracker', href: '/jobs', current: false },
+  { name: 'Dashboard', href: '/un/dashboard', current: true },
+  { name: 'Resume', href: '/un/resume', current: false },
+  { name: 'Job Tracker', href: '/un/jobs', current: false },
 ];
 
 export default function SessionNav({ user }: { user: SessionUser }) {

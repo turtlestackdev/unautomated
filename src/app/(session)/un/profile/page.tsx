@@ -1,6 +1,6 @@
 import ApplicationShell from '@/ui/layout/ApplicationShell';
 import { validatedSession, validateRequest } from '@/auth';
-import { ProfileForm } from '@/app/(session)/profile/form';
+import { ProfileForm } from '@/app/(session)/un/profile/form';
 import * as users from '@/models/user';
 
 export default async function Dashboard() {
