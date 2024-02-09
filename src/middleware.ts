@@ -15,7 +15,6 @@ export const middleware = async (request: NextRequest): Promise<NextResponse> =>
       },
     });
     if (response.status >= 400) {
-      console.error('NO SESSION', response);
       const redirect = NextResponse.redirect(new URL('/login', request.url));
       redirect.cookies.set({ name: 'redirect-path', value: path });
 
@@ -26,7 +25,7 @@ export const middleware = async (request: NextRequest): Promise<NextResponse> =>
   if (request.method === 'GET') {
     return NextResponse.next();
   }
-  
+
   const originHeader = request.headers.get('Origin');
   // NOTE: You may need to use `X-Forwarded-Host` instead
   const hostHeader = request.headers.get('Host');

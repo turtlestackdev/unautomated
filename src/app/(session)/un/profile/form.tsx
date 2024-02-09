@@ -3,15 +3,22 @@ import type { SessionUser } from '@/auth';
 import { Text } from '@/ui/Text';
 import { Input } from '@/ui/Input';
 import { Avatar } from '@/ui/Avatar';
-import { Button, FileButton } from '@/ui/Button';
-import { Field, FieldGroup, Fieldset, Label, Legend } from '@/ui/Fieldset';
+import { FileButton, Submit } from '@/ui/Button';
+import { ErrorMessage, Field, FieldGroup, Fieldset, Label, Legend } from '@/ui/Fieldset';
 import { GitHubIcon, LinkedInIcon } from '@/ui/icons/SocialIcons';
 import { WindowIcon } from '@heroicons/react/20/solid';
 import { Select } from '@/ui/Select';
 import { US_STATES } from '@/models/locale/state';
-import { useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { update_profile } from '@/app/(session)/un/profile/actions';
-import { useFormStatus } from 'react-dom';
+import { useFormState } from 'react-dom';
+import { NotificationDispatchContext } from '@/ui/notifications/Notification';
+
+export interface FormState {
+  status: 'new' | 'pending' | 'error' | 'success';
+  message?: string;
+  errors?: { [key: string]: string };
+}
 
 export function ProfileForm({
   user,
@@ -20,8 +27,31 @@ export function ProfileForm({
   user: SessionUser;
   links: { [key: string]: string };
 }) {
-  const { pending } = useFormStatus();
+  const action = update_profile.bind(null, user.id);
+  const [state, form_action] = useFormState(action, { status: 'new' });
+  const notification_dispatch = useContext(NotificationDispatchContext);
   const [avatarUrl, setAvatarUrl] = useState(user.avatar);
+
+  useEffect(() => {
+    if (state.status === 'success') {
+      notification_dispatch({
+        type: 'add',
+        notification: {
+          type: 'success',
+          title: 'Profile updated',
+          details: 'Your profile data has been saved',
+        },
+      });
+    }
+
+    if (state.status === 'error' && state.message) {
+      notification_dispatch({
+        type: 'add',
+        notification: { type: 'error', title: 'Update failed', details: state.message },
+      });
+    }
+  }, [notification_dispatch, state]);
+
   const previewImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const [file] = event.target.files;
@@ -33,7 +63,7 @@ export function ProfileForm({
   };
 
   return (
-    <form action={update_profile.bind(null, user.id)} className={'max-w-lg'}>
+    <form action={form_action} className={'max-w-lg'}>
       <div className="space-y-12 divide-y divide-gray-300">
         <Fieldset aria-label="Contact information">
           <Legend>Contact Information</Legend>
@@ -54,8 +84,11 @@ export function ProfileForm({
                   className={'h-12 w-12 bg-brand-500 text-white'}
                   src={avatarUrl}
                 />
-                <label htmlFor="avatar_file">
+                <label htmlFor="avatar_file" className={'flex items-center gap-2'}>
                   <FileButton color={'white'}>Change</FileButton>
+                  {state.errors && state.errors['avatar_file'] && (
+                    <ErrorMessage>{state.errors['avatar_file']}</ErrorMessage>
+                  )}
                   <input
                     id="avatar_file"
                     name="avatar_file"
@@ -191,9 +224,7 @@ export function ProfileForm({
       </div>
 
       <div className="mt-6 flex items-center justify-end gap-x-6">
-        <Button type="submit" color={'brand'} aria-disabled={pending} disabled={pending}>
-          Save
-        </Button>
+        <Submit color={'brand'}>Save</Submit>
       </div>
     </form>
   );

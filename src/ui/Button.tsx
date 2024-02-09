@@ -1,3 +1,4 @@
+'use client';
 import {
   Button as HeadlessButton,
   type ButtonProps as HeadlessButtonProps,
@@ -5,6 +6,7 @@ import {
 import { clsx } from 'clsx';
 import React from 'react';
 import { Link } from '@/ui/Link';
+import { useFormStatus } from 'react-dom';
 
 const styles = {
   base: [
@@ -216,6 +218,15 @@ export const Button = React.forwardRef(function Button(
     </HeadlessButton>
   );
 });
+
+export function Submit({ children, ...props }: ButtonProps & { type?: never; disabled?: never }) {
+  const { pending } = useFormStatus();
+  return (
+    <Button type={'submit'} aria-disabled={pending} disabled={pending} {...props}>
+      {children}
+    </Button>
+  );
+}
 
 export const FileButton = React.forwardRef(function FileButton(
   { color, outline, plain, className, children, ...props }: ButtonProps,

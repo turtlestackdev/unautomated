@@ -6,6 +6,7 @@ import { UPLOAD_DIR } from '@/settings';
 import imageSize from 'image-size';
 import type { Selectable, Transaction } from 'kysely';
 import type { DB, FileUpload } from '@/database/schema';
+import { FileFormatError, FileSizeError } from '@/errors';
 
 const allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif'] as const;
 const maxFileSize = 10 * 1024 ** 2;
@@ -49,12 +50,12 @@ export async function uploadImage(
   trx?: Transaction<DB>
 ): Promise<Selectable<FileUpload>> {
   if (file.size > maxFileSize) {
-    throw new Error('file exceeds max size');
+    throw new FileSizeError('file exceeds max size');
   }
 
   const details = await getFileDetails(file);
   if (!details || details.type !== 'image') {
-    throw new Error('unsupported file format');
+    throw new FileFormatError('unsupported file format');
   }
 
   const bytes = await file.arrayBuffer();

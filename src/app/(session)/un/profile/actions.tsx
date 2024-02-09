@@ -1,8 +1,13 @@
 'use server';
 import * as users from '@/models/user';
+import { FileFormatError, FileSizeError } from '@/errors';
+import { type FormState } from '@/app/(session)/un/profile/form';
 
-export async function update_profile(id: string, data: FormData) {
-  console.log('update_profile called', id, data);
+export async function update_profile(
+  id: string,
+  _prev: FormState,
+  data: FormData
+): Promise<FormState> {
   const name = data.get('name') as string;
   const phone = data.get('phone') as string;
   const pronouns = data.get('pronouns') as string;
@@ -25,9 +30,16 @@ export async function update_profile(id: string, data: FormData) {
       links,
     });
 
-    return 'success';
+    return { status: 'success' };
   } catch (error) {
     console.error(error);
-    return 'error';
+
+    if (error instanceof FileFormatError) {
+      return { status: 'error', errors: { avatar_file: 'file format not supported' } };
+    } else if (error instanceof FileSizeError) {
+      return { status: 'error', errors: { avatar_file: 'file is too big' } };
+    } else {
+      return { status: 'error', message: 'an unknown error occurred' };
+    }
   }
 }
