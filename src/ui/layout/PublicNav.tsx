@@ -8,10 +8,10 @@ import { usePathname } from 'next/navigation';
 import type { SessionUser } from '@/auth';
 
 export interface NavProps {
-  user?: SessionUser;
+  user: SessionUser | null;
 }
 
-export default function PublicNav({ user }: NavProps) {
+export default function PublicNav({ user = null }: NavProps) {
   const pathname = usePathname();
   const showLoginLink = !user && pathname !== '/login';
 
@@ -28,7 +28,7 @@ export default function PublicNav({ user }: NavProps) {
                   </Link>
                 </div>
               </div>
-              {user && <UserMenu user={user} />}
+              {user && <UserMenu user={user} publicFacing={true} />}
               {showLoginLink && (
                 <div className="hidden sm:ml-6 sm:flex sm:items-center">
                   <Link href={'/login'}>
@@ -83,7 +83,7 @@ export default function PublicNav({ user }: NavProps) {
                 Calendar
               </Disclosure.Button>
             </div>
-            {user && <UserMobileMenu user={user} />}
+            {user && <UserMobileMenu user={user} publicFacing={true} />}
           </Disclosure.Panel>
         </>
       )}

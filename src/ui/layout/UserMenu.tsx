@@ -6,22 +6,34 @@ import type { SessionUser } from '@/auth';
 import { Avatar } from '@/ui/Avatar';
 
 const userNavigation = [
-  { name: 'Your Profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'My Profile', href: '/profile' },
+  { name: 'Sign out', href: '/logout' },
 ];
 
-export function UserMenu({ user }: { user: SessionUser }) {
+function links(publicFacing: boolean) {
+  const pages = [
+    { name: 'My Profile', href: '/profile' },
+    { name: 'Sign out', href: '/logout' },
+  ];
+
+  if (publicFacing) {
+    pages.unshift({ name: 'Dashboard', href: '/dashboard' });
+  }
+
+  return pages;
+}
+
+export function UserMenu({
+  user,
+  publicFacing = false,
+}: {
+  user: SessionUser;
+  publicFacing?: boolean;
+}) {
   return (
-    <div className="hidden md:block">
+    <div className="hidden place-items-center sm:flex">
       <div className="ml-4 flex items-center md:ml-6">
-        <button
-          type="button"
-          className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-        >
-          <span className="absolute -inset-1.5" />
-          <span className="sr-only">View notifications</span>
-          <BellIcon className="h-6 w-6" aria-hidden="true" />
-        </button>
+        <Notifications publicFacing={publicFacing} />
 
         {/* Profile dropdown */}
         <Menu as="div" className="relative ml-3">
@@ -47,7 +59,7 @@ export function UserMenu({ user }: { user: SessionUser }) {
             leaveTo="transform opacity-0 scale-95"
           >
             <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-              {userNavigation.map((item) => (
+              {links(publicFacing).map((item) => (
                 <Menu.Item key={item.name}>
                   {({ focus }) => (
                     <a
@@ -70,7 +82,13 @@ export function UserMenu({ user }: { user: SessionUser }) {
   );
 }
 
-export function UserMobileMenu({ user }: { user: SessionUser }) {
+export function UserMobileMenu({
+  user,
+  publicFacing = false,
+}: {
+  user: SessionUser;
+  publicFacing?: boolean;
+}) {
   return (
     <div className="border-t border-gray-700 pb-3 pt-4">
       <div className="flex items-center px-5">
@@ -86,17 +104,10 @@ export function UserMobileMenu({ user }: { user: SessionUser }) {
           <div className="text-base font-medium text-white">{user.name}</div>
           <div className="text-sm font-medium text-gray-400">{user.email}</div>
         </div>
-        <button
-          type="button"
-          className="relative ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-        >
-          <span className="absolute -inset-1.5" />
-          <span className="sr-only">View notifications</span>
-          <BellIcon className="h-6 w-6" aria-hidden="true" />
-        </button>
+        <Notifications mobile={true} publicFacing={publicFacing} />
       </div>
       <div className="mt-3 space-y-1 px-2">
-        {userNavigation.map((item) => (
+        {links(publicFacing).map((item) => (
           <Disclosure.Button
             key={item.name}
             as="a"
@@ -108,5 +119,28 @@ export function UserMobileMenu({ user }: { user: SessionUser }) {
         ))}
       </div>
     </div>
+  );
+}
+
+export function Notifications({
+  publicFacing = false,
+  mobile = false,
+}: {
+  publicFacing?: boolean;
+  mobile?: boolean;
+}) {
+  const base =
+    'relative rounded-full p-1 text-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 ';
+  const colors = publicFacing
+    ? 'bg-white hover:text-gray-500 focus:ring-brand-500'
+    : 'bg-gray-800 hover:text-white focus:ring-white focus:ring-offset-gray-800';
+  const layout = mobile ? 'ml-auto flex-shrink-0 ' : '';
+
+  return (
+    <button type="button" className={clsx(base, colors, layout)}>
+      <span className="absolute -inset-1.5" />
+      <span className="sr-only">View notifications</span>
+      <BellIcon className="h-6 w-6" aria-hidden="true" />
+    </button>
   );
 }

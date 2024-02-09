@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Logo from '@/ui/branding/Logo';
-import { Strong, Text } from '@/ui/Text';
+import { Strong } from '@/ui/Text';
 
 export default function Home() {
   return (

@@ -1,7 +1,7 @@
 import { db } from '@/database/client';
-import type { Selectable, Insertable } from 'kysely';
-import type { User } from '@/database/schema';
-import { gravatar } from '@/ui/Avatar';
+import type { Selectable, Insertable, Updateable } from 'kysely';
+import type { FileUpload, User, UserLink } from '@/database/schema';
+import { uploadImage } from '@/models/file-upload';
 
 export async function create(
   user: Omit<Insertable<User>, 'id' | 'avatar_id'>
@@ -39,6 +39,50 @@ type ReadProps =
       github_username: string;
     };
 
+export interface UpdateProfileProps {
+  user: Omit<Updateable<User>, 'avatar_id'> & { id: string };
+  avatar?: File | null;
+  links?: Insertable<UserLink>[] | null;
+}
+
+export async function update_profile({ user, avatar, links }: UpdateProfileProps) {
+  return await db.transaction().execute(async (trx) => {
+    let inserted_avatar: null | Selectable<FileUpload> = null;
+    if (avatar) {
+      inserted_avatar = await uploadImage(avatar, user.id, 'user avatar', trx);
+    }
+
+    const { id, ...profile } = user;
+    const updated_user = await trx
+      .updateTable('users')
+      .set(
+        inserted_avatar
+          ? {
+              ...profile,
+              avatar_id: inserted_avatar.id,
+            }
+          : profile
+      )
+      .where('id', '=', id)
+      .returningAll()
+      .executeTakeFirstOrThrow();
+
+    let upserted_links: null | Selectable<UserLink>[] = null;
+    if (links) {
+      upserted_links = await trx
+        .insertInto('user_links')
+        .values(links)
+        .onConflict((oc) =>
+          oc.columns(['user_id', 'type']).doUpdateSet({ url: (eb) => eb.ref('excluded.url') })
+        )
+        .returningAll()
+        .execute();
+    }
+
+    return { user: updated_user, avatar: inserted_avatar, links: upserted_links };
+  });
+}
+
 export async function read(props: ReadProps): Promise<Selectable<User> | null> {
   const where = readField(props);
   const users = await db
@@ -72,4 +116,17 @@ export function readField(props: ReadProps) {
   }
 
   throw new Error('unreachable code');
+}
+
+export async function read_links({ id, types }: { id: string; types?: string | string[] }) {
+  const query = db.selectFrom('user_links').selectAll().where('user_id', '=', id);
+  if (types) {
+    query.where('type', 'in', types);
+  }
+
+  const links: { [key: string]: string } = {};
+  const results = await query.execute();
+  results.forEach((link) => (links[link.type] = link.url));
+
+  return links;
 }

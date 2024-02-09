@@ -1,7 +1,7 @@
 import ApplicationShell from '@/ui/layout/ApplicationShell';
-import { validateRequest } from '@/auth';
+import { validatedSession, validateRequest } from '@/auth';
 
 export default async function Dashboard() {
-  const { user } = await validateRequest();
-  return <ApplicationShell pageName={'Dashboard'} user={user!} />;
+  const { user } = await validatedSession();
+  return <ApplicationShell pageName={'Dashboard'} user={user} />;
 }

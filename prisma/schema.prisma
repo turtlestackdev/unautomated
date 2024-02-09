@@ -20,12 +20,17 @@ model User {
   email              String             @unique
   github_id          String             @unique
   github_username    String             @unique
-  name               String?
-  phone              String?
-  pronouns           String?
+  name               String             @default("")
+  phone              String             @default("")
+  country            String             @default("us")
+  street_address     String             @default("")
+  city               String             @default("")
+  state              String             @default("")
+  postal_code        String             @default("")
+  pronouns           String             @default("")
   avatar_id          String?
   avatar             FileUpload?        @relation(name: "Avatar", fields: [avatar_id], references: [id])
-  links              UserLinks[]
+  links              UserLink[]
   resume_title       ResumeTitle[]
   resume_objective   ResumeObjective[]
   employment_history JobTitle[]
@@ -65,13 +70,14 @@ model FileUpload {
   @@map("file_uploads")
 }
 
-model UserLinks {
-  id      Int     @id @default(autoincrement())
+model UserLink {
+  id      Int    @id @default(autoincrement())
   user_id String
-  user    User    @relation(fields: [user_id], references: [id])
+  user    User   @relation(fields: [user_id], references: [id])
   url     String
-  type    String?
+  type    String
 
+  @@unique([user_id, type])
   @@map("user_links")
 }
 

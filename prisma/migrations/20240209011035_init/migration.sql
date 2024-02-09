@@ -4,9 +4,14 @@ CREATE TABLE "users" (
     "email" TEXT NOT NULL,
     "github_id" TEXT NOT NULL,
     "github_username" TEXT NOT NULL,
-    "name" TEXT,
-    "phone" TEXT,
-    "pronouns" TEXT,
+    "name" TEXT NOT NULL DEFAULT '',
+    "phone" TEXT NOT NULL DEFAULT '',
+    "country" TEXT NOT NULL DEFAULT 'us',
+    "street_address" TEXT NOT NULL DEFAULT '',
+    "city" TEXT NOT NULL DEFAULT '',
+    "state" TEXT NOT NULL DEFAULT '',
+    "postal_code" TEXT NOT NULL DEFAULT '',
+    "pronouns" TEXT NOT NULL DEFAULT '',
     "avatar_id" TEXT,
     CONSTRAINT "users_avatar_id_fkey" FOREIGN KEY ("avatar_id") REFERENCES "file_uploads" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
@@ -40,7 +45,7 @@ CREATE TABLE "user_links" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "user_id" TEXT NOT NULL,
     "url" TEXT NOT NULL,
-    "type" TEXT,
+    "type" TEXT NOT NULL,
     CONSTRAINT "user_links_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -148,6 +153,9 @@ CREATE UNIQUE INDEX "users_github_username_key" ON "users"("github_username");
 
 -- CreateIndex
 CREATE INDEX "file_uploads_type_idx" ON "file_uploads"("type");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_links_user_id_type_key" ON "user_links"("user_id", "type");
 
 -- CreateIndex
 CREATE INDEX "job_titles_start_date_idx" ON "job_titles"("start_date");

@@ -32,24 +32,18 @@ export const lucia = new Lucia(adapter, {
       phone: attributes.phone,
       pronouns: attributes.pronouns,
       avatar_id: attributes.avatar_id,
-      avatar: attributes.avatar ?? null,
+      street_address: attributes.street_address,
+      city: attributes.city,
+      state: attributes.state,
+      postal_code: attributes.postal_code,
+      avatar: attributes.avatar_id ? `/uploads/${attributes.avatar_id}` : null,
       initials: attributes.initials ?? null,
     };
   },
 });
 
 export type SessionUser = LuciaUser & { avatar: null | string; initials: null | string };
-/*const avatar = result.user.avatar_id
-  ? (await uploads.read(result.user.avatar_id)).path
-  : await gravatar(result.user.email);
 
-const initials = result.user.name
-  ? result.user.name
-    .split(' ')
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join()
-  : null;*/
 export const validateRequest = cache(
   async (): Promise<{ user: SessionUser; session: Session } | { user: null; session: null }> => {
     const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
@@ -77,10 +71,7 @@ export const validateRequest = cache(
     }
 
     if (result.user && result.session) {
-      const avatar = result.user.avatar_id
-        ? (await uploads.read(result.user.avatar_id)).path
-        : await gravatar(result.user.email);
-
+      const avatar = result.user.avatar ?? (await gravatar(result.user.email));
       const initials = result.user.name
         ? result.user.name
             .split(' ')
@@ -99,12 +90,20 @@ export const validateRequest = cache(
   }
 );
 
+// This function will be called from places where the session has already been validated.
+// It's just to avoid null checking all over the place.
+export async function validatedSession() {
+  const { session, user } = await validateRequest();
+
+  return { session: session!, user: user! };
+}
+
 export const github = new GitHub(process.env.GITHUB_CLIENT_ID!, process.env.GITHUB_CLIENT_SECRET!);
 
 // IMPORTANT!
 declare module 'lucia' {
   interface Register {
     Lucia: typeof lucia;
-    DatabaseUserAttributes: Selectable<User> & { initials: null | string; avatar: null | string };
+    DatabaseUserAttributes: Selectable<User> & { initials: null | string };
   }
 }

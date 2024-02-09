@@ -8,6 +8,7 @@ import { TouchTarget } from '@/ui/Button';
 import { Link } from '@/ui/Link';
 import { UserIcon } from '@heroicons/react/20/solid';
 import { createHash } from 'crypto';
+import Image from 'next/image';
 
 type AvatarProps = {
   src?: string | null;
@@ -58,7 +59,15 @@ export function Avatar({
           </text>
         </svg>
       )}
-      {src && <img src={src} alt={alt} />}
+      {src && (
+        <Image
+          src={src}
+          alt={alt}
+          height={96}
+          width={96}
+          className={'aspect-square object-cover'}
+        />
+      )}
       {!initials && !src && <UserIcon />}
       {/* Add an inset border that sits on top of the image */}
       <span
@@ -121,6 +130,6 @@ export async function gravatar(email: string) {
   if (response.status === 404) {
     return null;
   }
-  
+
   return url;
 }
