@@ -78,7 +78,7 @@ export const validateRequest = cache(
             .split(' ')
             .map((n) => n[0])
             .slice(0, 2)
-            .join()
+            .join('')
         : null;
 
       result = {

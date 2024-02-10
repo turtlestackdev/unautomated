@@ -1,4 +1,3 @@
-//import { createHash } from 'node:crypto';
 import {
   Button as HeadlessButton,
   type ButtonProps as HeadlessButtonProps,
@@ -106,8 +105,7 @@ export const AvatarButton = forwardRef(function AvatarButton(
 });
 
 export async function gravatar(email: string): Promise<string | null> {
-  const hash = await generateHash(email.trim().toLowerCase());
-  //const hash = crypto.createHash('sha256').update(email.trim().toLowerCase()).digest('hex');
+  const hash = await sha256(email.trim().toLowerCase());
   const url = `https://gravatar.com/avatar/${hash}`;
   const response = await fetch(`${url}?d=404`);
   if (response.status === 404) {
@@ -117,18 +115,16 @@ export async function gravatar(email: string): Promise<string | null> {
   return url;
 }
 
-async function generateHash(value: string): Promise<string> {
-  const buffer = str2ab(value); // Fix
-  const hashBytes = await crypto.subtle.digest('SHA-1', buffer);
+async function sha256(message: string): Promise<string> {
+  // encode as UTF-8
+  const msgBuffer = new TextEncoder().encode(message);
 
-  return [...new Uint8Array(hashBytes)].map((x) => x.toString(16).padStart(2, '0')).join('');
-}
+  // hash the message
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
 
-function str2ab(value: string): ArrayBuffer {
-  const buf = new ArrayBuffer(value.length);
-  const bufView = new Uint8Array(buf);
-  for (let i = 0, strLen = value.length; i < strLen; i++) {
-    bufView[i] = value.charCodeAt(i);
-  }
-  return buf;
+  // convert ArrayBuffer to Array
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+
+  // convert bytes to hex string
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
