@@ -1,14 +1,14 @@
 import type { Session, User as LuciaUser } from 'lucia';
 import { Lucia } from 'lucia';
 import { BetterSqlite3Adapter } from '@lucia-auth/adapter-sqlite';
-import { sqliteDatabase } from '@/database/client';
 import type { Selectable } from 'kysely';
-import type { User } from '@/database/schema';
 import { GitHub } from 'arctic';
 import { cookies } from 'next/headers';
 import { cache } from 'react';
-import { gravatar } from '@/ui/Avatar';
-import { SESSION_COOKIE_NAME } from '@/settings';
+import type { User } from '@/database/schema';
+import { sqliteDatabase } from '@/database/client';
+import { gravatar } from '@/ui/avatar';
+import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, SESSION_COOKIE_NAME } from '@/settings';
 
 const adapter = new BetterSqlite3Adapter(sqliteDatabase, { user: 'users', session: 'sessions' });
 
@@ -71,7 +71,7 @@ export const validateRequest = cache(
       // next.js throws when you attempt to set cookie when rendering page
     }
 
-    if (result.user && result.session) {
+    if (result.user) {
       const avatar = result.user.avatar ?? (await gravatar(result.user.email));
       const initials = result.user.name
         ? result.user.name
@@ -83,7 +83,7 @@ export const validateRequest = cache(
 
       result = {
         session: { ...result.session },
-        user: { ...result.user, avatar: avatar, initials: initials },
+        user: { ...result.user, avatar, initials },
       };
     }
 
@@ -93,13 +93,16 @@ export const validateRequest = cache(
 
 // This function will be called from places where the session has already been validated.
 // It's just to avoid null checking all over the place.
-export async function validatedSession() {
+export async function validatedSession(): Promise<{ user: SessionUser; session: Session }> {
   const { session, user } = await validateRequest();
 
-  return { session: session!, user: user! };
+  if (!session) {
+    throw new Error('session is invalid');
+  }
+  return { session, user };
 }
 
-export const github = new GitHub(process.env.GITHUB_CLIENT_ID!, process.env.GITHUB_CLIENT_SECRET!);
+export const github = new GitHub(GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET);
 
 // IMPORTANT!
 declare module 'lucia' {

@@ -1,14 +1,14 @@
 'use client';
-import { Fragment, useContext, useReducer } from 'react';
-import SessionNav from '@/ui/layout/SessionNav';
-import PageHeader from '@/ui/layout/PageHeader';
+import { type ReactElement, useReducer } from 'react';
 import type { User } from 'lucia';
+import { SessionNav } from '@/ui/layout/session-nav';
+import { PageHeader } from '@/ui/layout/page-header';
 import {
   NotificationContext,
   NotificationDispatchContext,
-  notification_reducer,
+  notificationReducer,
   NotificationPanel,
-} from '@/ui/notifications/Notification';
+} from '@/ui/notifications/notification';
 
 export interface ApplicationShellProps {
   user: User;
@@ -16,8 +16,12 @@ export interface ApplicationShellProps {
   children?: React.ReactNode;
 }
 
-export default function ApplicationShell({ user, pageName, children }: ApplicationShellProps) {
-  const [notifications, dispatch] = useReducer(notification_reducer, []);
+export function ApplicationShell({
+  user,
+  pageName,
+  children,
+}: ApplicationShellProps): ReactElement {
+  const [notifications, dispatch] = useReducer(notificationReducer, []);
   return (
     <NotificationContext.Provider value={notifications}>
       <NotificationDispatchContext.Provider value={dispatch}>

@@ -1,11 +1,11 @@
 import { BellIcon } from '@heroicons/react/24/outline';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import clsx from 'clsx';
+import { Fragment, type ReactElement } from 'react';
+import { clsx } from 'clsx';
 import type { SessionUser } from '@/auth';
-import { Avatar } from '@/ui/Avatar';
+import { Avatar } from '@/ui/avatar';
 
-function links(publicFacing: boolean) {
+function links(publicFacing: boolean): { name: string; href: string }[] {
   const pages = [
     { name: 'My Profile', href: '/un/profile' },
     { name: 'Sign out', href: '/logout' },
@@ -24,11 +24,11 @@ export function UserMenu({
 }: {
   user: SessionUser;
   publicFacing?: boolean;
-}) {
+}): ReactElement {
   return (
     <div className="hidden place-items-center sm:flex">
       <div className="ml-4 flex items-center md:ml-6">
-        <Notifications publicFacing={publicFacing} />
+        <Messages publicFacing={publicFacing} />
 
         {/* Profile dropdown */}
         <Menu as="div" className="relative ml-3">
@@ -37,9 +37,9 @@ export function UserMenu({
               <span className="absolute -inset-1.5" />
               <span className="sr-only">Open user menu</span>
               <Avatar
+                alt={user.name}
+                className="h-8 w-8 bg-brand-500 text-white"
                 initials={user.initials}
-                alt={user.name ?? ''}
-                className={'h-8 w-8 bg-brand-500 text-white'}
                 src={user.avatar}
               />
             </Menu.Button>
@@ -58,11 +58,11 @@ export function UserMenu({
                 <Menu.Item key={item.name}>
                   {({ focus }) => (
                     <a
-                      href={item.href}
                       className={clsx(
                         focus ? 'bg-gray-100' : '',
                         'block px-4 py-2 text-sm text-gray-700'
                       )}
+                      href={item.href}
                     >
                       {item.name}
                     </a>
@@ -83,15 +83,15 @@ export function UserMobileMenu({
 }: {
   user: SessionUser;
   publicFacing?: boolean;
-}) {
+}): ReactElement {
   return (
     <div className="border-t border-gray-700 pb-3 pt-4">
       <div className="flex items-center px-5">
         <div className="flex-shrink-0">
           <Avatar
+            alt={user.name}
+            className="h-8 w-8 bg-brand-500 text-white"
             initials={user.initials}
-            alt={user.name ?? ''}
-            className={'h-8 w-8 bg-brand-500 text-white'}
             src={user.avatar}
           />
         </div>
@@ -99,15 +99,15 @@ export function UserMobileMenu({
           <div className="text-base font-medium text-white">{user.name}</div>
           <div className="text-sm font-medium text-gray-400">{user.email}</div>
         </div>
-        <Notifications mobile={true} publicFacing={publicFacing} />
+        <Messages mobile publicFacing={publicFacing} />
       </div>
       <div className="mt-3 space-y-1 px-2">
         {links(publicFacing).map((item) => (
           <Disclosure.Button
-            key={item.name}
             as="a"
-            href={item.href}
             className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+            href={item.href}
+            key={item.name}
           >
             {item.name}
           </Disclosure.Button>
@@ -117,13 +117,13 @@ export function UserMobileMenu({
   );
 }
 
-export function Notifications({
+export function Messages({
   publicFacing = false,
   mobile = false,
 }: {
   publicFacing?: boolean;
   mobile?: boolean;
-}) {
+}): ReactElement {
   const base =
     'relative rounded-full p-1 text-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 ';
   const colors = publicFacing
@@ -132,10 +132,10 @@ export function Notifications({
   const layout = mobile ? 'ml-auto flex-shrink-0 ' : '';
 
   return (
-    <button type="button" className={clsx(base, colors, layout)}>
+    <button className={clsx(base, colors, layout)} type="button">
       <span className="absolute -inset-1.5" />
-      <span className="sr-only">View notifications</span>
-      <BellIcon className="h-6 w-6" aria-hidden="true" />
+      <span className="sr-only">View Messages</span>
+      <BellIcon aria-hidden="true" className="h-6 w-6" />
     </button>
   );
 }

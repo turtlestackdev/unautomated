@@ -1,23 +1,24 @@
 'use client';
-import type { SessionUser } from '@/auth';
-import { Text } from '@/ui/Text';
-import { Input } from '@/ui/Input';
-import { Avatar } from '@/ui/Avatar';
-import { FileButton, Submit } from '@/ui/Button';
-import { ErrorMessage, Field, FieldGroup, Fieldset, Label, Legend } from '@/ui/Fieldset';
-import { GitHubIcon, LinkedInIcon } from '@/ui/icons/SocialIcons';
 import { WindowIcon } from '@heroicons/react/20/solid';
-import { Select } from '@/ui/Select';
-import { US_STATES } from '@/models/locale/state';
+import type { ReactElement } from 'react';
 import { useContext, useState, useEffect } from 'react';
-import { update_profile } from '@/app/(session)/un/profile/actions';
 import { useFormState } from 'react-dom';
-import { NotificationDispatchContext } from '@/ui/notifications/Notification';
+import type { SessionUser } from '@/auth';
+import { Text } from '@/ui/text';
+import { Input } from '@/ui/input';
+import { Avatar } from '@/ui/avatar';
+import { FileButton, Submit } from '@/ui/button';
+import { ErrorMessage, Field, FieldGroup, Fieldset, Label, Legend } from '@/ui/fieldset';
+import { GitHubIcon, LinkedInIcon } from '@/ui/icons/social-icons';
+import { Select } from '@/ui/select';
+import { US_STATES } from '@/models/locale/state';
+import { updateProfile } from '@/app/(session)/un/profile/actions';
+import { NotificationDispatchContext } from '@/ui/notifications/notification';
 
 export interface FormState {
   status: 'new' | 'pending' | 'error' | 'success';
   message?: string;
-  errors?: { [key: string]: string };
+  errors?: Record<string, string>;
 }
 
 export function ProfileForm({
@@ -25,16 +26,16 @@ export function ProfileForm({
   links,
 }: {
   user: SessionUser;
-  links: { [key: string]: string };
-}) {
-  const action = update_profile.bind(null, user.id);
-  const [state, form_action] = useFormState(action, { status: 'new' });
-  const notification_dispatch = useContext(NotificationDispatchContext);
+  links: Record<string, string>;
+}): ReactElement {
+  const action = updateProfile.bind(null, user.id);
+  const [state, formAction] = useFormState(action, { status: 'new' });
+  const notificationDispatch = useContext(NotificationDispatchContext);
   const [avatarUrl, setAvatarUrl] = useState(user.avatar);
 
   useEffect(() => {
     if (state.status === 'success') {
-      notification_dispatch({
+      notificationDispatch({
         type: 'add',
         notification: {
           type: 'success',
@@ -45,25 +46,27 @@ export function ProfileForm({
     }
 
     if (state.status === 'error' && state.message) {
-      notification_dispatch({
+      notificationDispatch({
         type: 'add',
         notification: { type: 'error', title: 'Update failed', details: state.message },
       });
     }
-  }, [notification_dispatch, state]);
+  }, [notificationDispatch, state]);
 
-  const previewImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const previewImage = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    let url = user.avatar;
     if (event.target.files) {
       const [file] = event.target.files;
-      const url = URL.createObjectURL(file);
-      setAvatarUrl(url);
-    } else {
-      setAvatarUrl(user.avatar);
+      if (file !== undefined) {
+        url = URL.createObjectURL(file);
+      }
     }
+
+    setAvatarUrl(url);
   };
 
   return (
-    <form action={form_action} className={'max-w-lg'}>
+    <form action={formAction} className="max-w-lg">
       <div className="space-y-12 divide-y divide-gray-300">
         <Fieldset aria-label="Contact information">
           <Legend>Contact Information</Legend>
@@ -79,23 +82,23 @@ export function ProfileForm({
               <Label>Avatar</Label>
               <div className="mt-2 flex items-center gap-x-3">
                 <Avatar
+                  alt={user.name}
+                  className="h-12 w-12 bg-brand-500 text-white"
                   initials={user.initials}
-                  alt={user.name ?? ''}
-                  className={'h-12 w-12 bg-brand-500 text-white'}
                   src={avatarUrl}
                 />
-                <label htmlFor="avatar_file" className={'flex items-center gap-2'}>
-                  <FileButton color={'white'}>Change</FileButton>
-                  {state.errors && state.errors['avatar_file'] && (
-                    <ErrorMessage>{state.errors['avatar_file']}</ErrorMessage>
-                  )}
+                <label className="flex items-center gap-2" htmlFor="avatar_file">
+                  <FileButton color="white">Change</FileButton>
+                  {state.errors?.avatar_file ? (
+                    <ErrorMessage>{state.errors.avatar_file}</ErrorMessage>
+                  ) : null}
                   <input
-                    id="avatar_file"
-                    name="avatar_file"
-                    type="file"
                     accept="image/png, image/jpeg, image/gif"
                     className="sr-only"
+                    id="avatar_file"
+                    name="avatar_file"
                     onChange={previewImage}
+                    type="file"
                   />
                 </label>
               </div>
@@ -103,87 +106,87 @@ export function ProfileForm({
             <Field>
               <Label>Full name</Label>
               <Input
-                defaultValue={user.name}
-                type="text"
-                name="name"
-                id="name"
                 autoComplete="name"
+                defaultValue={user.name}
+                id="name"
+                name="name"
                 placeholder="Jane Smith"
+                type="text"
               />
             </Field>
 
             <Field>
               <Label>Pronouns</Label>
               <Input
-                defaultValue={user.pronouns}
-                type="text"
-                name="pronouns"
-                id="pronouns"
                 autoComplete="pronouns"
+                defaultValue={user.pronouns}
+                id="pronouns"
+                name="pronouns"
                 placeholder="She/Her He/Him They/Them"
+                type="text"
               />
             </Field>
 
             <Field>
               <Label>Phone</Label>
               <Input
-                defaultValue={user.phone}
-                type="tel"
-                name="phone"
-                id="phone"
                 autoComplete="tel"
+                defaultValue={user.phone}
+                id="phone"
+                name="phone"
                 placeholder="(555) 867-5309"
+                type="tel"
               />
             </Field>
           </FieldGroup>
         </Fieldset>
 
-        <Fieldset className={'pt-12'} aria-label="Contact information">
+        <Fieldset aria-label="Contact information" className="pt-12">
           <Legend>Social links</Legend>
 
           <FieldGroup>
             <Field>
-              <Label className={'flex items-center gap-1'}>
-                <LinkedInIcon className={'inline h-5 w-5 fill-blue-600'} /> LinkedIn
+              <Label className="flex items-center gap-1">
+                <LinkedInIcon className="inline h-5 w-5 fill-blue-600" /> LinkedIn
               </Label>
               <Input
-                defaultValue={links['linked_in'] ?? ''}
-                type="url"
-                name="linked_in"
+                defaultValue={links.linked_in ?? ''}
                 id="linked_in"
+                name="linked_in"
                 placeholder="linkedin.com/in/janesmith/"
+                type="url"
               />
             </Field>
 
             <Field>
-              <Label className={'flex items-center gap-1'}>
-                <GitHubIcon className={'inline h-5 w-5 fill-[#1f2328]'} /> GitHub
+              <Label className="flex items-center gap-1">
+                <GitHubIcon className="inline h-5 w-5 fill-[#1f2328]" /> GitHub
               </Label>
               <Input
-                defaultValue={links['github'] ?? ''}
-                type="url"
-                name="github"
+                defaultValue={links.github ?? ''}
                 id="github"
+                name="github"
                 placeholder="github.com/janesmith"
+                type="url"
               />
             </Field>
 
             <Field>
-              <Label className={'flex items-center gap-1'}>
-                <WindowIcon className={'inline h-5 w-5 fill-brand-500'} /> Personal site
+              <Label className="flex items-center gap-1">
+                <WindowIcon className="inline h-5 w-5 fill-brand-500" /> Personal site
               </Label>
               <Input
-                defaultValue={links['personal_site'] ?? ''}
-                type="url"
-                name="personal_site"
+                defaultValue={links.personal_site ?? ''}
                 id="personal_site"
+                name="personal_site"
                 placeholder="janesmith.com"
+                type="url"
               />
             </Field>
           </FieldGroup>
         </Fieldset>
 
-        <Fieldset className={'pt-12'} aria-label="Contact information">
+        <Fieldset aria-label="Contact information" className="pt-12">
           <Legend>Location</Legend>
 
           <FieldGroup>
@@ -191,25 +194,25 @@ export function ProfileForm({
               <Label>Street address</Label>
               <Input
                 defaultValue={user.street_address}
-                type="text"
-                name="street_address"
                 id="street_address"
+                name="street_address"
+                type="text"
               />
             </Field>
 
             <Field>
               <Label>City</Label>
-              <Input defaultValue={user.city} type="text" name="city" id="city" />
+              <Input defaultValue={user.city} id="city" name="city" type="text" />
             </Field>
 
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-4">
               <Field className="sm:col-span-2">
                 <Label>State</Label>
-                <Select name="state" defaultValue={user.state}>
-                  <option defaultValue={''}>Select your state</option>
-                  {US_STATES.map((state) => (
-                    <option defaultValue={state.id} key={state.id}>
-                      {state.name}
+                <Select defaultValue={user.state} name="state">
+                  <option defaultValue="">Select your state</option>
+                  {US_STATES.map((usState) => (
+                    <option defaultValue={usState.id} key={usState.id}>
+                      {usState.name}
                     </option>
                   ))}
                 </Select>
@@ -224,7 +227,7 @@ export function ProfileForm({
       </div>
 
       <div className="mt-6 flex items-center justify-end gap-x-6">
-        <Submit color={'brand'}>Save</Submit>
+        <Submit color="brand">Save</Submit>
       </div>
     </form>
   );

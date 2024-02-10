@@ -1,10 +1,10 @@
-export interface State {
+export interface StateOrProvince {
   id: string;
   name: string;
   country_id: string;
 }
 
-export const US_STATES: ReadonlyArray<State> = [
+export const US_STATES: readonly StateOrProvince[] = [
   { id: 'al', name: 'Alabama', country_id: 'us' },
   { id: 'ak', name: 'Alaska', country_id: 'us' },
   { id: 'az', name: 'Arizona', country_id: 'us' },

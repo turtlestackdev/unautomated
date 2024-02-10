@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import '../globals.css';
-import PublicNav from '@/ui/layout/PublicNav';
+import type { ReactElement } from 'react';
+import { PublicNav } from '@/ui/layout/public-nav';
 import { validateRequest } from '@/auth';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -15,13 +16,13 @@ export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>): Promise<ReactElement> {
   const { user } = await validateRequest();
   return (
-    <html lang="en" className={'h-full'}>
+    <html className="h-full" lang="en">
       <body className={`${inter.className} h-full bg-white`}>
         <PublicNav user={user} />
-        <main className={'py-24 sm:py-32'}>{children}</main>
+        <main className="py-24 sm:py-32">{children}</main>
       </body>
     </html>
   );

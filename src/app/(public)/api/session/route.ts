@@ -1,7 +1,7 @@
-import { validateRequest } from '@/auth';
 import { NextResponse } from 'next/server';
+import { validateRequest } from '@/auth';
 
-export async function GET(request: Request, { params }: { params: { uploadId: string } }) {
+export async function GET(): Promise<Response> {
   const { session, user } = await validateRequest();
   if (!session) {
     return new Response(null, { status: 401 });

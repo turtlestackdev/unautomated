@@ -1,4 +1,6 @@
-export default function PageHeader({ name }: { name: string }) {
+import type { ReactElement } from 'react';
+
+export function PageHeader({ name }: { name: string }): ReactElement {
   return (
     <header className="bg-white shadow-sm">
       <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">

@@ -1,6 +1,6 @@
 import { Orbitron } from 'next/font/google';
-import clsx from 'clsx';
-import type { ComponentPropsWithoutRef, ComponentPropsWithRef, ElementType } from 'react';
+import { clsx } from 'clsx';
+import type { ComponentPropsWithoutRef, ReactElement } from 'react';
 
 const orbitron = Orbitron({ weight: '400', subsets: ['latin'] });
 const orbitronBold = Orbitron({ weight: '700', subsets: ['latin'] });
@@ -19,13 +19,13 @@ export type LogoProps<T extends React.ElementType> = ComponentPropsWithoutRef<T>
   className?: string;
 };
 
-export default function Logo<T extends React.ElementType>({
+export function Logo<T extends React.ElementType>({
   as,
   size = 'medium',
   className,
 
   ...props
-}: LogoProps<T>) {
+}: LogoProps<T>): ReactElement {
   const Component = as ?? 'h1';
 
   const classes = clsx(className, typography[size], orbitron.className);

@@ -1,6 +1,6 @@
-import { github, lucia } from '@/auth';
 import { cookies } from 'next/headers';
 import { OAuth2RequestError } from 'arctic';
+import { github, lucia } from '@/auth';
 import * as users from '@/models/user';
 
 export async function GET(request: Request): Promise<Response> {
@@ -21,7 +21,7 @@ export async function GET(request: Request): Promise<Response> {
         Authorization: `Bearer ${tokens.accessToken}`,
       },
     });
-    const githubUser: GitHubUser = await githubUserResponse.json();
+    const githubUser = (await githubUserResponse.json()) as GitHubUser;
     const existingUser = await users.read({ github_id: githubUser.id });
 
     if (existingUser) {

@@ -1,22 +1,22 @@
+//import { createHash } from 'node:crypto';
 import {
   Button as HeadlessButton,
   type ButtonProps as HeadlessButtonProps,
 } from '@headlessui/react';
-import clsx from 'clsx';
-import React from 'react';
-import { TouchTarget } from '@/ui/Button';
-import { Link } from '@/ui/Link';
+import { clsx } from 'clsx';
+import React, { forwardRef, type ReactElement } from 'react';
 import { UserIcon } from '@heroicons/react/20/solid';
-import { createHash } from 'crypto';
 import Image from 'next/image';
+import { TouchTarget } from '@/ui/button';
+import { Link } from '@/ui/link';
 
-type AvatarProps = {
+interface AvatarProps {
   src?: string | null;
   square?: boolean;
   initials?: string | null;
   alt?: string;
   className?: string;
-};
+}
 
 export function Avatar({
   src = null,
@@ -25,10 +25,9 @@ export function Avatar({
   alt = '',
   className,
   ...props
-}: AvatarProps & React.ComponentPropsWithoutRef<'span'>) {
+}: AvatarProps & React.ComponentPropsWithoutRef<'span'>): ReactElement {
   return (
     <span
-      data-slot="avatar"
       className={clsx(
         className,
 
@@ -38,47 +37,42 @@ export function Avatar({
         // Add the correct border radius
         square ? 'rounded-[20%] *:rounded-[20%]' : 'rounded-full *:rounded-full'
       )}
+      data-slot="avatar"
       {...props}
     >
-      {initials && (
+      {initials ? (
         <svg
+          aria-hidden={alt ? undefined : 'true'}
           className="select-none fill-current text-[48px] font-medium uppercase"
           viewBox="0 0 100 100"
-          aria-hidden={alt ? undefined : 'true'}
         >
-          {alt && <title>{alt}</title>}
+          {alt ? <title>{alt}</title> : null}
           <text
-            x="50%"
-            y="50%"
             alignmentBaseline="middle"
             dominantBaseline="middle"
-            textAnchor="middle"
             dy=".125em"
+            textAnchor="middle"
+            x="50%"
+            y="50%"
           >
             {initials}
           </text>
         </svg>
-      )}
-      {src && (
-        <Image
-          src={src}
-          alt={alt}
-          height={96}
-          width={96}
-          className={'aspect-square object-cover'}
-        />
-      )}
+      ) : null}
+      {src ? (
+        <Image alt={alt} className="aspect-square object-cover" height={96} src={src} width={96} />
+      ) : null}
       {!initials && !src && <UserIcon />}
       {/* Add an inset border that sits on top of the image */}
       <span
-        className="ring-1 ring-inset ring-black/5 dark:ring-white/5 forced-colors:outline"
         aria-hidden="true"
+        className="ring-1 ring-inset ring-black/5 dark:ring-white/5 forced-colors:outline"
       />
     </span>
   );
 }
 
-export const AvatarButton = React.forwardRef(function AvatarButton(
+export const AvatarButton = forwardRef(function AvatarButton(
   {
     src,
     square = false,
@@ -89,7 +83,7 @@ export const AvatarButton = React.forwardRef(function AvatarButton(
   }: AvatarProps & (HeadlessButtonProps | React.ComponentPropsWithoutRef<typeof Link>),
   ref: React.ForwardedRef<HTMLElement>
 ) {
-  let classes = clsx(
+  const classes = clsx(
     className,
 
     square ? 'rounded-lg' : 'rounded-full',
@@ -99,32 +93,21 @@ export const AvatarButton = React.forwardRef(function AvatarButton(
   return 'href' in props ? (
     <Link {...props} className={classes} ref={ref as React.ForwardedRef<HTMLAnchorElement>}>
       <TouchTarget>
-        <Avatar
-          src={src}
-          square={square}
-          initials={initials}
-          alt={alt}
-          className={'h-full w-full'}
-        />
+        <Avatar alt={alt} className="h-full w-full" initials={initials} square={square} src={src} />
       </TouchTarget>
     </Link>
   ) : (
     <HeadlessButton {...props} className={classes} ref={ref}>
       <TouchTarget>
-        <Avatar
-          src={src}
-          square={square}
-          initials={initials}
-          alt={alt}
-          className={'h-full w-full'}
-        />
+        <Avatar alt={alt} className="h-full w-full" initials={initials} square={square} src={src} />
       </TouchTarget>
     </HeadlessButton>
   );
 });
 
-export async function gravatar(email: string) {
-  const hash = createHash('sha256').update(email.trim().toLowerCase()).digest('hex');
+export async function gravatar(email: string): Promise<string | null> {
+  const hash = await generateHash(email.trim().toLowerCase());
+  //const hash = crypto.createHash('sha256').update(email.trim().toLowerCase()).digest('hex');
   const url = `https://gravatar.com/avatar/${hash}`;
   const response = await fetch(`${url}?d=404`);
   if (response.status === 404) {
@@ -132,4 +115,20 @@ export async function gravatar(email: string) {
   }
 
   return url;
+}
+
+async function generateHash(value: string): Promise<string> {
+  const buffer = str2ab(value); // Fix
+  const hashBytes = await crypto.subtle.digest('SHA-1', buffer);
+
+  return [...new Uint8Array(hashBytes)].map((x) => x.toString(16).padStart(2, '0')).join('');
+}
+
+function str2ab(value: string): ArrayBuffer {
+  const buf = new ArrayBuffer(value.length);
+  const bufView = new Uint8Array(buf);
+  for (let i = 0, strLen = value.length; i < strLen; i++) {
+    bufView[i] = value.charCodeAt(i);
+  }
+  return buf;
 }

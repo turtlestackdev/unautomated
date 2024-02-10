@@ -4,9 +4,9 @@ import {
   type ButtonProps as HeadlessButtonProps,
 } from '@headlessui/react';
 import { clsx } from 'clsx';
-import React from 'react';
-import { Link } from '@/ui/Link';
+import React, { forwardRef, type ReactElement } from 'react';
 import { useFormStatus } from 'react-dom';
+import { Link } from '@/ui/link';
 
 const styles = {
   base: [
@@ -194,18 +194,30 @@ type ButtonProps = (
     | React.ComponentPropsWithoutRef<typeof Link>
   );
 
-export const Button = React.forwardRef(function Button(
+function buttonStyle(
+  outline: boolean,
+  plain: boolean,
+  color?: keyof typeof styles.colors
+): string | string[] {
+  if (outline) {
+    return styles.outline;
+  }
+
+  if (plain) {
+    return styles.plain;
+  }
+
+  return clsx(styles.solid, styles.colors[color ?? 'dark/zinc']);
+}
+
+export const Button = forwardRef(function Button(
   { color, outline, plain, className, children, ...props }: ButtonProps,
   ref: React.ForwardedRef<HTMLElement>
 ) {
-  let classes = clsx(
+  const classes = clsx(
     className,
     styles.base,
-    outline
-      ? styles.outline
-      : plain
-        ? styles.plain
-        : clsx(styles.solid, styles.colors[color ?? 'dark/zinc'])
+    buttonStyle(outline === true, plain === true, color)
   );
 
   return 'href' in props ? (
@@ -219,27 +231,26 @@ export const Button = React.forwardRef(function Button(
   );
 });
 
-export function Submit({ children, ...props }: ButtonProps & { type?: never; disabled?: never }) {
+export function Submit({
+  children,
+  ...props
+}: ButtonProps & { type?: never; disabled?: never }): ReactElement {
   const { pending } = useFormStatus();
   return (
-    <Button type={'submit'} aria-disabled={pending} disabled={pending} {...props}>
+    <Button aria-disabled={pending} disabled={pending} type="submit" {...props}>
       {children}
     </Button>
   );
 }
 
-export const FileButton = React.forwardRef(function FileButton(
+export const FileButton = forwardRef(function FileButton(
   { color, outline, plain, className, children, ...props }: ButtonProps,
   ref: React.ForwardedRef<HTMLElement>
 ) {
-  let classes = clsx(
+  const classes = clsx(
     className,
     styles.base,
-    outline
-      ? styles.outline
-      : plain
-        ? styles.plain
-        : clsx(styles.solid, styles.colors[color ?? 'dark/zinc'])
+    buttonStyle(outline === true, plain === true, color)
   );
 
   return (
@@ -250,13 +261,13 @@ export const FileButton = React.forwardRef(function FileButton(
 });
 
 /* Expand the hit area to at least 44×44px on touch devices */
-export function TouchTarget({ children }: { children: React.ReactNode }) {
+export function TouchTarget({ children }: { children: React.ReactNode }): ReactElement {
   return (
     <>
       {children}
       <span
-        className="absolute left-1/2 top-1/2 size-[max(100%,2.75rem)] -translate-x-1/2 -translate-y-1/2 [@media(pointer:fine)]:hidden"
         aria-hidden="true"
+        className="absolute left-1/2 top-1/2 size-[max(100%,2.75rem)] -translate-x-1/2 -translate-y-1/2 [@media(pointer:fine)]:hidden"
       />
     </>
   );

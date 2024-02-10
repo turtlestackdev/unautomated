@@ -1,12 +1,12 @@
-import { db } from '@/database/client';
 import type { Selectable, Insertable, Updateable } from 'kysely';
+import { db } from '@/database/client';
 import type { FileUpload, User, UserLink } from '@/database/schema';
 import { uploadImage } from '@/models/file-upload';
 
 export async function create(
   user: Omit<Insertable<User>, 'id' | 'avatar_id'>
 ): Promise<Selectable<User>> {
-  return await db
+  return db
     .insertInto('users')
     .values({ ...user, id: crypto.randomUUID() })
     .returningAll()
@@ -45,21 +45,25 @@ export interface UpdateProfileProps {
   links?: Insertable<UserLink>[] | null;
 }
 
-export async function update_profile({ user, avatar, links }: UpdateProfileProps) {
-  return await db.transaction().execute(async (trx) => {
-    let inserted_avatar: null | Selectable<FileUpload> = null;
+export async function updateProfile({ user, avatar, links }: UpdateProfileProps): Promise<{
+  user: Selectable<User>;
+  avatar: Selectable<FileUpload> | null;
+  links: Selectable<UserLink>[] | null;
+}> {
+  return db.transaction().execute(async (trx) => {
+    let insertedAvatar: null | Selectable<FileUpload> = null;
     if (avatar) {
-      inserted_avatar = await uploadImage(avatar, user.id, 'user avatar', trx);
+      insertedAvatar = await uploadImage(avatar, user.id, 'user avatar', trx);
     }
 
     const { id, ...profile } = user;
-    const updated_user = await trx
+    const updatedUser = await trx
       .updateTable('users')
       .set(
-        inserted_avatar
+        insertedAvatar
           ? {
               ...profile,
-              avatar_id: inserted_avatar.id,
+              avatar_id: insertedAvatar.id,
             }
           : profile
       )
@@ -67,9 +71,9 @@ export async function update_profile({ user, avatar, links }: UpdateProfileProps
       .returningAll()
       .executeTakeFirstOrThrow();
 
-    let upserted_links: null | Selectable<UserLink>[] = null;
+    let upsertedLinks: null | Selectable<UserLink>[] = null;
     if (links) {
-      upserted_links = await trx
+      upsertedLinks = await trx
         .insertInto('user_links')
         .values(links)
         .onConflict((oc) =>
@@ -79,7 +83,7 @@ export async function update_profile({ user, avatar, links }: UpdateProfileProps
         .execute();
     }
 
-    return { user: updated_user, avatar: inserted_avatar, links: upserted_links };
+    return { user: updatedUser, avatar: insertedAvatar, links: upsertedLinks };
   });
 }
 
@@ -95,10 +99,13 @@ export async function read(props: ReadProps): Promise<Selectable<User> | null> {
     return null;
   }
 
-  return users[0];
+  return users[0] ?? null;
 }
 
-export function readField(props: ReadProps) {
+export function readField(props: ReadProps): {
+  field: 'id' | 'email' | 'github_id' | 'github_username';
+  value: string;
+} {
   if (props.id) {
     return { field: 'id', value: props.id } as const;
   }
@@ -118,13 +125,19 @@ export function readField(props: ReadProps) {
   throw new Error('unreachable code');
 }
 
-export async function read_links({ id, types }: { id: string; types?: string | string[] }) {
+export async function readLinks({
+  id,
+  types,
+}: {
+  id: string;
+  types?: string | string[];
+}): Promise<Record<string, string>> {
   const query = db.selectFrom('user_links').selectAll().where('user_id', '=', id);
   if (types) {
     query.where('type', 'in', types);
   }
 
-  const links: { [key: string]: string } = {};
+  const links: Record<string, string> = {};
   const results = await query.execute();
   results.forEach((link) => (links[link.type] = link.url));
 

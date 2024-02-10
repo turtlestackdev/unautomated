@@ -1,4 +1,5 @@
 {
+  "extends": "@vercel/style-guide/typescript/node20",
   "compilerOptions": {
     "target": "es6",
     "lib": [

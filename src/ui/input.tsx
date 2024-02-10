@@ -2,7 +2,7 @@ import { Input as HeadlessInput, type InputProps as HeadlessInputProps } from '@
 import { clsx } from 'clsx';
 import { forwardRef } from 'react';
 
-const dateTypes = ['date', 'datetime-local', 'month', 'time', 'week'];
+const dateTypes = ['date', 'datetime-local', 'month', 'time', 'week'] as const;
 type DateType = (typeof dateTypes)[number];
 
 export const Input = forwardRef<
@@ -13,7 +13,6 @@ export const Input = forwardRef<
 >(function Input({ className, ...props }, ref) {
   return (
     <span
-      data-slot="control"
       className={clsx([
         className,
 
@@ -35,13 +34,13 @@ export const Input = forwardRef<
         // Invalid state
         'before:has-[[data-invalid]]:shadow-red-500/10',
       ])}
+      data-slot="control"
     >
       <HeadlessInput
-        ref={ref}
         className={clsx([
           // Date classes
           props.type &&
-            dateTypes.includes(props.type) && [
+            (dateTypes as readonly string[]).includes(props.type) && [
               '[&::-webkit-datetime-edit-fields-wrapper]:p-0',
               '[&::-webkit-date-and-time-value]:min-h-[1.5em]',
               '[&::-webkit-datetime-edit]:inline-flex',
@@ -77,6 +76,7 @@ export const Input = forwardRef<
           // Disabled state
           'data-[disabled]:border-zinc-950/20 dark:data-[hover]:data-[disabled]:border-white/15 data-[disabled]:dark:border-white/15 data-[disabled]:dark:bg-white/[2.5%]',
         ])}
+        ref={ref}
         {...props}
       />
     </span>

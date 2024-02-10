@@ -1,10 +1,10 @@
-import { db } from '@/database/client';
+import { writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { fileTypeFromBlob } from 'file-type';
-import { writeFile } from 'fs/promises';
-import { join } from 'path';
-import { UPLOAD_DIR } from '@/settings';
-import imageSize from 'image-size';
+import { imageSize } from 'image-size';
 import type { Selectable, Transaction } from 'kysely';
+import { UPLOAD_DIR } from '@/settings';
+import { db } from '@/database/client';
 import type { DB, FileUpload } from '@/database/schema';
 import { FileFormatError, FileSizeError } from '@/errors';
 
@@ -16,11 +16,22 @@ export type ImageType = (typeof allowedImageTypes)[number];
 export function isImageType(type: string): type is ImageType {
   // The as const on allowedImageTypes makes the includes check useless without widening the type.
   // This type guard is created so that widening doesn't need to be repeated.
-  return (allowedImageTypes as ReadonlyArray<string>).includes(type);
+  return (allowedImageTypes as readonly string[]).includes(type);
 }
 
-export async function getFileDetails(file: File) {
-  let type = 'unknown';
+export type FileType = 'unknown' | 'image';
+
+export async function getFileDetails(file: File): Promise<
+  | {
+      ext: string;
+      mime_type: string;
+      type: FileType;
+      size: number;
+      name: string;
+    }
+  | undefined
+> {
+  let type: FileType = 'unknown';
   const fileType = await fileTypeFromBlob(file);
   if (!fileType) {
     return undefined;
@@ -39,7 +50,7 @@ export async function getFileDetails(file: File) {
   };
 }
 
-export async function read(id: string) {
+export async function read(id: string): Promise<Selectable<FileUpload>> {
   return db.selectFrom('file_uploads').selectAll().where('id', '=', id).executeTakeFirstOrThrow();
 }
 
@@ -66,17 +77,17 @@ export async function uploadImage(
   const { height, width } = imageSize(path);
 
   const qb = trx ? trx : db;
-  return await qb
+  return qb
     .insertInto('file_uploads')
     .values({
-      id: id,
+      id,
       ...details,
       name: file.name,
-      description: description,
-      path: path,
+      description,
+      path,
       uploaded_by_id: userID,
-      height: height,
-      width: width,
+      height,
+      width,
     })
     .returningAll()
     .executeTakeFirstOrThrow();

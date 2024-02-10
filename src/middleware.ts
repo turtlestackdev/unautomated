@@ -8,10 +8,10 @@ export const middleware = async (request: NextRequest): Promise<NextResponse> =>
   // So, we make an api request to verify the session user id.
   const path = request.nextUrl.pathname;
   if (path.startsWith('/un/')) {
-    const auth_cookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+    const authCookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
     const response = await fetch(`${LOCALHOST}/api/session`, {
       headers: {
-        Cookie: `${SESSION_COOKIE_NAME}=${auth_cookie}`,
+        Cookie: `${SESSION_COOKIE_NAME}=${authCookie}`,
       },
     });
     if (response.status >= 400) {

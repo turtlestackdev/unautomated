@@ -1,7 +1,8 @@
-import ApplicationShell from '@/ui/layout/ApplicationShell';
-import { validatedSession, validateRequest } from '@/auth';
+import type { ReactElement } from 'react';
+import { ApplicationShell } from '@/ui/layout/application-shell';
+import { validatedSession } from '@/auth';
 
-export default async function Dashboard() {
+export default async function Dashboard(): Promise<ReactElement> {
   const { user } = await validatedSession();
-  return <ApplicationShell pageName={'Dashboard'} user={user} />;
+  return <ApplicationShell pageName="Dashboard" user={user} />;
 }

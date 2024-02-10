@@ -1,17 +1,21 @@
 import { clsx } from 'clsx';
-import { Link } from '@/ui/Link';
+import type { ReactElement } from 'react';
+import { Link } from '@/ui/link';
 
-export function Text({ className, ...props }: React.ComponentPropsWithoutRef<'p'>) {
+export function Text({ className, ...props }: React.ComponentPropsWithoutRef<'p'>): ReactElement {
   return (
     <p
       {...props}
-      data-slot="text"
       className={clsx(className, 'text-base/6 text-zinc-600 sm:text-sm/6 dark:text-zinc-400')}
+      data-slot="text"
     />
   );
 }
 
-export function TextLink({ className, ...props }: React.ComponentPropsWithoutRef<typeof Link>) {
+export function TextLink({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof Link>): ReactElement {
   return (
     <Link
       {...props}
@@ -23,13 +27,19 @@ export function TextLink({ className, ...props }: React.ComponentPropsWithoutRef
   );
 }
 
-export function Strong({ className, ...props }: React.ComponentPropsWithoutRef<'strong'>) {
+export function Strong({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<'strong'>): ReactElement {
   return (
     <strong {...props} className={clsx(className, 'font-medium text-zinc-950 dark:text-white')} />
   );
 }
 
-export function Code({ className, ...props }: React.ComponentPropsWithoutRef<'code'>) {
+export function Code({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<'code'>): ReactElement {
   return (
     <code
       {...props}
