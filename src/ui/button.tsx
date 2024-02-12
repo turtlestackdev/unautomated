@@ -82,7 +82,7 @@ const styles = {
   colors: {
     brand: [
       'text-brand-950 [--btn-hover-overlay:theme(colors.white/25%)] [--btn-bg:theme(colors.brand.400)] [--btn-border:theme(colors.brand.500/80%)]',
-      '[--btn-icon:theme(colors.brand.600)]',
+      '[--btn-icon:theme(colors.brand.950)]',
     ],
     'dark/zinc': [
       'text-white [--btn-bg:theme(colors.zinc.900)] [--btn-border:theme(colors.zinc.950/90%)] [--btn-hover-overlay:theme(colors.white/10%)]',
@@ -244,17 +244,50 @@ export function Submit({
 }
 
 export const FileButton = forwardRef(function FileButton(
-  { color, outline, plain, className, children, ...props }: ButtonProps,
+  {
+    color,
+    outline,
+    plain,
+    className,
+    disabled,
+    children,
+    ...props
+  }: ButtonProps & { disabled?: boolean },
   ref: React.ForwardedRef<HTMLElement>
 ) {
   const classes = clsx(
     className,
     styles.base,
-    buttonStyle(outline === true, plain === true, color)
+    buttonStyle(outline === true, plain === true, color),
+    disabled ? '' : 'cursor-pointer'
   );
 
+  if (disabled) {
+    const prevent = (
+      event: React.MouseEvent<HTMLSpanElement> | React.KeyboardEvent<HTMLSpanElement>
+    ): void => {
+      event.stopPropagation();
+      event.preventDefault();
+    };
+    return (
+      <span
+        {...props}
+        aria-disabled={disabled}
+        className={classes}
+        data-disabled={disabled}
+        onClick={prevent}
+        onKeyUp={prevent}
+        ref={ref}
+        role="button"
+        tabIndex={0}
+      >
+        <TouchTarget>{children}</TouchTarget>
+      </span>
+    );
+  }
+
   return (
-    <span {...props} className={clsx(classes, 'cursor-pointer')} ref={ref}>
+    <span {...props} className={classes} ref={ref}>
       <TouchTarget>{children}</TouchTarget>
     </span>
   );

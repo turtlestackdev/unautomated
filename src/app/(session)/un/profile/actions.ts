@@ -2,7 +2,6 @@
 import * as users from '@/models/user';
 import { FileFormatError, FileSizeError } from '@/errors';
 import { type FormState } from '@/app/(session)/un/profile/form';
-import { logger } from '@/logger';
 
 export async function updateProfile(
   id: string,
@@ -42,7 +41,7 @@ export async function updateProfile(
 
     return { status: 'success' };
   } catch (error) {
-    logger.info({ error }, 'form update failed');
+    console.info('form update failed', error);
 
     if (error instanceof FileFormatError) {
       return { status: 'error', errors: { avatar_file: 'file format not supported' } };

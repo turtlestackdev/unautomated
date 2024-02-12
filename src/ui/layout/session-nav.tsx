@@ -3,18 +3,22 @@ import { clsx } from 'clsx';
 import { Disclosure } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import type { ReactElement } from 'react';
+import { usePathname } from 'next/navigation';
 import { UserMenu, UserMobileMenu } from '@/ui/layout/user-menu';
 import { Logo } from '@/ui/branding/logo';
 import type { SessionUser } from '@/auth';
 import { Link } from '@/ui/link';
 
 const navigation = [
-  { name: 'Dashboard', href: '/un/dashboard', current: true },
-  { name: 'Resume', href: '/un/resume', current: false },
-  { name: 'Job Tracker', href: '/un/jobs', current: false },
+  { name: 'Dashboard', href: '/un/dashboard' },
+  { name: 'Experience', href: '/un/experience' },
+  { name: 'Job Tracker', href: '/un/jobs' },
 ];
 
 export function SessionNav({ user }: { user: SessionUser }): ReactElement {
+  const pathname = usePathname();
+  const isCurrent = (href: string): boolean => pathname.startsWith(href);
+
   return (
     <Disclosure as="nav" className="bg-gray-800 pb-0.5">
       {({ open }) => (
@@ -27,19 +31,19 @@ export function SessionNav({ user }: { user: SessionUser }): ReactElement {
                 </div>
                 <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
                   <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
-                    {navigation.map((item) => (
+                    {navigation.map((link) => (
                       <Link
-                        aria-current={item.current ? 'page' : undefined}
+                        aria-current={isCurrent(link.href) ? 'page' : undefined}
                         className={clsx(
-                          item.current
+                          isCurrent(link.href)
                             ? 'border-brand-500 text-white'
                             : 'border-transparent text-gray-300 hover:border-gray-200 hover:text-gray-400',
                           'inline-flex items-center border-b-4 px-1 pt-1 text-sm font-medium'
                         )}
-                        href={item.href}
-                        key={item.name}
+                        href={link.href}
+                        key={link.name}
                       >
-                        {item.name}
+                        {link.name}
                       </Link>
                     ))}
                   </div>
@@ -63,20 +67,20 @@ export function SessionNav({ user }: { user: SessionUser }): ReactElement {
 
           <Disclosure.Panel className="md:hidden">
             <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-              {navigation.map((item) => (
+              {navigation.map((link) => (
                 <Disclosure.Button
-                  aria-current={item.current ? 'page' : undefined}
+                  aria-current={isCurrent(link.href) ? 'page' : undefined}
                   as="a"
                   className={clsx(
-                    item.current
+                    isCurrent(link.href)
                       ? 'bg-gray-900 text-white'
                       : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                     'block rounded-md px-3 py-2 text-base font-medium'
                   )}
-                  href={item.href}
-                  key={item.name}
+                  href={link.href}
+                  key={link.name}
                 >
-                  {item.name}
+                  {link.name}
                 </Disclosure.Button>
               ))}
             </div>
