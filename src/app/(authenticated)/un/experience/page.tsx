@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import { validatedSession } from '@/auth';
+import { validatedSession } from '@/lib/auth';
 import { Boundary } from '@/app/(authenticated)/un/experience/boundary';
 import * as resumeData from '@/models/resume-data';
 

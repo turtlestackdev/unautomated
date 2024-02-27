@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyRequestOrigin } from 'lucia';
-import { SESSION_COOKIE_NAME, LOCALHOST } from '@/settings';
+import { SESSION_COOKIE_NAME, LOCALHOST } from '@/lib/settings';
 
 export const middleware = async (request: NextRequest): Promise<NextResponse> => {
   // The Edge runtime does not support various Node functionality and is forced on us for middleware.

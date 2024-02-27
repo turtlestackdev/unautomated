@@ -12,7 +12,7 @@ import {
 } from '@headlessui/react';
 import { clsx } from 'clsx';
 import React, { type ReactElement } from 'react';
-import { isString } from '@/type-guards';
+import { isString } from '@/lib/type-guards';
 
 export function Fieldset({
   className,

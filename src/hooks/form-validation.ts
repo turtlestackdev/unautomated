@@ -1,8 +1,8 @@
 import type { z, ZodType } from 'zod';
 import { useFormState } from 'react-dom';
 import { useEffect } from 'react';
-import type { FormState } from '@/models/validation';
-import { initialFormState } from '@/models/validation';
+import type { FormState } from '@/lib/validation';
+import { initialFormState } from '@/lib/validation';
 
 interface FormValidationProps<T extends ZodType, M> {
   // the server function to use, any binding should be done prior to calling the hook

@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { OAuth2RequestError } from 'arctic';
-import { github, lucia } from '@/auth';
+import { github, lucia } from '@/lib/auth';
 import * as users from '@/models/user';
 
 export async function GET(request: Request): Promise<Response> {

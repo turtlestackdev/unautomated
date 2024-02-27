@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 import { ApplicationShell } from '@/ui/layout/application-shell';
-import { validatedSession } from '@/auth';
+import { validatedSession } from '@/lib/auth';
 import { ProfileForm } from '@/app/(authenticated)/un/profile/form';
 import * as users from '@/models/user';
 

@@ -2,7 +2,7 @@ import { BellIcon } from '@heroicons/react/24/outline';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Fragment, type ReactElement } from 'react';
 import { clsx } from 'clsx';
-import type { SessionUser } from '@/auth';
+import type { SessionUser } from '@/lib/auth';
 import { Avatar } from '@/ui/avatar';
 
 function links(publicFacing: boolean): { name: string; href: string }[] {

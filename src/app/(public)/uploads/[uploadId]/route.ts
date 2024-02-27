@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import type { ReadableOptions } from 'node:stream';
 import path from 'node:path';
 import { NextResponse } from 'next/server';
-import { validateRequest } from '@/auth';
+import { validateRequest } from '@/lib/auth';
 import * as files from '@/models/file-upload';
 
 function streamFile(filePath: string, options?: ReadableOptions): ReadableStream<Uint8Array> {

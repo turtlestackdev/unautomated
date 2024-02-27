@@ -3,10 +3,10 @@ import { join } from 'node:path';
 import { fileTypeFromBlob } from 'file-type';
 import { imageSize } from 'image-size';
 import type { Selectable, Transaction } from 'kysely';
-import { UPLOAD_DIR } from '@/settings';
+import { UPLOAD_DIR } from '@/lib/settings';
 import { db } from '@/database/client';
 import type { DB, FileUpload } from '@/database/schema';
-import { FileFormatError, FileSizeError } from '@/errors';
+import { FileFormatError, FileSizeError } from '@/lib/errors';
 
 const allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif'] as const;
 const maxFileSize = 10 * 1024 ** 2;

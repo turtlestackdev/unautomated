@@ -1,6 +1,6 @@
 'use server';
 import * as users from '@/models/user';
-import { FileFormatError, FileSizeError } from '@/errors';
+import { FileFormatError, FileSizeError } from '@/lib/errors';
 import { type FormState } from '@/app/(authenticated)/un/profile/form';
 
 export async function updateProfile(

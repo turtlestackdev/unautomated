@@ -6,7 +6,7 @@ import { Field, FieldGroup, Label } from '@/ui/fieldset';
 import { Switch } from '@/ui/switch';
 import { Textarea } from '@/ui/textarea';
 import { Submit } from '@/ui/button';
-import type { SessionUser } from '@/auth';
+import type { SessionUser } from '@/lib/auth';
 import type { ResumeObjective } from '@/database/schema';
 import { useFormValidation } from '@/hooks/form-validation';
 

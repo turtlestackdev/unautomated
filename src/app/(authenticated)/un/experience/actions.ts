@@ -1,8 +1,8 @@
 'use server';
 
 import type { Selectable } from 'kysely';
-import { sleep } from '@/utils';
-import type { FormState } from '@/models/validation';
+import { sleep } from '@/lib/utils';
+import type { FormState } from '@/lib/validation';
 import { createObjectiveSchema } from '@/app/(authenticated)/un/experience/validation';
 import type { ResumeObjective } from '@/database/schema';
 import * as resumeData from '@/models/resume-data';

@@ -8,7 +8,7 @@ import { cache } from 'react';
 import type { User } from '@/database/schema';
 import { pool } from '@/database/client';
 import { gravatar } from '@/ui/avatar';
-import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, SESSION_COOKIE_NAME } from '@/settings';
+import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, SESSION_COOKIE_NAME } from '@/lib/settings';
 
 const adapter = new NodePostgresAdapter(pool, {
   user: 'users',

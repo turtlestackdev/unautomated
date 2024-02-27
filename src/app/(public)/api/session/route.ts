@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { validateRequest } from '@/auth';
+import { validateRequest } from '@/lib/auth';
 
 export async function GET(): Promise<Response> {
   const { session, user } = await validateRequest();

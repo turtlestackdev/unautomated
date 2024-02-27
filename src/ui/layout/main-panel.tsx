@@ -7,7 +7,7 @@ import {
   notificationReducer,
 } from '@/ui/notifications/notification';
 import { SessionNav } from '@/ui/layout/session-nav';
-import { type SessionUser } from '@/auth';
+import { type SessionUser } from '@/lib/auth';
 
 export interface MainPanelProps {
   user: SessionUser;

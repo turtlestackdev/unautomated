@@ -3,7 +3,7 @@ import { WindowIcon } from '@heroicons/react/20/solid';
 import type { ReactElement } from 'react';
 import { useContext, useState, useEffect } from 'react';
 import { useFormState } from 'react-dom';
-import type { SessionUser } from '@/auth';
+import type { SessionUser } from '@/lib/auth';
 import { Text } from '@/ui/text';
 import { Input } from '@/ui/input';
 import { Avatar } from '@/ui/avatar';

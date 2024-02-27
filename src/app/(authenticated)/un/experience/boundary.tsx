@@ -9,7 +9,7 @@ import { clsx } from 'clsx';
 import { MainPanel } from '@/ui/layout/main-panel';
 import { Button } from '@/ui/button';
 import { H2, Text } from '@/ui/text';
-import type { SessionUser } from '@/auth';
+import type { SessionUser } from '@/lib/auth';
 import { ResumeUpload } from '@/app/(authenticated)/un/experience/resume-upload';
 import type { ResumeData } from '@/models/resume-data';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';

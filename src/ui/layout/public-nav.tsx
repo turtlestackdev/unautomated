@@ -6,7 +6,7 @@ import type { ReactElement } from 'react';
 import { Logo } from '@/ui/branding/logo';
 import { Link } from '@/ui/link';
 import { UserMenu, UserMobileMenu } from '@/ui/layout/user-menu';
-import type { SessionUser } from '@/auth';
+import type { SessionUser } from '@/lib/auth';
 
 export interface NavProps {
   user: SessionUser | null;

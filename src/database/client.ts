@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import { Kysely, PostgresDialect } from 'kysely';
-import { DATABASE_URL } from '@/settings';
+import { DATABASE_URL } from '@/lib/settings';
 import type { DB } from '@/database/schema';
 
 export const pool = new Pool({

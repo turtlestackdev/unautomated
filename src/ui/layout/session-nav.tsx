@@ -6,7 +6,7 @@ import type { ReactElement } from 'react';
 import { usePathname } from 'next/navigation';
 import { UserMenu, UserMobileMenu } from '@/ui/layout/user-menu';
 import { Logo } from '@/ui/branding/logo';
-import type { SessionUser } from '@/auth';
+import type { SessionUser } from '@/lib/auth';
 import { Link } from '@/ui/link';
 
 const navigation = [
