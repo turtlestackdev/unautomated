@@ -1,16 +1,19 @@
 import type { Session, User as LuciaUser } from 'lucia';
 import { Lucia } from 'lucia';
-import { BetterSqlite3Adapter } from '@lucia-auth/adapter-sqlite';
+import { NodePostgresAdapter } from '@lucia-auth/adapter-postgresql';
 import type { Selectable } from 'kysely';
 import { GitHub } from 'arctic';
 import { cookies } from 'next/headers';
 import { cache } from 'react';
 import type { User } from '@/database/schema';
-import { sqliteDatabase } from '@/database/client';
+import { pool } from '@/database/client';
 import { gravatar } from '@/ui/avatar';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, SESSION_COOKIE_NAME } from '@/settings';
 
-const adapter = new BetterSqlite3Adapter(sqliteDatabase, { user: 'users', session: 'sessions' });
+const adapter = new NodePostgresAdapter(pool, {
+  user: 'users',
+  session: 'sessions',
+});
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {

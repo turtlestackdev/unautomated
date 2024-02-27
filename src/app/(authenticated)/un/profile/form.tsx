@@ -12,7 +12,7 @@ import { ErrorMessage, Field, FieldGroup, Fieldset, Label, Legend } from '@/ui/f
 import { GitHubIcon, LinkedInIcon } from '@/ui/icons/social-icons';
 import { Select } from '@/ui/select';
 import { US_STATES } from '@/models/locale/state';
-import { updateProfile } from '@/app/(session)/un/profile/actions';
+import { updateProfile } from '@/app/(authenticated)/un/profile/actions';
 import { NotificationDispatchContext } from '@/ui/notifications/notification';
 
 export interface FormState {

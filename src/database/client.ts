@@ -1,14 +1,15 @@
-import SQLite from 'better-sqlite3';
-import { Kysely, SqliteDialect } from 'kysely';
-import type { DB } from '@/database/schema';
+import { Pool } from 'pg';
+import { Kysely, PostgresDialect } from 'kysely';
 import { DATABASE_URL } from '@/settings';
+import type { DB } from '@/database/schema';
 
-const file = DATABASE_URL.replace(/^file:/, '');
+export const pool = new Pool({
+  connectionString: DATABASE_URL,
+  max: 10,
+});
 
-export const sqliteDatabase = new SQLite(file);
+const dialect = new PostgresDialect({ pool });
 
 export const db = new Kysely<DB>({
-  dialect: new SqliteDialect({
-    database: sqliteDatabase,
-  }),
+  dialect,
 });

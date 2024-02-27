@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/unautomated.iml" filepath="$PROJECT_DIR$/.idea/unautomated.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/unautomated-portal.iml" filepath="$PROJECT_DIR$/.idea/unautomated-portal.iml" />
     </modules>
   </component>
 </project>

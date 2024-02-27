@@ -4,7 +4,7 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/ui/dialog';
 import { Button, FileButton } from '@/ui/button';
 import { LoadingIcon } from '@/ui/icons/loading-icon';
-import { uploadResume } from '@/app/(session)/un/experience/actions';
+import { uploadResume } from '@/app/(authenticated)/un/experience/actions';
 
 export function ResumeUpload({
   open,

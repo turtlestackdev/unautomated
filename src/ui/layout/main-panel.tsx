@@ -39,7 +39,7 @@ export function MainPanelHeader({
   return (
     <header className="bg-white shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center px-4 py-4 sm:px-6 lg:px-8">
-        <h1 className="text-lg font-semibold leading-6 text-gray-900">{title}</h1>
+        <h1 className="text-lg font-semibold leading-6 text-gray-800">{title}</h1>
         <div className="flex grow place-content-end ">{children}</div>
       </div>
     </header>
@@ -51,7 +51,7 @@ MainPanel.Header = MainPanelHeader;
 export function MainPanelContent({ children }: { children?: ReactNode }): ReactElement {
   return (
     <main>
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{children}</div>
+      <div className="mx-auto max-w-7xl space-y-8 px-4 py-6 sm:px-6 lg:px-8">{children}</div>
     </main>
   );
 }
