@@ -11,8 +11,8 @@ import { Link } from '@/ui/link';
 
 const navigation = [
   { name: 'Dashboard', href: '/un/dashboard' },
-  { name: 'Experience', href: '/un/experience' },
-  { name: 'Job Tracker', href: '/un/jobs' },
+  { name: 'Resume', href: '/un/resume' },
+  { name: 'Lead Tracker', href: '/un/leads' },
 ];
 
 export function SessionNav({ user }: { user: SessionUser }): ReactElement {

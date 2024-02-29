@@ -56,7 +56,7 @@ module.exports = {
   overrides: [
     // Next.js needs default exports for pages and layouts.
     {
-      files: ['src/app/**/*/page.tsx', 'src/app/**/*/layout.tsx', 'next.config.mjs', 'tailwind.config.ts'],
+      files: ['src/app/**/*/page.tsx', 'src/app/**/*/layout.tsx', 'next.config.mjs', 'tailwind.config.ts', 'vitest.config.ts'],
       rules: {
         'import/no-default-export': 'off',
         'import/prefer-default-export': ['error', { target: 'any' }],

@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 import { validatedSession } from '@/lib/auth';
-import { Boundary } from '@/app/(authenticated)/un/experience/boundary';
+import { Boundary } from '@/app/(authenticated)/un/resume/boundary';
 import * as resumeData from '@/models/resume-data';
 
 export default async function ResumePage(): Promise<ReactElement> {

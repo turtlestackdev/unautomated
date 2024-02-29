@@ -1,5 +1,6 @@
 import { Input as HeadlessInput, type InputProps as HeadlessInputProps } from '@headlessui/react';
 import { clsx } from 'clsx';
+import type { ReactNode } from 'react';
 import { forwardRef } from 'react';
 import { ErrorMessage } from '@/ui/fieldset';
 
@@ -10,10 +11,37 @@ export const Input = forwardRef<
   HTMLInputElement,
   {
     type?: 'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url' | DateType;
+    head?: ReactNode;
+    tail?: ReactNode;
     errors?: string[];
+    showErrors?: boolean;
+    multiColumn?: boolean;
   } & HeadlessInputProps
->(function Input({ className, errors, invalid = [], ...props }, ref) {
+>(function Input(
+  { className, head, tail, errors, showErrors = true, multiColumn = false, invalid = [], ...props },
+  ref
+) {
   const inputInvalid = errors !== undefined ? errors.length > 0 : invalid === true;
+
+  let errorMessages: ReactNode = null;
+  if (showErrors && errors?.length && errors.length > 0) {
+    if (multiColumn) {
+      // when inputs are displayed on the same line, the error message throws the centering off
+      // this removes the space issue, but if there are multiple errors the next form row may be obscured.
+      errorMessages = (
+        <span className="absolute mt-1.5">
+          {errors.map((error) => (
+            <ErrorMessage className=" mb-1.5" key={error}>
+              {error}
+            </ErrorMessage>
+          ))}
+        </span>
+      );
+    } else {
+      errorMessages = errors.map((error) => <ErrorMessage key={error}>{error}</ErrorMessage>);
+    }
+  }
+
   return (
     <>
       <span
@@ -40,6 +68,11 @@ export const Input = forwardRef<
         ])}
         data-slot="control"
       >
+        {head ? (
+          <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <span className="text-gray-500 sm:text-sm">{head}</span>
+          </span>
+        ) : null}
         <HeadlessInput
           className={clsx([
             // Date classes
@@ -58,6 +91,10 @@ export const Input = forwardRef<
                 '[&::-webkit-datetime-edit-millisecond-field]:p-0',
                 '[&::-webkit-datetime-edit-meridiem-field]:p-0',
               ],
+
+            // todo find a way to make this more flexible
+            head ? 'pl-7 sm:pl-7' : '',
+            tail ? 'pr-12 sm:pr-12' : '',
 
             // Basic layout
             'relative block w-full appearance-none rounded-lg px-[calc(theme(spacing[3.5])-1px)] py-[calc(theme(spacing[2.5])-1px)] sm:px-[calc(theme(spacing[3])-1px)] sm:py-[calc(theme(spacing[1.5])-1px)]',
@@ -84,8 +121,13 @@ export const Input = forwardRef<
           ref={ref}
           {...props}
         />
+        {tail ? (
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <span className="text-gray-500 sm:text-sm">{tail}</span>
+          </div>
+        ) : null}
       </span>
-      {errors?.map((error) => <ErrorMessage key={error}>{error}</ErrorMessage>)}
+      {errorMessages}
     </>
   );
 });

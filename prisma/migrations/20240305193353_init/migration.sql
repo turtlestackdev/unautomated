@@ -90,34 +90,26 @@ CREATE TABLE "companies" (
 );
 
 -- CreateTable
-CREATE TABLE "job_titles" (
+CREATE TABLE "job_details" (
     "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "user_id" UUID NOT NULL,
-    "title" TEXT NOT NULL,
-    "company_id" UUID NOT NULL,
-    "start_date" TIMESTAMP(3) NOT NULL,
-    "end_date" TIMESTAMP(3),
+    "title" TEXT NOT NULL DEFAULT '',
+    "company" TEXT NOT NULL DEFAULT '',
+    "description" TEXT NOT NULL DEFAULT '',
+    "start_date" DATE,
+    "end_date" DATE,
     "is_current_position" BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT "job_titles_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "job_details_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "responsibilites" (
+CREATE TABLE "job_highlights" (
     "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "job_id" UUID NOT NULL,
     "description" TEXT NOT NULL,
 
-    CONSTRAINT "responsibilites_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "professional_achievements" (
-    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
-    "job_id" UUID NOT NULL,
-    "description" TEXT NOT NULL,
-
-    CONSTRAINT "professional_achievements_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "job_highlights_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -181,13 +173,13 @@ CREATE INDEX "file_uploads_type_idx" ON "file_uploads"("type");
 CREATE UNIQUE INDEX "user_links_user_id_type_key" ON "user_links"("user_id", "type");
 
 -- CreateIndex
-CREATE INDEX "job_titles_start_date_idx" ON "job_titles"("start_date");
+CREATE INDEX "job_details_start_date_idx" ON "job_details"("start_date");
 
 -- CreateIndex
-CREATE INDEX "job_titles_end_date_idx" ON "job_titles"("end_date");
+CREATE INDEX "job_details_end_date_idx" ON "job_details"("end_date");
 
 -- CreateIndex
-CREATE INDEX "job_titles_is_current_position_idx" ON "job_titles"("is_current_position");
+CREATE INDEX "job_details_is_current_position_idx" ON "job_details"("is_current_position");
 
 -- CreateIndex
 CREATE INDEX "school_enrollment_start_date_idx" ON "school_enrollment"("start_date");
@@ -217,16 +209,10 @@ ALTER TABLE "resume_titles" ADD CONSTRAINT "resume_titles_user_id_fkey" FOREIGN 
 ALTER TABLE "resume_objectives" ADD CONSTRAINT "resume_objectives_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "job_titles" ADD CONSTRAINT "job_titles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "job_details" ADD CONSTRAINT "job_details_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "job_titles" ADD CONSTRAINT "job_titles_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "responsibilites" ADD CONSTRAINT "responsibilites_job_id_fkey" FOREIGN KEY ("job_id") REFERENCES "job_titles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "professional_achievements" ADD CONSTRAINT "professional_achievements_job_id_fkey" FOREIGN KEY ("job_id") REFERENCES "job_titles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "job_highlights" ADD CONSTRAINT "job_highlights_job_id_fkey" FOREIGN KEY ("job_id") REFERENCES "job_details"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "school_enrollment" ADD CONSTRAINT "school_enrollment_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

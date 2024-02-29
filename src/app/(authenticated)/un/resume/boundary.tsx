@@ -8,14 +8,14 @@ import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 import { clsx } from 'clsx';
 import { MainPanel } from '@/ui/layout/main-panel';
 import { Button } from '@/ui/button';
-import { H2, Text } from '@/ui/text';
+import { Text } from '@/ui/text';
 import type { SessionUser } from '@/lib/auth';
-import { ResumeUpload } from '@/app/(authenticated)/un/experience/resume-upload';
+import { ResumeUpload } from '@/app/(authenticated)/un/resume/resume-upload';
 import type { ResumeData } from '@/models/resume-data';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
 import { EnabledIcon } from '@/ui/icons/action-icons';
 import { VerticalNav } from '@/ui/navigation/vertical-nav';
-import { CreateObjectiveForm } from '@/app/(authenticated)/un/experience/forms';
+import { CreateObjectiveForm, CreateResumeForm } from '@/app/(authenticated)/un/resume/forms';
 import type { ResumeObjective } from '@/database/schema';
 
 export function Boundary({
@@ -36,7 +36,7 @@ export function Boundary({
       current: true,
     },
     {
-      name: 'Work History',
+      name: 'Employment',
 
       onClick: () => {
         console.log('clicked');
@@ -61,7 +61,7 @@ export function Boundary({
 
   return (
     <MainPanel user={user}>
-      <MainPanel.Header title="Experience">
+      <MainPanel.Header title="Resume">
         <Button
           color="brand"
           onClick={() => {
@@ -73,9 +73,11 @@ export function Boundary({
         <ResumeUpload open={fileDialogOpen} setIsOpen={setFileDialogOpen} />
       </MainPanel.Header>
       <MainPanel.Content>
-        <div className="flex items-start gap-8 sm:gap-4">
+        <div className="flex items-start gap-8 sm:gap-16">
           <div className="grow space-y-8">
-            <ObjectivePanel objectives={resumeData.objectives} user={user} />
+            <div className="max-w-2xl">
+              <CreateResumeForm resumeData={resumeData} user={user} />
+            </div>
           </div>
           <div>
             <VerticalNav>
@@ -90,7 +92,7 @@ export function Boundary({
   );
 }
 
-function ObjectivePanel({
+export function ObjectivePanel({
   user,
   objectives,
 }: {
@@ -99,7 +101,6 @@ function ObjectivePanel({
 }): ReactElement {
   return (
     <>
-      <H2>Objectives</H2>
       <div className="max-w-2xl">
         <CreateObjectiveForm objectives={objectives} user={user} />
       </div>

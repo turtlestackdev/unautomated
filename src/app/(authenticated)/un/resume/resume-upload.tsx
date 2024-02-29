@@ -4,7 +4,7 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/ui/dialog';
 import { Button, FileButton } from '@/ui/button';
 import { LoadingIcon } from '@/ui/icons/loading-icon';
-import { uploadResume } from '@/app/(authenticated)/un/experience/actions';
+import { uploadResume } from '@/app/(authenticated)/un/resume/actions';
 
 export function ResumeUpload({
   open,
@@ -13,8 +13,8 @@ export function ResumeUpload({
   open: boolean;
   setIsOpen: (open: boolean) => void;
 }): ReactElement {
-  const [state, formAction] = useFormState(uploadResume, { status: 'new' });
-  console.log(state);
+  const [_state, formAction] = useFormState(uploadResume, { status: 'new' });
+
   return (
     <Dialog onClose={setIsOpen} open={open}>
       <form action={formAction}>

@@ -35,7 +35,7 @@ model User {
   links              UserLink[]
   resume_title       ResumeTitle[]
   resume_objective   ResumeObjective[]
-  employment_history JobTitle[]
+  employment_history JobDetails[]
   skills             Skills[]
   schhol_enrollment  SchoolEnrollment[]
   sessions           Session[]
@@ -104,50 +104,39 @@ model ResumeObjective {
 }
 
 model Company {
-  id               String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name             String
-  description      String
-  industry         String
-  employee_history JobTitle[]
+  id          String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String
+  description String
+  industry    String
 
   @@map("companies")
 }
 
-model JobTitle {
-  id                  String                     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id             String                     @db.Uuid
-  user                User                       @relation(fields: [user_id], references: [id])
-  title               String
-  company_id          String                     @db.Uuid
-  company             Company                    @relation(fields: [company_id], references: [id])
-  start_date          DateTime
-  end_date            DateTime?
-  is_current_position Boolean                    @default(false)
-  responibilities     Responibility[]
-  achievements        ProfessionalAchievements[]
+model JobDetails {
+  id                  String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id             String         @db.Uuid
+  user                User           @relation(fields: [user_id], references: [id])
+  title               String         @default("")
+  company             String         @default("")
+  description         String         @default("")
+  start_date          DateTime?      @db.Date
+  end_date            DateTime?      @db.Date
+  is_current_position Boolean        @default(false)
+  highlights          JobHighlight[]
 
   @@index([start_date])
   @@index([end_date])
   @@index([is_current_position])
-  @@map("job_titles")
+  @@map("job_details")
 }
 
-model Responibility {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  job_id      String   @db.Uuid
-  job         JobTitle @relation(fields: [job_id], references: [id])
+model JobHighlight {
+  id          String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  job_id      String     @db.Uuid
+  job         JobDetails @relation(fields: [job_id], references: [id])
   description String
 
-  @@map("responsibilites")
-}
-
-model ProfessionalAchievements {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  job_id      String   @db.Uuid
-  job         JobTitle @relation(fields: [job_id], references: [id])
-  description String
-
-  @@map("professional_achievements")
+  @@map("job_highlights")
 }
 
 model School {
