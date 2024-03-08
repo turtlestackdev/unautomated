@@ -140,40 +140,39 @@ model JobHighlight {
 }
 
 model School {
-  id          String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id          String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name        String
   description String
-  enrollment  SchoolEnrollment[]
 
   @@map("schools")
 }
 
 model SchoolEnrollment {
-  id                    String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id               String                   @db.Uuid
-  user                  User                     @relation(fields: [user_id], references: [id])
-  degree                String
-  gpa                   Float
-  school_id             String                   @db.Uuid
-  school                School                   @relation(fields: [school_id], references: [id])
-  start_date            DateTime
-  end_date              DateTime?
-  is_currently_enrolled Boolean                  @default(false)
-  achievements          ScholasticAchievements[]
+  id             String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id        String                @db.Uuid
+  user           User                  @relation(fields: [user_id], references: [id])
+  degree         String
+  field_of_study String
+  gpa            Float?
+  school         String
+  location       String
+  start_date     DateTime?             @db.Date
+  end_date       DateTime?             @db.Date
+  highlights     ScholasticHighlight[]
 
   @@index([start_date])
   @@index([end_date])
-  @@index([is_currently_enrolled])
   @@map("school_enrollment")
 }
 
-model ScholasticAchievements {
+model ScholasticHighlight {
   id            String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   enrollment_id String           @db.Uuid
   enrollment    SchoolEnrollment @relation(fields: [enrollment_id], references: [id])
   description   String
 
-  @@map("scholastic_achievements")
+  @@index([description])
+  @@map("scholastic_highlights")
 }
 
 model Skills {

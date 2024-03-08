@@ -1,7 +1,7 @@
 import type { z, ZodType } from 'zod';
 import { useFormState } from 'react-dom';
 import type { RefObject } from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import type { FormState } from '@/lib/validation';
 import { formToObject, initialFormState } from '@/lib/validation';
 
@@ -24,61 +24,73 @@ interface FormValidationProps<T extends ZodType, M> {
  * The generic M is the model which will be returned from a successful form submission
  *
  */
-export function useFormValidation<T extends ZodType, M>(
-  props: FormValidationProps<T, M>
-): [
+export function useFormValidation<T extends ZodType, M>({
+  schema,
+  onError,
+  onInit,
+  onSuccess,
+  ...props
+}: FormValidationProps<T, M>): [
   RefObject<HTMLFormElement>,
   (payload: FormData) => void,
   () => void,
+  (shouldSubmit: boolean) => void,
   z.inferFlattenedErrors<T> | null,
 ] {
   const formRef = useRef<HTMLFormElement>(null);
   const [errors, setErrors] = useState<z.inferFlattenedErrors<T> | null>(null);
   const [state, action] = useFormState(props.action, initialFormState);
+  const [shouldSubmit, setShouldSubmit] = useState(false);
 
-  const isValid = (): boolean => {
-    if (!formRef.current) {
-      return false;
-    }
-
-    const data = new FormData(formRef.current);
-    const request = props.schema.safeParse(formToObject(data));
-    if (!request.success) {
-      const errorList = request.error.flatten();
-      if (props.onError) {
-        props.onError(errorList);
+  const submit = useCallback((): void => {
+    const isValid = (): boolean => {
+      if (!formRef.current) {
+        return false;
       }
 
-      setErrors(errorList);
+      const data = new FormData(formRef.current);
+      const request = schema.safeParse(formToObject(data));
+      if (!request.success) {
+        const errorList = request.error.flatten();
+        if (onError) {
+          onError(errorList);
+        }
 
-      return false;
-    }
+        setErrors(errorList);
 
-    return true;
-  };
+        return false;
+      }
 
-  const submit = (): void => {
+      return true;
+    };
+
     if (isValid()) {
       formRef.current?.requestSubmit();
     }
-  };
+  }, [schema, onError]);
 
   useEffect(() => {
-    if (state.status === 'new' && props.onInit) {
-      props.onInit();
+    if (state.status === 'new' && onInit) {
+      onInit();
     }
 
-    if (state.status === 'success' && props.onSuccess) {
-      props.onSuccess(state.model);
+    if (state.status === 'success' && onSuccess) {
+      onSuccess(state.model);
     }
 
     if (state.status === 'error') {
-      if (props.onError) {
-        props.onError(state.errors);
+      if (onError) {
+        onError(state.errors);
       }
       setErrors(state.errors);
     }
-  }, [state, props]);
 
-  return [formRef, action, submit, errors];
+    if (shouldSubmit) {
+      // used for submissions that are dependent on DOM update changes.
+      submit();
+      setShouldSubmit(false);
+    }
+  }, [state, onError, onInit, onSuccess, props.action, shouldSubmit, submit]);
+
+  return [formRef, action, submit, setShouldSubmit, errors];
 }

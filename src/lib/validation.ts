@@ -19,7 +19,7 @@ export const initialFormState = { status: 'new' } as const;
 
 export function emptyStringToUndefined(arg: unknown): unknown {
   if (isString(arg) && arg === '') {
-    return z.NEVER;
+    return undefined;
   }
   return arg;
 }
@@ -108,5 +108,6 @@ export function formToObject(
       }
     }
   }
+
   return data;
 }

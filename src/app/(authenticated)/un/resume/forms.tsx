@@ -4,7 +4,6 @@ import { Field as HeadlessField } from '@headlessui/react';
 import type { Selectable } from 'kysely';
 import type { z } from 'zod';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, TrashIcon } from '@heroicons/react/16/solid';
-import { format } from 'date-fns/fp';
 import { createObjective, saveJob } from '@/app/(authenticated)/un/resume/actions';
 import { Field, FieldGroup, Fieldset, Label, Legend } from '@/ui/fieldset';
 import { Switch } from '@/ui/switch';
@@ -12,15 +11,17 @@ import { Textarea } from '@/ui/textarea';
 import { Button, Submit } from '@/ui/button';
 import type { SessionUser } from '@/lib/auth';
 import type { ResumeObjective } from '@/database/schema';
-import { useFormValidation } from '@/hooks/form-validation';
+import { useFormValidation } from '@/hooks/use-form-validation';
 import type { ResumeData } from '@/models/resume-data';
 import { objectiveSchema, jobSchema } from '@/app/(authenticated)/un/resume/validation';
 import { Input } from '@/ui/input';
 import { Combobox } from '@/ui/combobox';
-import { degreeTypes } from '@/models/education';
+import type { Degree, Education } from '@/models/education/types';
 import type { Job } from '@/models/employment';
-import type { Optional } from '@/lib/utils';
+import type { Optional, UnSaved } from '@/lib/utils';
 import { DatePicker } from '@/ui/date-picker';
+import { educationSchema } from '@/models/education/validation';
+import { saveEducation } from '@/models/education/actions';
 
 export function CreateObjectiveForm({
   user,
@@ -29,7 +30,7 @@ export function CreateObjectiveForm({
   user: SessionUser;
   objectives: Selectable<ResumeObjective>[];
 }): ReactElement {
-  const [formRef, action, _submit, errors] = useFormValidation({
+  const [formRef, action, _submit, _shouldSubmit, errors] = useFormValidation({
     schema: objectiveSchema,
     action: createObjective.bind(null, user.id),
   });
@@ -167,15 +168,12 @@ function JobDetailsForm({
   onChange: (job: Job) => void;
   user: SessionUser;
 }): ReactElement {
-  const [formRef, action, submit, errors] = useFormValidation({
+  const [formRef, action, submit, setShouldSubmit, errors] = useFormValidation({
     schema: jobSchema,
     action: saveJob.bind(null, user.id),
     onSuccess: onChange,
   });
 
-  const startDateRef = useRef<HTMLInputElement>(null);
-  const endDateRef = useRef<HTMLInputElement>(null);
-  const isCurrentRef = useRef<HTMLInputElement>(null);
   const highlights = job.highlights.map((highlight) => highlight.description);
 
   return (
@@ -212,49 +210,41 @@ function JobDetailsForm({
           <Field className="">
             <Label>Start Date</Label>
             <DatePicker
+              defaultValue={job.start_date ?? undefined}
               errors={errors?.fieldErrors.start_date}
               max={new Date()}
               multiColumn
               name="start_date"
               onChange={(date) => {
-                if (date !== job.start_date && startDateRef.current) {
-                  startDateRef.current.value = format('yyyy-MM-dd', date);
-                  submit();
+                if (date !== job.start_date) {
+                  setShouldSubmit(true);
                 }
               }}
-              ref={startDateRef}
-              value={job.start_date ?? undefined}
             />
           </Field>
           <Field className="">
             <Label>End Date</Label>
             <DatePicker
+              defaultValue={job.end_date ?? undefined}
               errors={errors?.fieldErrors.start_date}
               max={new Date()}
               min={job.start_date ?? undefined}
               multiColumn
               name="end_date"
               onChange={(date) => {
-                if (date !== job.end_date && endDateRef.current) {
-                  endDateRef.current.value = format('yyyy-MM-dd', date);
-                  submit();
+                if (date !== job.end_date) {
+                  setShouldSubmit(true);
                 }
               }}
-              ref={endDateRef}
-              value={job.end_date ?? undefined}
             />
           </Field>
           <HeadlessField className="mt-8 flex grow place-content-end items-center gap-4">
             <Label>Is current position?</Label>
             <Switch
-              checkboxRef={isCurrentRef}
               defaultChecked={job.is_current_position}
               name="is_current_position"
-              onChange={(checked) => {
-                if (isCurrentRef.current) {
-                  isCurrentRef.current.checked = checked;
-                  submit();
-                }
+              onChange={() => {
+                setShouldSubmit(true);
               }}
             />
           </HeadlessField>
@@ -348,10 +338,11 @@ function BulletList(props: {
   const addItem = (): void => {
     if (ref.current?.value.trim()) {
       setItems([ref.current.value.trim(), ...items]);
-    }
+      if (props.onChange) {
+        props.onChange(items);
+      }
 
-    if (props.onChange) {
-      props.onChange(items);
+      ref.current.value = '';
     }
   };
 
@@ -423,7 +414,7 @@ function BulletList(props: {
   return (
     <>
       <Field>
-        <Label>Duties, achievements, highlights, etc.</Label>
+        <Label>{props.label}</Label>
         <div className="mt-3 flex gap-2">
           <Input name={props.name ? `${props.name}[]` : undefined} ref={ref} />
           <Button color="brand" onClick={addItem}>
@@ -463,10 +454,25 @@ function BulletList(props: {
   );
 }
 
-function EducationFormFields(): ReactElement {
-  const [degree, setDegree] = useState<(typeof degreeTypes)[number] | undefined>(undefined);
+function EducationFormFields({
+  user,
+  education,
+  degrees,
+}: {
+  user: SessionUser;
+  education: UnSaved<Education>;
+  degrees: Degree[];
+}): ReactElement {
+  const [formRef, action, submit, setShouldSubmit, errors] = useFormValidation({
+    schema: educationSchema,
+    action: saveEducation.bind(null, user.id),
+    onError: (errs) => {
+      console.error(errs);
+    },
+  });
+
   const [degreeSearch, setDegreeSearch] = useState('');
-  const degreeOptions = degreeTypes
+  const degreeOptions = degrees
     .filter(
       (type) =>
         type.name.toLowerCase().startsWith(degreeSearch.toLowerCase()) ||
@@ -475,61 +481,126 @@ function EducationFormFields(): ReactElement {
     .map((type) => {
       return { id: type.id, value: type };
     });
-  return (
-    <Fieldset className="pt-8">
-      <Legend className="flex items-center gap-4">
-        <span className="grow">Education</span>
 
-        <Button className="place-self-end" color="brand">
-          <PlusIcon /> Add degree
-        </Button>
-      </Legend>
-      <FieldGroup>
-        <Field>
-          <Label>School/University</Label>
-          <Input name="school" required />
-        </Field>
-        <Field>
-          <div className="grid grid-cols-2 gap-4">
-            <Field>
-              <Label>Degree</Label>
-              <Combobox
-                displayValue={(value) => value?.name ?? ''}
-                onChange={(value) => {
-                  if (value) {
-                    setDegree(value);
-                    setDegreeSearch('');
+  const submitOnChange = (
+    field: keyof Education
+  ): ((event: React.FormEvent<HTMLInputElement>) => void) => {
+    return (event) => {
+      if (event.currentTarget.value !== education[field]) {
+        submit();
+      }
+    };
+  };
+
+  return (
+    <form action={action} id="edu-form" ref={formRef}>
+      {education.id ? <input defaultValue={education.id} name="id" type="hidden" /> : null}
+      <Fieldset className="pt-8">
+        <Legend className="flex items-center gap-4">
+          <span className="grow">Education</span>
+
+          <Button className="place-self-end" color="brand">
+            <PlusIcon /> Add degree
+          </Button>
+        </Legend>
+        <FieldGroup>
+          <Field>
+            <Label>School/University</Label>
+            <Input
+              defaultValue={education.school}
+              name="school"
+              onBlur={submitOnChange('school')}
+            />
+          </Field>
+          <Field>
+            <div className="grid grid-cols-10 gap-4">
+              <Field className="col-span-3">
+                <Label>Degree</Label>
+                <Combobox
+                  defaultValue={
+                    degreeOptions.find((degree) => degree.id === education.degree)?.value
                   }
-                }}
-                onQueryChange={(event) => {
-                  setDegreeSearch(event.currentTarget.value);
-                }}
-                options={degreeOptions}
-                value={degree}
+                  displayValue={(value) => value?.name ?? ''}
+                  name="degree"
+                  onChange={() => {
+                    setShouldSubmit(true);
+                  }}
+                  onQueryChange={(event) => {
+                    setDegreeSearch(event.currentTarget.value);
+                  }}
+                  options={degreeOptions}
+                />
+              </Field>
+              <Field className="col-span-6">
+                <Label>Field of study</Label>
+                <Input
+                  defaultValue={education.field_of_study}
+                  name="field_of_study"
+                  onBlur={submitOnChange('field_of_study')}
+                />
+              </Field>
+              <Field className="col-span-1">
+                <Label>GPA</Label>
+                <Input
+                  defaultValue={education.gpa ?? undefined}
+                  name="gpa"
+                  onBlur={submitOnChange('gpa')}
+                  pattern="\d(?:\.\d\d?)?"
+                  type="text"
+                />
+              </Field>
+            </div>
+          </Field>
+          <div className="flex items-center gap-4">
+            <Field className="grow">
+              <Label>Location</Label>
+              <Input
+                defaultValue={education.location}
+                name="location"
+                onBlur={submitOnChange('location')}
               />
             </Field>
-            <Field>
-              <Label>Field of study</Label>
-              <Input name="field_of_study" required />
+            <Field className="">
+              <Label>Start Date</Label>
+              <DatePicker
+                defaultValue={education.start_date ?? undefined}
+                errors={errors?.fieldErrors.start_date}
+                max={new Date()}
+                multiColumn
+                name="start_date"
+                onChange={(date) => {
+                  if (date !== education.start_date) {
+                    setShouldSubmit(true);
+                  }
+                }}
+              />
+            </Field>
+            <Field className="">
+              <Label>End Date</Label>
+              <DatePicker
+                defaultValue={education.end_date ?? undefined}
+                errors={errors?.fieldErrors.end_date}
+                max={new Date()}
+                min={education.start_date ?? undefined}
+                multiColumn
+                name="end_date"
+                onChange={(date) => {
+                  if (date !== education.end_date) {
+                    setShouldSubmit(true);
+                  }
+                }}
+              />
             </Field>
           </div>
-        </Field>
-        <div className="flex items-center gap-4">
-          <Field>
-            <Label>Location</Label>
-            <Input name="location" required />
-          </Field>
-          <Field>
-            <Label>Start Date</Label>
-            <Input name="start_date" required />
-          </Field>
-          <Field>
-            <Label>End Date</Label>
-            <Input name="end_date" />
-          </Field>
-        </div>
-      </FieldGroup>
-    </Fieldset>
+          <BulletList
+            items={education.highlights.map((highlight) => highlight.description)}
+            label="Sholastic achievements"
+            name="highlights"
+            onChange={submit}
+          />
+        </FieldGroup>
+      </Fieldset>
+    </form>
   );
 }
 
@@ -561,11 +632,40 @@ export function CreateResumeForm({
   user: SessionUser;
   resumeData: ResumeData;
 }): ReactElement {
+  const emptyEdu = (): [string, UnSaved<Education>] => {
+    return [
+      `${new Date().getTime()}`,
+      {
+        school: '',
+        location: '',
+        degree: '',
+        field_of_study: '',
+        gpa: null,
+        start_date: null,
+        end_date: null,
+        highlights: [],
+      },
+    ];
+  };
+
+  const initialEdu: Map<string, UnSaved<Education>> = resumeData.education.length === 0
+    ? new Map<string, UnSaved<Education>>([emptyEdu()])
+    : new Map(resumeData.education.map((edu) => [edu.id, edu]));
+  //const [education, setEducation] = useState(initialEdu);
+
   return (
     <div className="space-y-8 divide-y divide-gray-300">
       <ObjectiveFormFields objectives={resumeData.objectives} />
       <WorkHistoryFormFields jobs={resumeData.jobs} user={user} />
-      <EducationFormFields />
+      {[...initialEdu.entries()].map(([key, edu]) => (
+        <EducationFormFields
+          degrees={resumeData.formOptions.degrees}
+          education={edu}
+          key={key}
+          user={user}
+        />
+      ))}
+
       <SkillsFields />
     </div>
   );

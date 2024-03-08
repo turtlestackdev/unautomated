@@ -156,14 +156,10 @@ type Color = keyof typeof colors;
 export function Switch({
   color = 'brand',
   className,
-  name,
-  value,
-  checkboxRef,
   ...props
 }: {
   color?: Color;
   className?: string;
-  checkboxRef?: React.ForwardedRef<HTMLInputElement>;
 } & Omit<HeadlessSwitchProps, 'children'>): ReactElement {
   return (
     <HeadlessSwitch
@@ -202,43 +198,29 @@ export function Switch({
       data-slot="control"
       {...props}
     >
-      {({ checked }) => (
-        <>
-          <span
-            aria-hidden="true"
-            className={clsx(
-              // Basic layout
-              'pointer-events-none relative inline-block size-[1.125rem] rounded-full sm:size-3.5',
+      <span
+        aria-hidden="true"
+        className={clsx(
+          // Basic layout
+          'pointer-events-none relative inline-block size-[1.125rem] rounded-full sm:size-3.5',
 
-              // Transition
-              'translate-x-0 transition duration-200 ease-in-out',
+          // Transition
+          'translate-x-0 transition duration-200 ease-in-out',
 
-              // Invisible border so the switch is still visible in forced-colors mode
-              'border border-transparent',
+          // Invisible border so the switch is still visible in forced-colors mode
+          'border border-transparent',
 
-              // Unchecked
-              'bg-white shadow ring-1 ring-black/5',
+          // Unchecked
+          'bg-white shadow ring-1 ring-black/5',
 
-              // Checked
-              'group-data-[checked]:bg-[--switch] group-data-[checked]:shadow-[--switch-shadow] group-data-[checked]:ring-[--switch-ring]',
-              'group-data-[checked]:translate-x-4 sm:group-data-[checked]:translate-x-3',
+          // Checked
+          'group-data-[checked]:bg-[--switch] group-data-[checked]:shadow-[--switch-shadow] group-data-[checked]:ring-[--switch-ring]',
+          'group-data-[checked]:translate-x-4 sm:group-data-[checked]:translate-x-3',
 
-              // Disabled
-              'group-data-[disabled]:group-data-[checked]:bg-white group-data-[disabled]:group-data-[checked]:shadow group-data-[disabled]:group-data-[checked]:ring-black/5'
-            )}
-          />
-          {name ? (
-            <input
-              className="sr-only"
-              defaultChecked={checked}
-              name={name}
-              ref={checkboxRef}
-              type="checkbox"
-              value={value ?? 'on'}
-            />
-          ) : null}
-        </>
-      )}
+          // Disabled
+          'group-data-[disabled]:group-data-[checked]:bg-white group-data-[disabled]:group-data-[checked]:shadow group-data-[disabled]:group-data-[checked]:ring-black/5'
+        )}
+      />
     </HeadlessSwitch>
   );
 }

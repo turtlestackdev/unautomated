@@ -1,4 +1,12 @@
-export const degreeTypes: { id: string; name: string }[] = [
+import type { AliasedRawBuilder, ExpressionBuilder, Selectable } from 'kysely';
+import { jsonArrayFrom } from 'kysely/helpers/postgres';
+import type { z } from 'zod';
+import type { DB, ScholasticHighlight } from '@/database/schema';
+import { db } from '@/database/client';
+import type { Education, Degree } from '@/models/education/types';
+import type { educationSchema } from '@/models/education/validation';
+
+export const degreeTypes: Degree[] = [
   { id: 'AA', name: 'Associate of Arts' },
   { id: 'AAA', name: 'Associate of Applied Arts' },
   { id: 'AE', name: 'Associate of Engineering or Associate in Electronics Engineering Technology' },
@@ -45,7 +53,6 @@ export const degreeTypes: { id: string; name: string }[] = [
   { id: 'BTech', name: 'Bachelor of Technology' },
   { id: 'BTh', name: 'Bachelor of Theology' },
   { id: 'MBBS', name: 'Bachelor of Medicine' },
-  { id: 'BCL', name: 'Bachelor of Civil Law' },
   { id: 'STL', name: 'Licentiate in Sacred Theology' },
   { id: 'MJur', name: 'Magister Juris' },
   { id: 'MBA', name: 'Master of Business Administration' },
@@ -94,3 +101,58 @@ export const degreeTypes: { id: string; name: string }[] = [
   { id: 'DVM', name: 'Doctor of Veterinary Medicine' },
   { id: 'JD', name: 'Juris Doctor' },
 ];
+
+export async function getUserEducation(userId: string): Promise<Education[]> {
+  return db
+    .selectFrom('school_enrollment')
+    .selectAll('school_enrollment')
+    .where('school_enrollment.user_id', '=', userId)
+    .select((eb) => [withHighlights(eb)])
+    .execute();
+}
+
+function withHighlights(
+  eb: ExpressionBuilder<DB, 'school_enrollment'>
+): AliasedRawBuilder<Selectable<ScholasticHighlight>[], 'highlights'> {
+  return jsonArrayFrom(
+    eb
+      .selectFrom('scholastic_highlights as h')
+      .selectAll('h')
+      .whereRef('h.enrollment_id', '=', 'school_enrollment.id')
+      .orderBy('h.id')
+  ).as('highlights');
+}
+
+export async function saveEducation(
+  values: z.infer<typeof educationSchema> & { user_id: string }
+): Promise<Education> {
+  const { id, highlights, ...data } = values;
+  return db.transaction().execute(async (trx) => {
+    const query =
+      id === undefined
+        ? trx.insertInto('school_enrollment').values(data)
+        : trx.updateTable('school_enrollment').set(data).where('id', '=', id);
+    const education = await query.returningAll().executeTakeFirstOrThrow();
+    await trx
+      .deleteFrom('scholastic_highlights')
+      .where('enrollment_id', '=', education.id)
+      .execute();
+    let eduHighlights: Selectable<ScholasticHighlight>[] = [];
+    if (highlights.length > 0) {
+      eduHighlights = await trx
+        .insertInto('scholastic_highlights')
+        .values(
+          highlights.map((highlight) => {
+            return {
+              enrollment_id: education.id,
+              description: highlight,
+            };
+          })
+        )
+        .returningAll()
+        .execute();
+    }
+
+    return { ...education, highlights: eduHighlights };
+  });
+}

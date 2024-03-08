@@ -28,7 +28,7 @@ export function Boundary({
   const [fileDialogOpen, setFileDialogOpen] = useState(false);
   const pageLinks = [
     {
-      name: 'Objectives',
+      name: 'Profile Data',
 
       onClick: () => {
         console.log('clicked');
@@ -36,7 +36,7 @@ export function Boundary({
       current: true,
     },
     {
-      name: 'Employment',
+      name: 'Resumes',
 
       onClick: () => {
         console.log('clicked');

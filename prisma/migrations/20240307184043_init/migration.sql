@@ -126,22 +126,23 @@ CREATE TABLE "school_enrollment" (
     "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "user_id" UUID NOT NULL,
     "degree" TEXT NOT NULL,
-    "gpa" DOUBLE PRECISION NOT NULL,
-    "school_id" UUID NOT NULL,
-    "start_date" TIMESTAMP(3) NOT NULL,
-    "end_date" TIMESTAMP(3),
-    "is_currently_enrolled" BOOLEAN NOT NULL DEFAULT false,
+    "field_of_study" TEXT NOT NULL,
+    "gpa" DOUBLE PRECISION,
+    "school" TEXT NOT NULL,
+    "location" TEXT NOT NULL,
+    "start_date" DATE,
+    "end_date" DATE,
 
     CONSTRAINT "school_enrollment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "scholastic_achievements" (
+CREATE TABLE "scholastic_highlights" (
     "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "enrollment_id" UUID NOT NULL,
     "description" TEXT NOT NULL,
 
-    CONSTRAINT "scholastic_achievements_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "scholastic_highlights_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -188,7 +189,7 @@ CREATE INDEX "school_enrollment_start_date_idx" ON "school_enrollment"("start_da
 CREATE INDEX "school_enrollment_end_date_idx" ON "school_enrollment"("end_date");
 
 -- CreateIndex
-CREATE INDEX "school_enrollment_is_currently_enrolled_idx" ON "school_enrollment"("is_currently_enrolled");
+CREATE INDEX "scholastic_highlights_description_idx" ON "scholastic_highlights"("description");
 
 -- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_avatar_id_fkey" FOREIGN KEY ("avatar_id") REFERENCES "file_uploads"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -218,10 +219,7 @@ ALTER TABLE "job_highlights" ADD CONSTRAINT "job_highlights_job_id_fkey" FOREIGN
 ALTER TABLE "school_enrollment" ADD CONSTRAINT "school_enrollment_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "school_enrollment" ADD CONSTRAINT "school_enrollment_school_id_fkey" FOREIGN KEY ("school_id") REFERENCES "schools"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "scholastic_achievements" ADD CONSTRAINT "scholastic_achievements_enrollment_id_fkey" FOREIGN KEY ("enrollment_id") REFERENCES "school_enrollment"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "scholastic_highlights" ADD CONSTRAINT "scholastic_highlights_enrollment_id_fkey" FOREIGN KEY ("enrollment_id") REFERENCES "school_enrollment"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "skills" ADD CONSTRAINT "skills_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
