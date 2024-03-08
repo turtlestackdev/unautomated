@@ -1,11 +1,12 @@
 'use client';
-import { Fragment, useState } from 'react';
+import { Fragment, useReducer, useState } from 'react';
 import type { ReactElement } from 'react';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import type { Selectable } from 'kysely';
 import { Menu, Transition } from '@headlessui/react';
 import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 import { clsx } from 'clsx';
+import type { Session } from 'lucia';
 import { MainPanel } from '@/ui/layout/main-panel';
 import { Button } from '@/ui/button';
 import { Text } from '@/ui/text';
@@ -17,18 +18,27 @@ import { EnabledIcon } from '@/ui/icons/action-icons';
 import { VerticalNav } from '@/ui/navigation/vertical-nav';
 import { CreateObjectiveForm, CreateResumeForm } from '@/app/(authenticated)/un/resume/forms';
 import type { ResumeObjective } from '@/database/schema';
+import {
+  NotificationContext,
+  NotificationDispatchContext,
+  NotificationPanel,
+  notificationReducer,
+} from '@/ui/notifications/notification';
+import { SessionContext } from '@/context/session-context';
 
 export function Boundary({
   user,
+  session,
   resumeData,
 }: {
   user: SessionUser;
+  session: Session;
   resumeData: ResumeData;
 }): ReactElement {
   const [fileDialogOpen, setFileDialogOpen] = useState(false);
   const pageLinks = [
     {
-      name: 'Profile Data',
+      name: 'Profile Data ',
 
       onClick: () => {
         console.log('clicked');
@@ -59,36 +69,45 @@ export function Boundary({
     },
   ];
 
+  const [notifications, dispatch] = useReducer(notificationReducer, []);
+
   return (
-    <MainPanel user={user}>
-      <MainPanel.Header title="Resume">
-        <Button
-          color="brand"
-          onClick={() => {
-            setFileDialogOpen(true);
-          }}
-        >
-          <PlusIcon /> Add resume
-        </Button>
-        <ResumeUpload open={fileDialogOpen} setIsOpen={setFileDialogOpen} />
-      </MainPanel.Header>
-      <MainPanel.Content>
-        <div className="flex items-start gap-8 sm:gap-16">
-          <div className="grow space-y-8">
-            <div className="max-w-2xl">
-              <CreateResumeForm resumeData={resumeData} user={user} />
-            </div>
-          </div>
-          <div>
-            <VerticalNav>
-              {pageLinks.map((link) => (
-                <VerticalNav.Link key={link.name} link={link} />
-              ))}
-            </VerticalNav>
-          </div>
-        </div>
-      </MainPanel.Content>
-    </MainPanel>
+    <SessionContext.Provider value={{ session, user }}>
+      <NotificationContext.Provider value={notifications}>
+        <NotificationDispatchContext.Provider value={dispatch}>
+          <MainPanel>
+            <MainPanel.Header title="Profile Data">
+              <Button
+                color="brand"
+                onClick={() => {
+                  setFileDialogOpen(true);
+                }}
+              >
+                <PlusIcon /> Add resume
+              </Button>
+              <ResumeUpload open={fileDialogOpen} setIsOpen={setFileDialogOpen} />
+            </MainPanel.Header>
+            <MainPanel.Content>
+              <div className="flex items-start gap-8 sm:gap-16">
+                <div className="grow space-y-8">
+                  <div className="max-w-2xl">
+                    <CreateResumeForm resumeData={resumeData} user={user} />
+                  </div>
+                </div>
+                <div>
+                  <VerticalNav>
+                    {pageLinks.map((link) => (
+                      <VerticalNav.Link key={link.name} link={link} />
+                    ))}
+                  </VerticalNav>
+                </div>
+              </div>
+            </MainPanel.Content>
+          </MainPanel>
+          <NotificationPanel />
+        </NotificationDispatchContext.Provider>
+      </NotificationContext.Provider>
+    </SessionContext.Provider>
   );
 }
 

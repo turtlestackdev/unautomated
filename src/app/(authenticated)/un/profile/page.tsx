@@ -5,11 +5,11 @@ import { ProfileForm } from '@/app/(authenticated)/un/profile/form';
 import * as users from '@/models/user';
 
 export default async function Dashboard(): Promise<ReactElement> {
-  const { user } = await validatedSession();
+  const { user, session } = await validatedSession();
   const links = await users.readLinks({ id: user.id });
 
   return (
-    <ApplicationShell pageName="Profile" user={user}>
+    <ApplicationShell pageName="Profile" session={session} user={user}>
       <ProfileForm links={links} user={user} />
     </ApplicationShell>
   );

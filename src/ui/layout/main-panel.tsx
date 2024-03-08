@@ -7,20 +7,18 @@ import {
   notificationReducer,
 } from '@/ui/notifications/notification';
 import { SessionNav } from '@/ui/layout/session-nav';
-import { type SessionUser } from '@/lib/auth';
 
 export interface MainPanelProps {
-  user: SessionUser;
   children?: React.ReactNode;
 }
 
-export function MainPanel({ user, children }: MainPanelProps): ReactElement {
+export function MainPanel({ children }: MainPanelProps): ReactElement {
   const [notifications, dispatch] = useReducer(notificationReducer, []);
   return (
     <NotificationContext.Provider value={notifications}>
       <NotificationDispatchContext.Provider value={dispatch}>
         <div className="min-h-full">
-          <SessionNav user={user} />
+          <SessionNav />
           {children}
         </div>
         <NotificationPanel />

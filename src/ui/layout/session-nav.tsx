@@ -6,8 +6,8 @@ import type { ReactElement } from 'react';
 import { usePathname } from 'next/navigation';
 import { UserMenu, UserMobileMenu } from '@/ui/layout/user-menu';
 import { Logo } from '@/ui/branding/logo';
-import type { SessionUser } from '@/lib/auth';
 import { Link } from '@/ui/link';
+import { useSession } from '@/hooks/use-session';
 
 const navigation = [
   { name: 'Dashboard', href: '/un/dashboard' },
@@ -15,7 +15,8 @@ const navigation = [
   { name: 'Lead Tracker', href: '/un/leads' },
 ];
 
-export function SessionNav({ user }: { user: SessionUser }): ReactElement {
+export function SessionNav(): ReactElement {
+  const { user } = useSession();
   const pathname = usePathname();
   const isCurrent = (href: string): boolean => pathname.startsWith(href);
 
