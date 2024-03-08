@@ -2,14 +2,14 @@
 import type { Insertable, Selectable } from 'kysely';
 import type { ResumeObjective } from '@/database/schema';
 import { db } from '@/database/client';
-import type { Job } from '@/models/employment';
-import { getUserJobs } from '@/models/employment';
+import type { Employment } from '@/models/employment/types';
+import { getUserJobs } from '@/models/employment/data';
 import type { Degree, Education } from '@/models/education/types';
 import { degreeTypes, getUserEducation } from '@/models/education/data';
 
 export interface ResumeData {
   objectives: Selectable<ResumeObjective>[];
-  jobs: Job[];
+  jobs: Employment[];
   education: Education[];
   formOptions: {
     degrees: Degree[];

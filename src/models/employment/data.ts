@@ -1,24 +1,13 @@
 import type { z } from 'zod';
 import type { Selectable } from 'kysely';
-import type { jobSchema } from '@/app/(authenticated)/un/resume/validation';
 import { db } from '@/database/client';
 import type { JobHighlight } from '@/database/schema';
-
-export interface Job {
-  id: string;
-  user_id: string;
-  company: string;
-  title: string;
-  start_date: Date | null;
-  end_date: Date | null;
-  is_current_position: boolean;
-  description: string;
-  highlights: Selectable<JobHighlight>[];
-}
+import type { Employment } from '@/models/employment/types';
+import type { employmentSchema } from '@/models/employment/validation';
 
 export async function saveJobDetails(
-  values: z.infer<typeof jobSchema> & { user_id: string }
-): Promise<Job> {
+  values: z.infer<typeof employmentSchema> & { user_id: string }
+): Promise<Employment> {
   const { id, highlights, ...data } = values;
   return db.transaction().execute(async (trx) => {
     const query =
@@ -47,7 +36,7 @@ export async function saveJobDetails(
   });
 }
 
-export async function getUserJobs(userId: string): Promise<Job[]> {
+export async function getUserJobs(userId: string): Promise<Employment[]> {
   const rows = await db
     .selectFrom('job_details as job')
     .leftJoin('job_highlights as h', 'job.id', 'h.job_id')
@@ -65,7 +54,7 @@ export async function getUserJobs(userId: string): Promise<Job[]> {
     .where('job.user_id', '=', userId)
     .execute();
 
-  const jobs = new Map<string, Job>();
+  const jobs = new Map<string, Employment>();
 
   rows.forEach((row) => {
     const { highlightId, highlight, ...jobData } = row;
