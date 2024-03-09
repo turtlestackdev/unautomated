@@ -9,7 +9,7 @@ export function VisibilityToggle({
   show: boolean;
   onToggle: (show: boolean) => void;
 }): React.JSX.Element {
-  const icon = show ? <EyeSlashIcon /> : <EyeIcon />;
+  const icon = show ? <EyeIcon /> : <EyeSlashIcon />;
   return (
     <Button
       title={show ? 'hide' : 'show'}
