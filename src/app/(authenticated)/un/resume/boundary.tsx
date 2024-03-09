@@ -11,7 +11,6 @@ import { MainPanel } from '@/ui/layout/main-panel';
 import { Button } from '@/ui/button';
 import { Text } from '@/ui/text';
 import type { SessionUser } from '@/lib/auth';
-import { ResumeUpload } from '@/app/(authenticated)/un/resume/resume-upload';
 import type { ResumeData } from '@/entities/resume-data';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
 import { EnabledIcon } from '@/ui/icons/action-icons';
@@ -26,6 +25,7 @@ import {
 } from '@/ui/notifications/notification';
 import { SessionContext } from '@/context/session-context';
 import { ObjectiveForm } from '@/entities/objective/forms';
+import { UploadResumeForm } from '@/entities/resume/forms';
 
 export function Boundary({
   user,
@@ -86,7 +86,7 @@ export function Boundary({
               >
                 <PlusIcon /> Add resume
               </Button>
-              <ResumeUpload open={fileDialogOpen} setIsOpen={setFileDialogOpen} />
+              <UploadResumeForm open={fileDialogOpen} setIsOpen={setFileDialogOpen} />
             </MainPanel.Header>
             <MainPanel.Content>
               <div className="flex items-start gap-8 sm:gap-16">

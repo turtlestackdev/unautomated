@@ -7,7 +7,7 @@ import { formToObject, initialFormState } from '@/lib/validation';
 
 interface FormValidationProps<T extends ZodType, M> {
   // the Zod schema to validate against
-  schema: T;
+  schema?: T;
   // the server function to use, any binding should be done prior to calling the hook
   action: (prev: FormState<T, M>, data: FormData) => Promise<FormState<T, M>>;
   // What to do when the form is created, e.g., open a panel
@@ -46,6 +46,11 @@ export function useFormValidation<T extends ZodType, M>({
     const isValid = (): boolean => {
       if (!formRef.current) {
         return false;
+      }
+
+      // if no schema is passed, do not apply front end validation.
+      if (!schema) {
+        return true;
       }
 
       const data = new FormData(formRef.current);

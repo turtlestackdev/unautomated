@@ -1,24 +1,28 @@
-import type { ReactElement } from 'react';
-import { Fragment } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import React from 'react';
+import { useFormStatus } from 'react-dom';
+import { useSession } from '@/hooks/use-session';
 import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/ui/dialog';
-import { Button, FileButton } from '@/ui/button';
 import { LoadingIcon } from '@/ui/icons/loading-icon';
-import { uploadResume } from '@/app/(authenticated)/un/resume/actions';
+import { Button, FileButton } from '@/ui/button';
+import { useFormValidation } from '@/hooks/use-form-validation';
+import { uploadResume } from '@/entities/resume/actions';
 
-export function ResumeUpload({
+export function UploadResumeForm({
   open,
   setIsOpen,
 }: {
   open: boolean;
   setIsOpen: (open: boolean) => void;
-}): ReactElement {
-  const [_state, formAction] = useFormState(uploadResume, { status: 'new' });
+}): React.JSX.Element {
+  const { user } = useSession();
+  const [formRef, action, _submit, _setShouldSubmit, _errors] = useFormValidation({
+    action: uploadResume.bind(null, user.id),
+  });
 
   return (
     <Dialog onClose={setIsOpen} open={open}>
-      <form action={formAction}>
-        <ResumeUploadChild
+      <form action={action} ref={formRef}>
+        <ResumeUploadInner
           close={() => {
             setIsOpen(false);
           }}
@@ -28,17 +32,13 @@ export function ResumeUpload({
   );
 }
 
-function ResumeUploadChild({ close }: { close: () => void }): ReactElement {
+function ResumeUploadInner({ close }: { close: () => void }): React.JSX.Element {
   const { pending } = useFormStatus();
-  console.log('pending', pending);
   const upload = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    console.log('upload called', event);
     if (event.target.files) {
       const [file] = event.target.files;
       if (file !== undefined) {
-        //url = URL.createObjectURL(file);
         event.target.form?.requestSubmit();
-        console.log('submit called', pending);
       }
     }
   };
@@ -54,15 +54,15 @@ function ResumeUploadChild({ close }: { close: () => void }): ReactElement {
         <Button disabled={pending} onClick={close} plain>
           Cancel
         </Button>
-        <label className="flex items-center gap-2" htmlFor="resume_file">
+        <label className="flex items-center gap-2" htmlFor="file">
           <FileButton aria-disabled={pending} color="brand" disabled={pending}>
             Choose file
           </FileButton>
           <input
             accept="text/plain, application/pdf, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             className="sr-only"
-            id="resume_file"
-            name="resume_file"
+            id="file"
+            name="file"
             onChange={upload}
             type="file"
           />
