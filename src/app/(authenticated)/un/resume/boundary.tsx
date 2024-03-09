@@ -9,17 +9,17 @@ import { clsx } from 'clsx';
 import type { Session } from 'lucia';
 import { MainPanel } from '@/ui/layout/main-panel';
 import { Button } from '@/ui/button';
-import { Text } from '@/ui/text';
+import { H3, Text } from '@/ui/text';
 import type { SessionUser } from '@/lib/auth';
 import type { ResumeData } from '@/entities/resume-data';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
 import { EnabledIcon } from '@/ui/icons/action-icons';
 import { VerticalNav } from '@/ui/navigation/vertical-nav';
-import { CreateResumeForm } from '@/app/(authenticated)/un/resume/forms';
 import type { ResumeObjective } from '@/database/schema';
-import { ObjectiveForm } from '@/entities/objective/forms';
+import { ObjectiveForm } from '@/entities/objective/components';
 import { UploadResumeForm } from '@/entities/resume/forms';
 import { ClientBoundary } from '@/ui/client-boundary';
+import { VisibilityToggle } from '@/ui/actions/visibility-toggle';
 
 export function Boundary({
   user,
@@ -33,7 +33,7 @@ export function Boundary({
   const [fileDialogOpen, setFileDialogOpen] = useState(false);
   const pageLinks = [
     {
-      name: 'Profile Data ',
+      name: 'Employment Profile',
 
       onClick: () => {
         console.log('clicked');
@@ -64,25 +64,37 @@ export function Boundary({
     },
   ];
 
+  const [showObjectives, setShowObjectives] = useState(true);
+
   return (
     <ClientBoundary session={{ session, user }}>
       <MainPanel>
-        <MainPanel.Header title="Profile Data">
+        <MainPanel.Header title="Employment Profile">
           <Button
             color="brand"
             onClick={() => {
               setFileDialogOpen(true);
             }}
           >
-            <PlusIcon /> Add resume
+            <PlusIcon /> Upload resume
           </Button>
           <UploadResumeForm open={fileDialogOpen} setIsOpen={setFileDialogOpen} />
         </MainPanel.Header>
         <MainPanel.Content>
           <div className="flex items-start gap-8 sm:gap-16">
-            <div className="grow space-y-8">
-              <div className="max-w-2xl">
-                <CreateResumeForm resumeData={resumeData} user={user} />
+            <div className="grow">
+              <div className="space-y-8">
+                <div className="flex items-center border-b border-gray-200">
+                  <H3 className="grow">Objectives</H3>
+                  <div className="flex shrink">
+                    <VisibilityToggle show={showObjectives} onToggle={setShowObjectives} />
+                  </div>
+                </div>
+                <div className="max-w-2xl">
+                  <ObjectiveForm
+                    is_default={!resumeData.objectives.some((objective) => objective.is_default)}
+                  />
+                </div>
               </div>
             </div>
             <div>

@@ -65,3 +65,18 @@ export function H2({
     </h2>
   );
 }
+
+export function H3({
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithoutRef<'h3'>): ReactElement {
+  return (
+    <h3
+      {...props}
+      className={clsx(className, 'text-xl font-semibold text-gray-800 dark:text-white')}
+    >
+      {children}
+    </h3>
+  );
+}

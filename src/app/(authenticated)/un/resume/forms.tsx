@@ -10,7 +10,7 @@ import type { Education } from '@/entities/education/types';
 import type { Employment } from '@/entities/employment/types';
 import { EducationForm } from '@/entities/education/forms';
 import { EmploymentForm } from '@/entities/employment/forms';
-import { ObjectiveForm } from '@/entities/objective/forms';
+import { ObjectiveForm } from '@/entities/objective/components';
 
 function WorkHistoryFormFields({
   ...props
@@ -119,7 +119,7 @@ export function CreateResumeForm({
   return (
     <div className="space-y-8 divide-y divide-gray-300">
       {resumeData.objectives.map((objective) => (
-        <ObjectiveForm key={objective.id} objective={objective} />
+        <ObjectiveForm key={objective.id} {...objective} />
       ))}
       <ObjectiveForm />
       <WorkHistoryFormFields jobs={resumeData.jobs} user={user} />
