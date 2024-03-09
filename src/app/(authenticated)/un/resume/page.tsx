@@ -6,5 +6,6 @@ import * as resumeData from '@/entities/resume-data';
 export default async function ResumePage(): Promise<ReactElement> {
   const { user, session } = await validatedSession();
   const resume = await resumeData.readUserData(user.id);
+
   return <Boundary resumeData={resume} session={session} user={user} />;
 }

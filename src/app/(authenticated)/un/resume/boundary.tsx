@@ -1,5 +1,5 @@
 'use client';
-import { Fragment, useReducer, useState } from 'react';
+import { Fragment, useState } from 'react';
 import type { ReactElement } from 'react';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import type { Selectable } from 'kysely';
@@ -17,15 +17,9 @@ import { EnabledIcon } from '@/ui/icons/action-icons';
 import { VerticalNav } from '@/ui/navigation/vertical-nav';
 import { CreateResumeForm } from '@/app/(authenticated)/un/resume/forms';
 import type { ResumeObjective } from '@/database/schema';
-import {
-  NotificationContext,
-  NotificationDispatchContext,
-  NotificationPanel,
-  notificationReducer,
-} from '@/ui/notifications/notification';
-import { SessionContext } from '@/context/session-context';
 import { ObjectiveForm } from '@/entities/objective/forms';
 import { UploadResumeForm } from '@/entities/resume/forms';
+import { ClientBoundary } from '@/ui/client-boundary';
 
 export function Boundary({
   user,
@@ -70,45 +64,38 @@ export function Boundary({
     },
   ];
 
-  const [notifications, dispatch] = useReducer(notificationReducer, []);
-
   return (
-    <SessionContext.Provider value={{ session, user }}>
-      <NotificationContext.Provider value={notifications}>
-        <NotificationDispatchContext.Provider value={dispatch}>
-          <MainPanel>
-            <MainPanel.Header title="Profile Data">
-              <Button
-                color="brand"
-                onClick={() => {
-                  setFileDialogOpen(true);
-                }}
-              >
-                <PlusIcon /> Add resume
-              </Button>
-              <UploadResumeForm open={fileDialogOpen} setIsOpen={setFileDialogOpen} />
-            </MainPanel.Header>
-            <MainPanel.Content>
-              <div className="flex items-start gap-8 sm:gap-16">
-                <div className="grow space-y-8">
-                  <div className="max-w-2xl">
-                    <CreateResumeForm resumeData={resumeData} user={user} />
-                  </div>
-                </div>
-                <div>
-                  <VerticalNav>
-                    {pageLinks.map((link) => (
-                      <VerticalNav.Link key={link.name} link={link} />
-                    ))}
-                  </VerticalNav>
-                </div>
+    <ClientBoundary session={{ session, user }}>
+      <MainPanel>
+        <MainPanel.Header title="Profile Data">
+          <Button
+            color="brand"
+            onClick={() => {
+              setFileDialogOpen(true);
+            }}
+          >
+            <PlusIcon /> Add resume
+          </Button>
+          <UploadResumeForm open={fileDialogOpen} setIsOpen={setFileDialogOpen} />
+        </MainPanel.Header>
+        <MainPanel.Content>
+          <div className="flex items-start gap-8 sm:gap-16">
+            <div className="grow space-y-8">
+              <div className="max-w-2xl">
+                <CreateResumeForm resumeData={resumeData} user={user} />
               </div>
-            </MainPanel.Content>
-          </MainPanel>
-          <NotificationPanel />
-        </NotificationDispatchContext.Provider>
-      </NotificationContext.Provider>
-    </SessionContext.Provider>
+            </div>
+            <div>
+              <VerticalNav>
+                {pageLinks.map((link) => (
+                  <VerticalNav.Link key={link.name} link={link} />
+                ))}
+              </VerticalNav>
+            </div>
+          </div>
+        </MainPanel.Content>
+      </MainPanel>
+    </ClientBoundary>
   );
 }
 
