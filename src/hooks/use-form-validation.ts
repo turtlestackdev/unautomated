@@ -74,8 +74,12 @@ export function useFormValidation<T extends ZodType, M>({
       onInit();
     }
 
-    if (state.status === 'success' && onSuccess) {
-      onSuccess(state.model);
+    if (state.status === 'success') {
+      if (onSuccess) {
+        onSuccess(state.model);
+      }
+      console.log('SUCCESS CLEARING ERRORS');
+      setErrors(null);
     }
 
     if (state.status === 'error') {

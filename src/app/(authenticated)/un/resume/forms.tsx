@@ -1,72 +1,16 @@
 import type { ReactElement } from 'react';
 import React, { useState } from 'react';
-import { Field as HeadlessField } from '@headlessui/react';
-import type { Selectable } from 'kysely';
-import type { z } from 'zod';
 import { PlusIcon, TrashIcon } from '@heroicons/react/16/solid';
-import { createObjective } from '@/app/(authenticated)/un/resume/actions';
 import { Field, FieldGroup, Fieldset, Label, Legend } from '@/ui/fieldset';
-import { Switch } from '@/ui/switch';
-import { Textarea } from '@/ui/textarea';
-import { Button, Submit } from '@/ui/button';
+import { Button } from '@/ui/button';
 import type { SessionUser } from '@/lib/auth';
-import type { ResumeObjective } from '@/database/schema';
-import { useFormValidation } from '@/hooks/use-form-validation';
 import type { ResumeData } from '@/models/resume-data';
-import { objectiveSchema } from '@/app/(authenticated)/un/resume/validation';
 import { Input } from '@/ui/input';
 import type { Education } from '@/models/education/types';
 import type { Employment } from '@/models/employment/types';
 import { EducationForm } from '@/models/education/forms';
 import { EmploymentForm } from '@/models/employment/forms';
-
-export function CreateObjectiveForm({
-  user,
-  objectives,
-}: {
-  user: SessionUser;
-  objectives: Selectable<ResumeObjective>[];
-}): ReactElement {
-  const [formRef, action, _submit, _shouldSubmit, errors] = useFormValidation({
-    schema: objectiveSchema,
-    action: createObjective.bind(null, user.id),
-  });
-
-  return (
-    <form action={action} className="space-y-8" ref={formRef}>
-      <ObjectiveFormFields errors={errors ?? undefined} objectives={objectives} />
-      <div className="grow text-right">
-        <Submit color="brand">Add objective</Submit>
-      </div>
-    </form>
-  );
-}
-
-function ObjectiveFormFields({
-  objectives,
-  errors,
-}: {
-  objectives: Selectable<ResumeObjective>[];
-  errors?: z.inferFlattenedErrors<typeof objectiveSchema>;
-}): ReactElement {
-  return (
-    <Fieldset>
-      <FieldGroup>
-        <Field>
-          <Label>Objective</Label>
-          <Textarea errors={errors?.fieldErrors.objective} name="objective" rows={10} />
-        </Field>
-        <HeadlessField className="flex grow place-content-end items-center gap-4">
-          <Label>Is default?</Label>
-          <Switch
-            defaultChecked={!objectives.some((objective) => objective.is_default)}
-            name="is_default_objective"
-          />
-        </HeadlessField>
-      </FieldGroup>
-    </Fieldset>
-  );
-}
+import { ObjectiveForm } from '@/models/objective/forms';
 
 function WorkHistoryFormFields({
   ...props
@@ -174,7 +118,10 @@ export function CreateResumeForm({
 
   return (
     <div className="space-y-8 divide-y divide-gray-300">
-      <ObjectiveFormFields objectives={resumeData.objectives} />
+      {resumeData.objectives.map((objective) => (
+        <ObjectiveForm key={objective.id} objective={objective} />
+      ))}
+      <ObjectiveForm />
       <WorkHistoryFormFields jobs={resumeData.jobs} user={user} />
       <EducationForm degrees={resumeData.formOptions.degrees} />
       {[...initialEdu.entries()].map(([key, edu]) => (

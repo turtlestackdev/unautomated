@@ -1,11 +1,11 @@
 'use server';
-import type { Insertable, Selectable } from 'kysely';
+import type { Selectable } from 'kysely';
 import type { ResumeObjective } from '@/database/schema';
-import { db } from '@/database/client';
 import type { Employment } from '@/models/employment/types';
 import { getUserJobs } from '@/models/employment/data';
 import type { Degree, Education } from '@/models/education/types';
 import { degreeTypes, getUserEducation } from '@/models/education/data';
+import { getUserObjectives } from '@/models/objective/data';
 
 export interface ResumeData {
   objectives: Selectable<ResumeObjective>[];
@@ -29,14 +29,4 @@ export async function readUserData(userId: string): Promise<ResumeData> {
     education,
     formOptions: { degrees: degreeTypes },
   };
-}
-
-export async function getUserObjectives(userId: string): Promise<Selectable<ResumeObjective>[]> {
-  return db.selectFrom('resume_objectives').selectAll().where('user_id', '=', userId).execute();
-}
-
-export async function createObjective(
-  value: Insertable<ResumeObjective>
-): Promise<Selectable<ResumeObjective>> {
-  return db.insertInto('resume_objectives').values(value).returningAll().executeTakeFirstOrThrow();
 }

@@ -16,7 +16,7 @@ import type { ResumeData } from '@/models/resume-data';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
 import { EnabledIcon } from '@/ui/icons/action-icons';
 import { VerticalNav } from '@/ui/navigation/vertical-nav';
-import { CreateObjectiveForm, CreateResumeForm } from '@/app/(authenticated)/un/resume/forms';
+import { CreateResumeForm } from '@/app/(authenticated)/un/resume/forms';
 import type { ResumeObjective } from '@/database/schema';
 import {
   NotificationContext,
@@ -25,6 +25,7 @@ import {
   notificationReducer,
 } from '@/ui/notifications/notification';
 import { SessionContext } from '@/context/session-context';
+import { ObjectiveForm } from '@/models/objective/forms';
 
 export function Boundary({
   user,
@@ -112,7 +113,6 @@ export function Boundary({
 }
 
 export function ObjectivePanel({
-  user,
   objectives,
 }: {
   user: SessionUser;
@@ -121,7 +121,7 @@ export function ObjectivePanel({
   return (
     <>
       <div className="max-w-2xl">
-        <CreateObjectiveForm objectives={objectives} user={user} />
+        <ObjectiveForm />
       </div>
       <Table>
         <TableHead>
