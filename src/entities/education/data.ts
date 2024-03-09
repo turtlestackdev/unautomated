@@ -3,8 +3,8 @@ import { jsonArrayFrom } from 'kysely/helpers/postgres';
 import type { z } from 'zod';
 import type { DB, ScholasticHighlight } from '@/database/schema';
 import { db } from '@/database/client';
-import type { Education, Degree } from '@/models/education/types';
-import type { educationSchema } from '@/models/education/validation';
+import type { Education, Degree } from '@/entities/education/types';
+import type { educationSchema } from '@/entities/education/validation';
 
 export const degreeTypes: Degree[] = [
   { id: 'AA', name: 'Associate of Arts' },

@@ -1,11 +1,11 @@
 'use server';
 import type { Selectable } from 'kysely';
 import type { ResumeObjective } from '@/database/schema';
-import type { Employment } from '@/models/employment/types';
-import { getUserJobs } from '@/models/employment/data';
-import type { Degree, Education } from '@/models/education/types';
-import { degreeTypes, getUserEducation } from '@/models/education/data';
-import { getUserObjectives } from '@/models/objective/data';
+import type { Employment } from '@/entities/employment/types';
+import { getUserJobs } from '@/entities/employment/data';
+import type { Degree, Education } from '@/entities/education/types';
+import { degreeTypes, getUserEducation } from '@/entities/education/data';
+import { getUserObjectives } from '@/entities/objective/data';
 
 export interface ResumeData {
   objectives: Selectable<ResumeObjective>[];

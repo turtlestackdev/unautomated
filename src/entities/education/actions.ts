@@ -1,9 +1,9 @@
 'use server';
 import type { FormState } from '@/lib/validation';
 import { formToObject } from '@/lib/validation';
-import { educationSchema } from '@/models/education/validation';
-import * as education from '@/models/education/data';
-import type { Education } from '@/models/education/types';
+import { educationSchema } from '@/entities/education/validation';
+import * as education from '@/entities/education/data';
+import type { Education } from '@/entities/education/types';
 
 type EducationFormState = FormState<typeof educationSchema, Education>;
 

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { PlusIcon } from '@heroicons/react/16/solid';
 import { useSession } from '@/hooks/use-session';
-import type { Education, Degree } from '@/models/education/types';
+import type { Education, Degree } from '@/entities/education/types';
 import { useFormValidation } from '@/hooks/use-form-validation';
-import { educationSchema } from '@/models/education/validation';
-import { saveEducation } from '@/models/education/actions';
+import { educationSchema } from '@/entities/education/validation';
+import { saveEducation } from '@/entities/education/actions';
 import { Field, FieldGroup, Fieldset, Label, Legend } from '@/ui/fieldset';
 import { Button } from '@/ui/button';
 import { Input } from '@/ui/input';

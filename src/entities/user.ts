@@ -1,7 +1,7 @@
 import type { Selectable, Insertable, Updateable } from 'kysely';
 import { db } from '@/database/client';
 import type { FileUpload, User, UserLink } from '@/database/schema';
-import { uploadImage } from '@/models/file-upload';
+import { uploadImage } from '@/entities/file-upload';
 
 export async function create(
   user: Omit<Insertable<User>, 'id' | 'avatar_id'>

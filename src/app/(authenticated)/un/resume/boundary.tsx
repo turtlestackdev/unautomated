@@ -12,7 +12,7 @@ import { Button } from '@/ui/button';
 import { Text } from '@/ui/text';
 import type { SessionUser } from '@/lib/auth';
 import { ResumeUpload } from '@/app/(authenticated)/un/resume/resume-upload';
-import type { ResumeData } from '@/models/resume-data';
+import type { ResumeData } from '@/entities/resume-data';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
 import { EnabledIcon } from '@/ui/icons/action-icons';
 import { VerticalNav } from '@/ui/navigation/vertical-nav';
@@ -25,7 +25,7 @@ import {
   notificationReducer,
 } from '@/ui/notifications/notification';
 import { SessionContext } from '@/context/session-context';
-import { ObjectiveForm } from '@/models/objective/forms';
+import { ObjectiveForm } from '@/entities/objective/forms';
 
 export function Boundary({
   user,

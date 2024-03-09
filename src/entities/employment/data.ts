@@ -2,8 +2,8 @@ import type { z } from 'zod';
 import type { Selectable } from 'kysely';
 import { db } from '@/database/client';
 import type { JobHighlight } from '@/database/schema';
-import type { Employment } from '@/models/employment/types';
-import type { employmentSchema } from '@/models/employment/validation';
+import type { Employment } from '@/entities/employment/types';
+import type { employmentSchema } from '@/entities/employment/validation';
 
 export async function saveJobDetails(
   values: z.infer<typeof employmentSchema> & { user_id: string }

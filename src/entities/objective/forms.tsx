@@ -2,13 +2,13 @@ import React from 'react';
 import { Field as HeadlessField } from '@headlessui/react';
 import type { Selectable } from 'kysely';
 import { useFormValidation } from '@/hooks/use-form-validation';
-import { objectiveSchema } from '@/models/objective/validation';
+import { objectiveSchema } from '@/entities/objective/validation';
 import { useSession } from '@/hooks/use-session';
 import { Field, FieldGroup, Fieldset, Label } from '@/ui/fieldset';
 import { Textarea } from '@/ui/textarea';
 import { Switch } from '@/ui/switch';
 import type { ResumeObjective } from '@/database/schema';
-import { saveObjective } from '@/models/objective/actions';
+import { saveObjective } from '@/entities/objective/actions';
 
 interface ObjectiveFormProps {
   objective?: Selectable<ResumeObjective>;

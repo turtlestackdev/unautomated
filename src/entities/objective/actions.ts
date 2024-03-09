@@ -1,9 +1,9 @@
 'use server';
 import type { Selectable } from 'kysely';
 import type { FormState } from '@/lib/validation';
-import { objectiveSchema } from '@/models/objective/validation';
+import { objectiveSchema } from '@/entities/objective/validation';
 import type { ResumeObjective } from '@/database/schema';
-import * as objectives from '@/models/objective/data';
+import * as objectives from '@/entities/objective/data';
 
 type ObjectiveFormState = FormState<typeof objectiveSchema, Selectable<ResumeObjective>>;
 

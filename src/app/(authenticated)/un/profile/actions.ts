@@ -1,5 +1,5 @@
 'use server';
-import * as users from '@/models/user';
+import * as users from '@/entities/user';
 import { FileFormatError, FileSizeError } from '@/lib/errors';
 import { type FormState } from '@/app/(authenticated)/un/profile/form';
 

@@ -3,7 +3,7 @@ import type { ReadableOptions } from 'node:stream';
 import path from 'node:path';
 import { NextResponse } from 'next/server';
 import { validateRequest } from '@/lib/auth';
-import * as files from '@/models/file-upload';
+import * as files from '@/entities/file-upload';
 
 function streamFile(filePath: string, options?: ReadableOptions): ReadableStream<Uint8Array> {
   const downloadStream = fs.createReadStream(filePath, options);

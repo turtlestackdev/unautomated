@@ -1,10 +1,10 @@
 import React from 'react';
 import { Field as HeadlessField } from '@headlessui/react';
 import { useSession } from '@/hooks/use-session';
-import type { Employment } from '@/models/employment/types';
+import type { Employment } from '@/entities/employment/types';
 import { useFormValidation } from '@/hooks/use-form-validation';
-import { employmentSchema } from '@/models/employment/validation';
-import { saveEmployment } from '@/models/employment/actions';
+import { employmentSchema } from '@/entities/employment/validation';
+import { saveEmployment } from '@/entities/employment/actions';
 import { Field, FieldGroup, Label } from '@/ui/fieldset';
 import { Input } from '@/ui/input';
 import { DatePicker } from '@/ui/date-picker';

@@ -2,9 +2,9 @@
 
 import type { FormState } from '@/lib/validation';
 import { formToObject } from '@/lib/validation';
-import type { Employment } from '@/models/employment/types';
-import * as employment from '@/models/employment/data';
-import { employmentSchema } from '@/models/employment/validation';
+import type { Employment } from '@/entities/employment/types';
+import * as employment from '@/entities/employment/data';
+import { employmentSchema } from '@/entities/employment/validation';
 
 type EmploymentFormState = FormState<typeof employmentSchema, Employment>;
 
