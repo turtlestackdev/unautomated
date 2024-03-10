@@ -1,5 +1,6 @@
 'use server';
 import type { Selectable } from 'kysely';
+import { type ZodType, type ZodTypeDef } from 'zod';
 import type { FormState } from '@/lib/validation';
 import { objectiveSchema } from '@/entities/objective/validation';
 import type { ResumeObjective } from '@/database/schema';
@@ -36,6 +37,26 @@ export async function saveObjective(
         formErrors: [],
         fieldErrors: {},
       },
+    };
+  }
+}
+
+type DeleteObjectiveState = FormState<ZodType<null, ZodTypeDef, null>, null>;
+
+export async function deleteObjective(
+  userId: string,
+  objectiveId: string,
+  _prevState: DeleteObjectiveState,
+  _data: FormData
+): Promise<DeleteObjectiveState> {
+  try {
+    await objectives.deleteObjective({ objectiveId, userId });
+    return { status: 'success', model: null };
+  } catch (error) {
+    console.warn('could not delete objective, error');
+    return {
+      status: 'error',
+      errors: { formErrors: ['Could not delete objective'], fieldErrors: {} },
     };
   }
 }

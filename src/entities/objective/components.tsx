@@ -1,8 +1,10 @@
-import React, { Fragment, useState } from 'react';
-import { Field as HeadlessField, Menu, Transition } from '@headlessui/react';
+import React, { useState } from 'react';
+import { Field as HeadlessField } from '@headlessui/react';
 import type { Selectable } from 'kysely';
-import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 import { clsx } from 'clsx';
+import { PencilSquareIcon } from '@heroicons/react/24/solid';
+import { TrashIcon } from '@heroicons/react/16/solid';
+import { XMarkIcon } from '@heroicons/react/20/solid';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import { objectiveSchema } from '@/entities/objective/validation';
 import { useSession } from '@/hooks/use-session';
@@ -10,14 +12,13 @@ import { Field, FieldGroup, Fieldset, Label } from '@/ui/fieldset';
 import { Textarea } from '@/ui/textarea';
 import { Switch } from '@/ui/switch';
 import type { ResumeObjective } from '@/database/schema';
-import { saveObjective } from '@/entities/objective/actions';
-import { Submit } from '@/ui/button';
+import { deleteObjective, saveObjective } from '@/entities/objective/actions';
+import { Button, Submit } from '@/ui/button';
 import { EnabledIcon, SaveIcon } from '@/ui/icons/action-icons';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
 import { H3, Text } from '@/ui/text';
 import { VisibilityToggle } from '@/ui/actions/visibility-toggle';
 import { Collapsible } from '@/ui/transitions/collapsible';
-import { type UnSaved } from '@/lib/utils';
 
 type ObjectiveFormProps = Partial<Selectable<ResumeObjective>> & {
   autoSave?: boolean;
@@ -70,9 +71,9 @@ export function ObjectiveForm({
             </HeadlessField>
             {!autoSave ? (
               <div className="grow text-right">
-                <Submit plain title="save">
+                <Submit color="brand" title="save">
                   Save
-                  <SaveIcon className="h-5 w-5 fill-brand-400" />
+                  <SaveIcon className="h-5 w-5 " />
                 </Submit>
               </div>
             ) : null}
@@ -86,9 +87,11 @@ export function ObjectiveForm({
 export function ObjectiveTable({
   objectives = [],
   onEdit,
+  onDelete,
 }: {
   objectives?: Selectable<ResumeObjective>[];
   onEdit?: (objective: Selectable<ResumeObjective>) => void;
+  onDelete?: (id: string) => void;
 }): React.JSX.Element {
   return (
     <Table>
@@ -103,66 +106,141 @@ export function ObjectiveTable({
       </TableHead>
       <TableBody>
         {objectives.map((objective) => (
-          <TableRow key={objective.id}>
-            <TableCell>
-              <Text className="max-w-prose truncate">{objective.objective}</Text>
-            </TableCell>
-            <TableCell>
-              <EnabledIcon enabled={objective.is_default} />
-            </TableCell>
-            <TableCell>
-              <Menu as="div" className="relative flex-none">
-                <Menu.Button className="-m-2.5 block p-2.5 text-gray-500 hover:text-gray-900">
-                  <span className="sr-only">Open options</span>
-                  <EllipsisVerticalIcon aria-hidden="true" className="h-5 w-5" />
-                </Menu.Button>
-                <Transition
-                  as={Fragment}
-                  enter="transition ease-out duration-100"
-                  enterFrom="transform opacity-0 scale-95"
-                  enterTo="transform opacity-100 scale-100"
-                  leave="transition ease-in duration-75"
-                  leaveFrom="transform opacity-100 scale-100"
-                  leaveTo="transform opacity-0 scale-95"
-                >
-                  <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
-                    <Menu.Item>
-                      {({ focus }) => (
-                        <button
-                          className={clsx(
-                            focus ? 'bg-gray-50' : '',
-                            'block w-full px-3 py-1 text-left text-sm leading-6 text-gray-900'
-                          )}
-                          type="button"
-                          onClick={() => {
-                            onEdit && onEdit(objective);
-                          }}
-                        >
-                          Edit
-                        </button>
-                      )}
-                    </Menu.Item>
-                    <Menu.Item>
-                      {({ focus }) => (
-                        <button
-                          className={clsx(
-                            focus ? 'bg-gray-50' : '',
-                            'block w-full px-3 py-1 text-left text-sm leading-6 text-gray-900'
-                          )}
-                          type="button"
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </Menu.Item>
-                  </Menu.Items>
-                </Transition>
-              </Menu>
-            </TableCell>
-          </TableRow>
+          <ObjectiveRow
+            key={JSON.stringify(objective)}
+            objective={objective}
+            onDelete={onDelete}
+            onEdit={onEdit}
+          />
         ))}
       </TableBody>
     </Table>
+  );
+}
+
+function ObjectiveRow({
+  objective,
+  onDelete,
+  onEdit,
+}: {
+  objective: Selectable<ResumeObjective>;
+  onEdit?: (objective: Selectable<ResumeObjective>) => void;
+  onDelete?: (id: string) => void;
+}): React.JSX.Element {
+  const { user } = useSession();
+  const [formRef, action, _submit, _setShouldSubmit, errors] = useFormValidation({
+    schema: objectiveSchema,
+    action: saveObjective.bind(null, user.id),
+    onSuccess: (updated: Selectable<ResumeObjective>) => {
+      onEdit?.(updated);
+    },
+  });
+  const [editing, setEditing] = useState(false);
+  const formId = `resume-objective-editing-${objective.id}`;
+
+  return (
+    <TableRow className={editing ? 'align-top' : ''}>
+      <TableCell className="w-full">
+        <Text className={clsx('max-w-prose truncate', !editing ? '' : 'hidden')}>
+          {objective.objective}
+        </Text>
+        <form action={action} ref={formRef} id={formId} className={clsx(editing ? '' : 'hidden')}>
+          <input type="hidden" name="id" value={objective.id} />
+          <Field>
+            <Label className="sr-only">Objective</Label>
+            <Textarea
+              defaultValue={objective.objective}
+              errors={errors?.fieldErrors.objective}
+              name="objective"
+              form={formId}
+              rows={10}
+            />
+          </Field>
+        </form>
+      </TableCell>
+      <TableCell>
+        <EnabledIcon className={clsx(!editing ? '' : 'hidden')} enabled={objective.is_default} />
+        <div className={editing ? ' sm:py-[calc(theme(spacing[1.5])-1px)]' : ''}>
+          <Switch
+            className={clsx(editing ? '' : 'hidden')}
+            defaultChecked={objective.is_default}
+            name="is_default_objective"
+            form={formId}
+          />
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center">
+          <Button
+            plain
+            title="edit"
+            className={clsx(!editing ? '' : 'hidden')}
+            onClick={() => {
+              setEditing(true);
+            }}
+          >
+            <PencilSquareIcon />
+          </Button>
+
+          <Button
+            plain
+            title="save"
+            type="submit"
+            form={formId}
+            className={clsx(editing ? '' : 'hidden')}
+          >
+            <SaveIcon className="h-4 w-4" data-slot="icon" />
+          </Button>
+
+          <Button
+            plain
+            title="cancel"
+            onClick={() => {
+              formRef.current?.reset();
+              setEditing(false);
+            }}
+            form={formId}
+            className={clsx(editing ? '' : 'hidden')}
+          >
+            <XMarkIcon />
+          </Button>
+
+          <DeleteObjectiveForm
+            className={clsx(!editing ? '' : 'hidden')}
+            objectiveId={objective.id}
+            onDelete={() => {
+              onDelete?.(objective.id);
+            }}
+          />
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}
+
+export function DeleteObjectiveForm({
+  objectiveId,
+  onDelete,
+  className,
+}: {
+  objectiveId: string;
+  onDelete?: () => void;
+  className?: string;
+}): React.JSX.Element {
+  const { user } = useSession();
+  const [formRef, action, _submit, _setShouldSubmit, _errors] = useFormValidation({
+    action: deleteObjective.bind(null, user.id, objectiveId),
+    onSuccess: () => {
+      onDelete && onDelete();
+    },
+  });
+
+  return (
+    <form ref={formRef} action={action} className={className}>
+      <Submit title="delete" plain>
+        <TrashIcon />
+      </Submit>
+    </form>
   );
 }
 
@@ -177,35 +255,30 @@ export function ObjectivePanel({
     props.objectives ?? []
   );
   const defaultObjective = objectives.find((objective) => objective.is_default);
-  const [editing, setEditing] = useState<UnSaved<Selectable<ResumeObjective>>>({
-    is_default: defaultObjective === undefined,
-    objective: '',
-  });
 
   const onSave = (saved: Selectable<ResumeObjective>): void => {
-    if (editing.id) {
-      setObjectives(
-        objectives.map((objective) => {
-          if (objective.id === saved.id) {
-            return saved;
-          }
-
-          return { ...objective, is_default: saved.is_default ? false : objective.is_default };
-        })
-      );
-    } else {
-      setObjectives([
-        ...objectives.map((objective) => {
-          return { ...objective, is_default: saved.is_default ? false : objective.is_default };
-        }),
-        saved,
-      ]);
-    }
+    setObjectives([
+      ...objectives.map((objective) => {
+        return { ...objective, is_default: saved.is_default ? false : objective.is_default };
+      }),
+      saved,
+    ]);
   };
 
-  const editObjective = (objective: Selectable<ResumeObjective>): void => {
-    // todo find a way to tell if the form can be replaced.
-    setEditing(objective);
+  const onEdit = (updated: Selectable<ResumeObjective>): void => {
+    setObjectives(
+      objectives.map((objective) => {
+        if (objective.id === updated.id) {
+          return updated;
+        }
+
+        return { ...objective, is_default: updated.is_default ? false : objective.is_default };
+      })
+    );
+  };
+
+  const onDelete = (id: string): void => {
+    setObjectives(objectives.filter((objective) => objective.id !== id));
   };
 
   return (
@@ -217,8 +290,16 @@ export function ObjectivePanel({
         </div>
       </div>
       <Collapsible show={show}>
-        <ObjectiveForm key={editing.id ?? `${new Date().getTime()}`} {...editing} onSave={onSave} />
-        <ObjectiveTable objectives={objectives} onEdit={editObjective} />
+        <div className="space-y-8">
+          <ObjectiveForm
+            key={`${new Date().getTime()}`}
+            is_default={defaultObjective === undefined}
+            onSave={onSave}
+          />
+          {objectives.length > 0 ? (
+            <ObjectiveTable objectives={objectives} onEdit={onEdit} onDelete={onDelete} />
+          ) : null}
+        </div>
       </Collapsible>
     </div>
   );

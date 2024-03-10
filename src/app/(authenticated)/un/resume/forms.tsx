@@ -9,7 +9,7 @@ import { Input } from '@/ui/input';
 import type { Education } from '@/entities/education/types';
 import type { Employment } from '@/entities/employment/types';
 import { EducationForm } from '@/entities/education/forms';
-import { EmploymentForm } from '@/entities/employment/forms';
+import { EmploymentForm } from '@/entities/employment/components';
 import { ObjectiveForm } from '@/entities/objective/components';
 
 function WorkHistoryFormFields({
