@@ -11,6 +11,7 @@ import { DatePicker } from '@/ui/date-picker';
 import { Switch } from '@/ui/switch';
 import { Textarea } from '@/ui/textarea';
 import { ListField } from '@/ui/form-elements/list-field';
+import { CollapsibleSection } from '@/ui/layout/collapsible-section';
 
 interface EmploymentFormProps {
   employment?: Employment;
@@ -123,5 +124,13 @@ export function EmploymentForm({ employment, onChange }: EmploymentFormProps): R
         />
       </FieldGroup>
     </form>
+  );
+}
+
+export function EmploymentPanel(): React.JSX.Element {
+  return (
+    <CollapsibleSection title="Employment" show>
+      <div>I AM A Section</div>
+    </CollapsibleSection>
   );
 }

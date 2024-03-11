@@ -11,6 +11,7 @@ import { VerticalNav } from '@/ui/navigation/vertical-nav';
 import { ObjectivePanel } from '@/entities/objective/components';
 import { UploadResumeForm } from '@/entities/resume/forms';
 import { ClientBoundary } from '@/ui/client-boundary';
+import { EmploymentPanel } from '@/entities/employment/components';
 
 export function Boundary({
   user,
@@ -71,8 +72,9 @@ export function Boundary({
         </MainPanel.Header>
         <MainPanel.Content>
           <div className="flex items-start gap-8 sm:gap-16">
-            <div className="grow">
+            <div className="grow space-y-8">
               <ObjectivePanel objectives={resumeData.objectives} />
+              <EmploymentPanel />
             </div>
             <div>
               <VerticalNav>

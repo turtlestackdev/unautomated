@@ -16,9 +16,8 @@ import { deleteObjective, saveObjective } from '@/entities/objective/actions';
 import { Button, Submit } from '@/ui/button';
 import { EnabledIcon, SaveIcon } from '@/ui/icons/action-icons';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
-import { H3, Text } from '@/ui/text';
-import { VisibilityToggle } from '@/ui/actions/visibility-toggle';
-import { Collapsible } from '@/ui/transitions/collapsible';
+import { Text } from '@/ui/text';
+import { CollapsibleSection } from '@/ui/layout/collapsible-section';
 
 type ObjectiveFormProps = Partial<Selectable<ResumeObjective>> & {
   autoSave?: boolean;
@@ -250,7 +249,6 @@ export function ObjectivePanel({
   objectives?: Selectable<ResumeObjective>[];
   show?: boolean;
 }): React.JSX.Element {
-  const [show, setShow] = useState(props.show ?? true);
   const [objectives, setObjectives] = useState<Selectable<ResumeObjective>[]>(
     props.objectives ?? []
   );
@@ -282,25 +280,15 @@ export function ObjectivePanel({
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center border-b border-gray-200">
-        <H3 className="grow">Objectives</H3>
-        <div className="flex shrink">
-          <VisibilityToggle show={show} onToggle={setShow} />
-        </div>
-      </div>
-      <Collapsible show={show}>
-        <div className="space-y-8">
-          <ObjectiveForm
-            key={`${new Date().getTime()}`}
-            is_default={defaultObjective === undefined}
-            onSave={onSave}
-          />
-          {objectives.length > 0 ? (
-            <ObjectiveTable objectives={objectives} onEdit={onEdit} onDelete={onDelete} />
-          ) : null}
-        </div>
-      </Collapsible>
-    </div>
+    <CollapsibleSection title="Objectives" show>
+      <ObjectiveForm
+        key={`${new Date().getTime()}`}
+        is_default={defaultObjective === undefined}
+        onSave={onSave}
+      />
+      {objectives.length > 0 ? (
+        <ObjectiveTable objectives={objectives} onEdit={onEdit} onDelete={onDelete} />
+      ) : null}
+    </CollapsibleSection>
   );
 }
