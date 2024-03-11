@@ -1,6 +1,5 @@
-import type { ZodType } from 'zod';
-import { z } from 'zod';
-import { isObject, isString } from '@/lib/type-guards';
+import { type ZodType, z, type ZodEffects, type ZodString } from 'zod';
+import { isObject } from '@/lib/type-guards';
 
 export type FormState<T extends ZodType, M> =
   | { status: 'new'; errors?: never; model?: never }
@@ -18,32 +17,60 @@ export type FormState<T extends ZodType, M> =
 export const initialFormState = { status: 'new' } as const;
 
 export function emptyStringToUndefined(arg: unknown): unknown {
-  if (isString(arg) && arg === '') {
+  if (arg === '') {
     return undefined;
   }
+
   return arg;
 }
 
-export const optionalDateString = z
-  .string()
-  .regex(/^$|\d{4}-\d{2}-\d{2}/, { message: 'invalid format' })
-  .optional()
-  .transform((val, ctx) => {
-    if (val) {
+export const emptyStringIsUndefined = z.string().transform((val) => (val === '' ? undefined : val));
+
+type MaybeDate = z.ZodUnion<
+  [
+    z.ZodEffects<z.ZodString, Date, string>,
+    z.ZodOptional<z.ZodEffects<z.ZodString, string | undefined, string>>,
+  ]
+>;
+type RequiredDate = z.ZodPipeline<
+  ZodEffects<ZodString, string | undefined, string>,
+  ZodEffects<ZodString, Date, string>
+>;
+export const dateString = (props?: {
+  optional?: boolean;
+  requiredMessage?: string;
+  formatMessage?: string;
+  invalidMessage?: string;
+}): MaybeDate | RequiredDate => {
+  const {
+    optional = false,
+    requiredMessage = 'date required',
+    formatMessage = 'invalid format',
+    invalidMessage = 'invalid date',
+  } = props ?? {};
+
+  const pattern = z
+    .string({ required_error: requiredMessage })
+    .regex(/\d{4}-\d{2}-\d{2}/, { message: formatMessage })
+    .transform((val, ctx) => {
       const parsed = new Date(`${val}T00:00:00`);
       if (isNaN(parsed.getTime())) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Invalid date',
+          message: invalidMessage,
         });
 
         return z.NEVER;
       }
 
       return parsed;
-    }
-    return undefined;
-  });
+    });
+
+  const maybeDate: MaybeDate = pattern.or(emptyStringIsUndefined.optional());
+  const requiredDate: RequiredDate = emptyStringIsUndefined.pipe(pattern);
+
+  return optional ? maybeDate : requiredDate;
+};
 
 export function parseFieldName(field: string):
   | { name: string; type: 'single' | 'array'; key?: never }

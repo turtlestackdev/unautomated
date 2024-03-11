@@ -74,7 +74,7 @@ export function Boundary({
           <div className="flex items-start gap-8 sm:gap-16">
             <div className="grow space-y-8">
               <ObjectivePanel objectives={resumeData.objectives} />
-              <EmploymentPanel />
+              <EmploymentPanel employment={resumeData.employment} />
             </div>
             <div>
               <VerticalNav>

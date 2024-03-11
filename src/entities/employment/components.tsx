@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Field as HeadlessField } from '@headlessui/react';
+import { format } from 'date-fns/fp';
 import { useSession } from '@/hooks/use-session';
 import type { Employment } from '@/entities/employment/types';
 import { useFormValidation } from '@/hooks/use-form-validation';
@@ -12,25 +13,33 @@ import { Switch } from '@/ui/switch';
 import { Textarea } from '@/ui/textarea';
 import { ListField } from '@/ui/form-elements/list-field';
 import { CollapsibleSection } from '@/ui/layout/collapsible-section';
+import { Submit } from '@/ui/button';
+import { SaveIcon } from '@/ui/icons/action-icons';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
 
 interface EmploymentFormProps {
   employment?: Employment;
-  onChange: (employment: Employment) => void;
+  onSave: (employment: Employment) => void;
+  autoSave?: boolean;
 }
 
-export function EmploymentForm({ employment, onChange }: EmploymentFormProps): React.JSX.Element {
+export function EmploymentForm({
+  employment,
+  onSave,
+  autoSave = false,
+}: EmploymentFormProps): React.JSX.Element {
   const { user } = useSession();
   const [formRef, action, submit, setShouldSubmit, errors] = useFormValidation({
     schema: employmentSchema,
     action: saveEmployment.bind(null, user.id),
-    onSuccess: onChange,
+    onSuccess: onSave,
   });
 
   const highlights = employment?.highlights.map((highlight) => highlight.description) ?? [];
 
   return (
-    <form action={action} ref={formRef}>
-      <FieldGroup className="pt-8">
+    <form action={action} ref={formRef} className="max-w-2xl">
+      <FieldGroup>
         {employment?.id ? <input defaultValue={employment.id} name="id" type="hidden" /> : null}
         <Field>
           <Label>Company</Label>
@@ -39,7 +48,7 @@ export function EmploymentForm({ employment, onChange }: EmploymentFormProps): R
             errors={errors?.fieldErrors.company}
             name="company"
             onBlur={(event) => {
-              if (event.target.value !== employment?.company) {
+              if (autoSave && event.target.value !== employment?.company) {
                 submit();
               }
             }}
@@ -52,7 +61,7 @@ export function EmploymentForm({ employment, onChange }: EmploymentFormProps): R
             errors={errors?.fieldErrors.title}
             name="title"
             onBlur={(event) => {
-              if (event.target.value !== employment?.title) {
+              if (autoSave && event.target.value !== employment?.title) {
                 submit();
               }
             }}
@@ -68,7 +77,7 @@ export function EmploymentForm({ employment, onChange }: EmploymentFormProps): R
               multiColumn
               name="start_date"
               onChange={(date) => {
-                if (date !== employment?.start_date) {
+                if (autoSave && date !== employment?.start_date) {
                   setShouldSubmit(true);
                 }
               }}
@@ -78,13 +87,13 @@ export function EmploymentForm({ employment, onChange }: EmploymentFormProps): R
             <Label>End Date</Label>
             <DatePicker
               defaultValue={employment?.end_date ?? undefined}
-              errors={errors?.fieldErrors.start_date}
+              errors={errors?.fieldErrors.end_date}
               max={new Date()}
               min={employment?.start_date ?? undefined}
               multiColumn
               name="end_date"
               onChange={(date) => {
-                if (date !== employment?.end_date) {
+                if (autoSave && date !== employment?.end_date) {
                   setShouldSubmit(true);
                 }
               }}
@@ -96,7 +105,9 @@ export function EmploymentForm({ employment, onChange }: EmploymentFormProps): R
               defaultChecked={employment?.is_current_position}
               name="is_current_position"
               onChange={() => {
-                setShouldSubmit(true);
+                if (autoSave) {
+                  setShouldSubmit(true);
+                }
               }}
             />
           </HeadlessField>
@@ -108,7 +119,7 @@ export function EmploymentForm({ employment, onChange }: EmploymentFormProps): R
             errors={errors?.fieldErrors.description}
             name="description"
             onBlur={(event) => {
-              if (event.target.value !== employment?.description) {
+              if (autoSave && event.target.value !== employment?.description) {
                 submit();
               }
             }}
@@ -120,17 +131,75 @@ export function EmploymentForm({ employment, onChange }: EmploymentFormProps): R
           items={highlights}
           label="Duties, achievements, highlights, etc."
           name="highlights"
-          onChange={submit}
+          onChange={() => {
+            if (autoSave) {
+              submit();
+            }
+          }}
         />
+        {autoSave ? null : (
+          <div className="text-right">
+            <Submit color="brand">
+              Save <SaveIcon className="h-5 w-5" />
+            </Submit>
+          </div>
+        )}
       </FieldGroup>
     </form>
   );
 }
 
-export function EmploymentPanel(): React.JSX.Element {
+function shorthandDate(startDate: Date | null, endDate: Date | null): string {
+  const start = startDate ? format('MMM yyyy', startDate) : '';
+  const end = endDate ? format(' - MMM yyyy', endDate) : '';
+
+  return `${start}${end}`;
+}
+
+export function EmploymentTable({ employment }: { employment: Employment[] }): React.JSX.Element {
   return (
-    <CollapsibleSection title="Employment" show>
-      <div>I AM A Section</div>
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableHeader>Company</TableHeader>
+          <TableHeader>Title</TableHeader>
+          <TableHeader>Dates</TableHeader>
+          <TableHeader>
+            <span className="sr-only">Actions</span>
+          </TableHeader>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {employment.map((job) => (
+          <TableRow key={JSON.stringify(job)}>
+            <TableCell>{job.company}</TableCell>
+            <TableCell>{job.title}</TableCell>
+            <TableCell>{shorthandDate(job.start_date, job.end_date)}</TableCell>
+            <TableCell>...</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+export function EmploymentPanel({
+  show = true,
+  ...props
+}: {
+  employment?: Employment[];
+  show?: boolean;
+}): React.JSX.Element {
+  const [employment, setEmployment] = useState<Employment[]>(props.employment ?? []);
+  return (
+    <CollapsibleSection title="Employment" show={show}>
+      <EmploymentForm
+        key={`${new Date().getTime()}`}
+        onSave={(job) => {
+          setEmployment([...employment, job]);
+        }}
+      />
+      {employment.length > 0 ? <EmploymentTable employment={employment} /> : null}
     </CollapsibleSection>
   );
 }

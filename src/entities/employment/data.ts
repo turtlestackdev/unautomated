@@ -36,7 +36,7 @@ export async function saveJobDetails(
   });
 }
 
-export async function getUserJobs(userId: string): Promise<Employment[]> {
+export async function getUserEmployment(userId: string): Promise<Employment[]> {
   const rows = await db
     .selectFrom('job_details as job')
     .leftJoin('job_highlights as h', 'job.id', 'h.job_id')

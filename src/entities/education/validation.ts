@@ -1,5 +1,5 @@
 import { preprocess, z } from 'zod';
-import { emptyStringToUndefined, optionalDateString } from '@/lib/validation';
+import { dateString, emptyStringToUndefined } from '@/lib/validation';
 
 export const educationSchema = z
   .object({
@@ -26,8 +26,8 @@ export const educationSchema = z
         })
     ),
     location: z.string().default(''),
-    start_date: optionalDateString,
-    end_date: optionalDateString,
+    start_date: dateString({ optional: true }),
+    end_date: dateString({ optional: true }),
     highlights: z
       .string()
       .array()

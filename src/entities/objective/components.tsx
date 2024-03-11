@@ -72,7 +72,7 @@ export function ObjectiveForm({
               <div className="grow text-right">
                 <Submit color="brand" title="save">
                   Save
-                  <SaveIcon className="h-5 w-5 " />
+                  <SaveIcon className="h-5 w-5" />
                 </Submit>
               </div>
             ) : null}
@@ -280,7 +280,7 @@ export function ObjectivePanel({
   };
 
   return (
-    <CollapsibleSection title="Objectives" show>
+    <CollapsibleSection title="Objectives" show={props.show ?? true}>
       <ObjectiveForm
         key={`${new Date().getTime()}`}
         is_default={defaultObjective === undefined}

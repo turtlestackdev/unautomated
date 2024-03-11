@@ -1,13 +1,13 @@
 import { z } from 'zod';
-import { optionalDateString } from '@/lib/validation';
+import { dateString } from '@/lib/validation';
 
 export const employmentSchema = z
   .object({
     id: z.string().optional(),
-    company: z.string().default(''),
-    title: z.string().default(''),
-    start_date: optionalDateString,
-    end_date: optionalDateString,
+    company: z.string().min(1, { message: 'Company is required' }),
+    title: z.string().min(1, { message: 'Job Title is required' }),
+    start_date: dateString({ optional: false }),
+    end_date: dateString({ optional: true }),
     is_current_position: z.preprocess((value) => value === 'on', z.boolean()).default(false),
     description: z.string().default(''),
     highlights: z
@@ -18,14 +18,15 @@ export const employmentSchema = z
   })
   .refine(
     (data) => {
-      return !(
-        data.start_date instanceof Date &&
-        data.end_date instanceof Date &&
-        data.end_date <= data.start_date
+      return (
+        (data.start_date instanceof Date &&
+          data.end_date instanceof Date &&
+          data.end_date > data.start_date) ||
+        (!data.start_date && !data.end_date)
       );
     },
     {
-      message: 'End date is after start.',
+      message: 'end date is before start.',
       path: ['end_date'],
     }
   );

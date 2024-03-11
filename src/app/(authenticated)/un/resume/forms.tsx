@@ -52,7 +52,7 @@ function WorkHistoryFormFields({
       </Legend>
       <div className="space-y-8 divide-y divide-dashed divide-gray-300">
         <EmploymentForm
-          onChange={(job) => {
+          onSave={(job) => {
             setJobs(new Map([...jobs.entries(), [job.id, job]]));
           }}
         />
@@ -60,7 +60,7 @@ function WorkHistoryFormFields({
           <div key={JSON.stringify(job)}>
             <EmploymentForm
               employment={job}
-              onChange={(updated) => {
+              onSave={(updated) => {
                 updateJob(key, updated);
               }}
             />
@@ -122,7 +122,7 @@ export function CreateResumeForm({
         <ObjectiveForm key={objective.id} {...objective} />
       ))}
       <ObjectiveForm />
-      <WorkHistoryFormFields jobs={resumeData.jobs} user={user} />
+      <WorkHistoryFormFields jobs={resumeData.employment} user={user} />
       <EducationForm degrees={resumeData.formOptions.degrees} />
       {[...initialEdu.entries()].map(([key, edu]) => (
         <EducationForm degrees={resumeData.formOptions.degrees} education={edu} key={key} />

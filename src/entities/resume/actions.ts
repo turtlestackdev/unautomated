@@ -23,7 +23,7 @@ export async function uploadResume(
     status: 'success',
     model: {
       objectives: [],
-      jobs: [],
+      employment: [],
       education: [],
       formOptions: { degrees: degreeTypes },
     },
