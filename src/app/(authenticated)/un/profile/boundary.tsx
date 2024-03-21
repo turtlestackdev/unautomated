@@ -3,14 +3,13 @@ import { useState } from 'react';
 import type { ReactElement } from 'react';
 import type { Session } from 'lucia';
 import { DocumentArrowUpIcon } from '@heroicons/react/24/outline';
-import { MainPanel } from '@/ui/layout/main-panel';
 import { Button } from '@/ui/button';
 import type { SessionUser } from '@/lib/auth';
 import type { ResumeData } from '@/entities/resume-data';
 import { VerticalNav } from '@/ui/navigation/vertical-nav';
 import { ObjectivePanel } from '@/entities/objective/components';
 import { UploadResumeForm } from '@/entities/resume/forms';
-import { ClientBoundary } from '@/ui/client-boundary';
+import { AppShell } from '@/ui/layout/app-shell';
 
 export function Boundary({
   user,
@@ -56,37 +55,32 @@ export function Boundary({
   ];
 
   return (
-    <ClientBoundary session={{ session, user }}>
-      <MainPanel>
-        <MainPanel.Header title="Employment Profile">
-          <Button
-            title="Uplaod resume"
-            color="brand"
-            onClick={() => {
-              setFileDialogOpen(true);
-            }}
-          >
-            <DocumentArrowUpIcon />
-            <span className="hidden sm:inline">Upload resume</span>
-          </Button>
-          <UploadResumeForm open={fileDialogOpen} setIsOpen={setFileDialogOpen} />
-        </MainPanel.Header>
-        <MainPanel.Content>
-          <div className="flex items-start gap-8 sm:gap-16">
-            <div>
-              <VerticalNav>
-                {pageLinks.map((link) => (
-                  <VerticalNav.Link key={link.name} link={link} />
-                ))}
-              </VerticalNav>
-            </div>
-            <div className="grow space-y-8">
-              <ObjectivePanel objectives={resumeData.objectives} />
-              {/*<EmploymentPanel employment={resumeData.employment} />*/}
-            </div>
-          </div>
-        </MainPanel.Content>
-      </MainPanel>
-    </ClientBoundary>
+    <AppShell session={{ session, user }}>
+      <AppShell.Header title="Employment Profile">
+        <Button
+          title="Uplaod resume"
+          color="brand"
+          onClick={() => {
+            setFileDialogOpen(true);
+          }}
+        >
+          <DocumentArrowUpIcon />
+          <span className="hidden sm:inline">Upload resume</span>
+        </Button>
+        <UploadResumeForm open={fileDialogOpen} setIsOpen={setFileDialogOpen} />
+      </AppShell.Header>
+      <AppShell.Content>
+        <AppShell.SideBar>
+          <VerticalNav>
+            {pageLinks.map((link) => (
+              <VerticalNav.Link key={link.name} link={link} />
+            ))}
+          </VerticalNav>
+        </AppShell.SideBar>
+        <AppShell.Main>
+          <ObjectivePanel objectives={resumeData.objectives} />
+        </AppShell.Main>
+      </AppShell.Content>
+    </AppShell>
   );
 }

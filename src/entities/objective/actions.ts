@@ -30,7 +30,7 @@ export async function saveObjective(
       model,
     };
   } catch (error) {
-    console.warn('Failed to insert objective', error);
+    console.warn('Failed to save objective', error);
     return {
       status: 'error',
       errors: {

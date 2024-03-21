@@ -73,6 +73,7 @@ CREATE TABLE "resume_titles" (
 CREATE TABLE "resume_objectives" (
     "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "user_id" UUID NOT NULL,
+    "name" TEXT NOT NULL,
     "objective" TEXT NOT NULL,
     "is_default" BOOLEAN NOT NULL DEFAULT false,
 
@@ -172,6 +173,9 @@ CREATE INDEX "file_uploads_type_idx" ON "file_uploads"("type");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_links_user_id_type_key" ON "user_links"("user_id", "type");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "resume_objectives_user_id_name_key" ON "resume_objectives"("user_id", "name");
 
 -- CreateIndex
 CREATE INDEX "job_details_start_date_idx" ON "job_details"("start_date");

@@ -1,16 +1,11 @@
 import type { ReactElement } from 'react';
-import { ApplicationShell } from '@/ui/layout/application-shell';
 import { validatedSession } from '@/lib/auth';
-import { ProfileForm } from '@/app/(authenticated)/un/profile/form';
-import * as users from '@/entities/user';
+import { Boundary } from '@/app/(authenticated)/un/profile/boundary';
+import * as resumeData from '@/entities/resume-data';
 
-export default async function Dashboard(): Promise<ReactElement> {
+export default async function ProfilePage(): Promise<ReactElement> {
   const { user, session } = await validatedSession();
-  const links = await users.readLinks({ id: user.id });
+  const resume = await resumeData.readUserData(user.id);
 
-  return (
-    <ApplicationShell pageName="Profile" session={session} user={user}>
-      <ProfileForm links={links} user={user} />
-    </ApplicationShell>
-  );
+  return <Boundary resumeData={resume} session={session} user={user} />;
 }

@@ -3,7 +3,13 @@ import type { ResumeObjective } from '@/database/schema';
 import { db } from '@/database/client';
 
 export async function getUserObjectives(userId: string): Promise<Selectable<ResumeObjective>[]> {
-  return db.selectFrom('resume_objectives').selectAll().where('user_id', '=', userId).execute();
+  return db
+    .selectFrom('resume_objectives')
+    .selectAll()
+    .orderBy('is_default', 'desc')
+    .orderBy('name', 'asc')
+    .where('user_id', '=', userId)
+    .execute();
 }
 
 export async function saveObjective(

@@ -97,9 +97,11 @@ model ResumeObjective {
   id         String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   user_id    String  @db.Uuid
   user       User    @relation(fields: [user_id], references: [id])
+  name       String
   objective  String
   is_default Boolean @default(false)
 
+  @@unique([user_id, name])
   @@map("resume_objectives")
 }
 

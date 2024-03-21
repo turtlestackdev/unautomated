@@ -19,7 +19,7 @@ interface EducationFormProps {
 
 export function EducationForm({ education, degrees }: EducationFormProps): React.JSX.Element {
   const { user } = useSession();
-  const [formRef, action, submit, setShouldSubmit, errors] = useFormValidation({
+  const { formRef, action, submit, setShouldSubmit, errors } = useFormValidation({
     schema: educationSchema,
     action: saveEducation.bind(null, user.id),
     onError: (errs) => {

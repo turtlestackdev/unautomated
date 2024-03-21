@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function DashboardLayout({ children }: { children: React.ReactNode }): ReactElement {
   return (
     <html className="h-full" lang="en">
-      <body className={`${inter.className} h-full bg-gray-100`}>{children}</body>
+      <body className={`${inter.className} h-full w-[100vw] bg-gray-100`}>{children}</body>
     </html>
   );
 }

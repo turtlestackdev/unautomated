@@ -29,7 +29,7 @@ export function EmploymentForm({
   autoSave = false,
 }: EmploymentFormProps): React.JSX.Element {
   const { user } = useSession();
-  const [formRef, action, submit, setShouldSubmit, errors] = useFormValidation({
+  const { formRef, action, submit, setShouldSubmit, errors } = useFormValidation({
     schema: employmentSchema,
     action: saveEmployment.bind(null, user.id),
     onSuccess: onSave,

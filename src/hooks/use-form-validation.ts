@@ -30,13 +30,13 @@ export function useFormValidation<T extends ZodType, M>({
   onInit,
   onSuccess,
   ...props
-}: FormValidationProps<T, M>): [
-  RefObject<HTMLFormElement>,
-  (payload: FormData) => void,
-  () => void,
-  (shouldSubmit: boolean) => void,
-  z.inferFlattenedErrors<T> | null,
-] {
+}: FormValidationProps<T, M>): {
+  formRef: RefObject<HTMLFormElement>;
+  action: (payload: FormData) => void;
+  submit: () => void;
+  setShouldSubmit: (shouldSubmit: boolean) => void;
+  errors: z.inferFlattenedErrors<T> | null;
+} {
   const formRef = useRef<HTMLFormElement>(null);
   const [errors, setErrors] = useState<z.inferFlattenedErrors<T> | null>(null);
   const [state, action] = useFormState(props.action, initialFormState);
@@ -100,5 +100,5 @@ export function useFormValidation<T extends ZodType, M>({
     }
   }, [state, onError, onInit, onSuccess, props.action, shouldSubmit, submit]);
 
-  return [formRef, action, submit, setShouldSubmit, errors];
+  return { formRef, action, submit, setShouldSubmit, errors };
 }

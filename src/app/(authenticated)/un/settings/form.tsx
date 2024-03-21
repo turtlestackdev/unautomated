@@ -12,7 +12,7 @@ import { ErrorMessage, Field, FieldGroup, Fieldset, Label, Legend } from '@/ui/f
 import { GitHubIcon, LinkedInIcon } from '@/ui/icons/social-icons';
 import { Select } from '@/ui/select';
 import { US_STATES } from '@/entities/locale/state';
-import { updateProfile } from '@/app/(authenticated)/un/profile/actions';
+import { updateProfile } from '@/app/(authenticated)/un/settings/actions';
 import { NotificationDispatchContext } from '@/ui/notifications/notification';
 
 export interface FormState {
@@ -40,7 +40,7 @@ export function ProfileForm({
         notification: {
           type: 'success',
           title: 'Profile updated',
-          details: 'Your profile data has been saved',
+          details: 'Your settings data has been saved',
         },
       });
     }

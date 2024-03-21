@@ -7,7 +7,7 @@ import { Avatar } from '@/ui/avatar';
 
 function links(publicFacing: boolean): { name: string; href: string }[] {
   const pages = [
-    { name: 'My Profile', href: '/un/profile' },
+    { name: 'Settings', href: '/un/settings' },
     { name: 'Sign out', href: '/logout' },
   ];
 

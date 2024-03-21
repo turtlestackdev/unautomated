@@ -48,10 +48,43 @@ MainPanel.Header = MainPanelHeader;
 
 export function MainPanelContent({ children }: { children?: ReactNode }): ReactElement {
   return (
-    <main>
+    <>
+      {/*<main>
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-6 sm:px-6 lg:px-8">{children}</div>
-    </main>
+    </main>*/}
+      <div className="mx-auto flex w-full max-w-7xl items-start gap-x-8 px-4 py-10 sm:px-6 lg:px-8">
+        {children}
+      </div>
+    </>
   );
 }
 
 MainPanel.Content = MainPanelContent;
+
+export function MainPanelLeftColumn({ children }: { children?: ReactNode }): React.JSX.Element {
+  return (
+    <aside className="sticky top-8 hidden w-44 shrink-0 border border-dashed border-gray-500 lg:block">
+      {/* Left column area */}
+      {children}
+    </aside>
+  );
+}
+
+MainPanel.LeftColumn = MainPanelLeftColumn;
+
+export function MainPanelMiddleColumn({ children }: { children?: ReactNode }): React.JSX.Element {
+  return <main className="flex-1 border border-dashed border-gray-500">{children}</main>;
+}
+
+MainPanel.MiddleColumn = MainPanelMiddleColumn;
+
+export function MainPanelRightColumn({ children }: { children?: ReactNode }): React.JSX.Element {
+  return (
+    <aside className="sticky top-8 hidden w-96 shrink-0 border border-dashed border-gray-500 xl:block">
+      {/* Right column area */}
+      {children}
+    </aside>
+  );
+}
+
+MainPanel.RightColumn = MainPanelRightColumn;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid';
 import { Button } from '@/ui/button';
 
 export function VisibilityToggle({
@@ -9,7 +9,7 @@ export function VisibilityToggle({
   show: boolean;
   onToggle: (show: boolean) => void;
 }): React.JSX.Element {
-  const icon = show ? <EyeIcon /> : <EyeSlashIcon />;
+  const icon = show ? <ChevronDownIcon /> : <ChevronUpIcon />;
   return (
     <Button
       title={show ? 'hide' : 'show'}

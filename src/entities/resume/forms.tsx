@@ -15,7 +15,7 @@ export function UploadResumeForm({
   setIsOpen: (open: boolean) => void;
 }): React.JSX.Element {
   const { user } = useSession();
-  const [formRef, action, _submit, _setShouldSubmit, _errors] = useFormValidation({
+  const { formRef, action } = useFormValidation({
     action: uploadResume.bind(null, user.id),
   });
 
