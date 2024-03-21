@@ -7,7 +7,7 @@ import {
   NotificationDispatchContext,
   NotificationPanel,
   notificationReducer,
-} from '@/ui/notifications/notification';
+} from '@/components/notifications/notification';
 import { SessionContext } from '@/context/session-context';
 
 export function ClientBoundary({

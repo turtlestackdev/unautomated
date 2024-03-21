@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
-import { Logo } from '@/ui/branding/logo';
-import { Strong } from '@/ui/text';
+import { Logo } from '@/components/branding/logo';
+import { Strong } from '@/components/text';
 
 export default function Home(): ReactElement {
   return (

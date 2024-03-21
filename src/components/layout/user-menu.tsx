@@ -3,7 +3,7 @@ import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Fragment, type ReactElement } from 'react';
 import { clsx } from 'clsx';
 import type { SessionUser } from '@/lib/auth';
-import { Avatar } from '@/ui/avatar';
+import { Avatar } from '@/components/avatar';
 
 function links(publicFacing: boolean): { name: string; href: string }[] {
   const pages = [

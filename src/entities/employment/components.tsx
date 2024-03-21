@@ -6,16 +6,16 @@ import type { Employment } from '@/entities/employment/types';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import { employmentSchema } from '@/entities/employment/validation';
 import { saveEmployment } from '@/entities/employment/actions';
-import { Field, FieldGroup, Label } from '@/ui/fieldset';
-import { Input } from '@/ui/input';
-import { DatePicker } from '@/ui/date-picker';
-import { Switch } from '@/ui/switch';
-import { Textarea } from '@/ui/textarea';
-import { ListField } from '@/ui/form-elements/list-field';
-import { CollapsibleSection } from '@/ui/layout/collapsible-section';
-import { Submit } from '@/ui/button';
-import { SaveIcon } from '@/ui/icons/action-icons';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
+import { Field, FieldGroup, Label } from '@/components/fieldset';
+import { Input } from '@/components/input';
+import { DatePicker } from '@/components/date-picker';
+import { Switch } from '@/components/switch';
+import { Textarea } from '@/components/textarea';
+import { ListField } from '@/components/form-elements/list-field';
+import { CollapsibleSection } from '@/components/layout/collapsible-section';
+import { Submit } from '@/components/button';
+import { SaveIcon } from '@/components/icons/action-icons';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
 
 interface EmploymentFormProps {
   employment?: Employment;

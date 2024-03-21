@@ -4,7 +4,7 @@ import {
 } from '@headlessui/react';
 import { clsx } from 'clsx';
 import { forwardRef } from 'react';
-import { ErrorMessage } from '@/ui/fieldset';
+import { ErrorMessage } from '@/components/fieldset';
 
 export const Textarea = forwardRef<
   HTMLTextAreaElement,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid';
-import { Button } from '@/ui/button';
+import { Button } from '@/components/button';
 
 export function VisibilityToggle({
   show,

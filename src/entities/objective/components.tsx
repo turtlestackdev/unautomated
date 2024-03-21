@@ -8,20 +8,26 @@ import { XMarkIcon } from '@heroicons/react/20/solid';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import { objectiveSchema } from '@/entities/objective/validation';
 import { useSession } from '@/hooks/use-session';
-import { Description, Field, FieldGroup, Fieldset, Label } from '@/ui/fieldset';
-import { Textarea } from '@/ui/textarea';
-import { Switch, SwitchField } from '@/ui/switch';
+import { Description, Field, FieldGroup, Fieldset, Label } from '@/components/fieldset';
+import { Textarea } from '@/components/textarea';
+import { Switch, SwitchField } from '@/components/switch';
 import type { ResumeObjective } from '@/database/schema';
 import { deleteObjective, saveObjective } from '@/entities/objective/actions';
-import { Button, Submit } from '@/ui/button';
-import { EnabledIcon, SaveIcon } from '@/ui/icons/action-icons';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
-import { H3, Text } from '@/ui/text';
-import { CollapsibleSection } from '@/ui/layout/collapsible-section';
-import { TwoColumn } from '@/ui/layout/two-column';
-import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/ui/dialog';
-import { Input } from '@/ui/input';
-import { Badge } from '@/ui/badge';
+import { Button, Submit } from '@/components/button';
+import { EnabledIcon, SaveIcon } from '@/components/icons/action-icons';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
+import { H3, Text } from '@/components/text';
+import { CollapsibleSection } from '@/components/layout/collapsible-section';
+import { TwoColumn } from '@/components/layout/two-column';
+import {
+  Dialog,
+  DialogActions,
+  DialogBody,
+  DialogDescription,
+  DialogTitle,
+} from '@/components/dialog';
+import { Input } from '@/components/input';
+import { Badge } from '@/components/badge';
 
 type ObjectiveFormProps = Partial<Selectable<ResumeObjective>> & {
   autoSave?: boolean;

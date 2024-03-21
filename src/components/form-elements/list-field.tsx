@@ -1,8 +1,8 @@
 import React, { forwardRef, type ReactElement, useRef, useState } from 'react';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, TrashIcon } from '@heroicons/react/16/solid';
-import { Field, Label } from '@/ui/fieldset';
-import { Input } from '@/ui/input';
-import { Button } from '@/ui/button';
+import { Field, Label } from '@/components/fieldset';
+import { Input } from '@/components/input';
+import { Button } from '@/components/button';
 
 export function ListField(props: {
   items: string[];

@@ -1,6 +1,6 @@
 import { clsx } from 'clsx';
 import type { ReactElement } from 'react';
-import { Link } from '@/ui/link';
+import { Link } from '@/components/link';
 
 export function Text({ className, ...props }: React.ComponentPropsWithoutRef<'p'>): ReactElement {
   return (

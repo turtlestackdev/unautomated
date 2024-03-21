@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import { ApplicationShellOld } from '@/ui/layout/app-shell';
+import { ApplicationShellOld } from '@/components/layout/app-shell';
 import { validatedSession } from '@/lib/auth';
 
 export default async function Dashboard(): Promise<ReactElement> {

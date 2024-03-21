@@ -1,9 +1,15 @@
 import React from 'react';
 import { useFormStatus } from 'react-dom';
 import { useSession } from '@/hooks/use-session';
-import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/ui/dialog';
-import { LoadingIcon } from '@/ui/icons/loading-icon';
-import { Button, FileButton } from '@/ui/button';
+import {
+  Dialog,
+  DialogActions,
+  DialogBody,
+  DialogDescription,
+  DialogTitle,
+} from '@/components/dialog';
+import { LoadingIcon } from '@/components/icons/loading-icon';
+import { Button, FileButton } from '@/components/button';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import { uploadResume } from '@/entities/resume/actions';
 

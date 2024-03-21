@@ -3,13 +3,13 @@ import { useState } from 'react';
 import type { ReactElement } from 'react';
 import type { Session } from 'lucia';
 import { DocumentArrowUpIcon } from '@heroicons/react/24/outline';
-import { Button } from '@/ui/button';
+import { Button } from '@/components/button';
 import type { SessionUser } from '@/lib/auth';
 import type { ResumeData } from '@/entities/resume-data';
-import { VerticalNav } from '@/ui/navigation/vertical-nav';
+import { VerticalNav } from '@/components/navigation/vertical-nav';
 import { ObjectivePanel } from '@/entities/objective/components';
 import { UploadResumeForm } from '@/entities/resume/forms';
-import { AppShell } from '@/ui/layout/app-shell';
+import { AppShell } from '@/components/layout/app-shell';
 
 export function Boundary({
   user,

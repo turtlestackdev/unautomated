@@ -4,16 +4,16 @@ import type { ReactElement } from 'react';
 import { useContext, useState, useEffect } from 'react';
 import { useFormState } from 'react-dom';
 import type { SessionUser } from '@/lib/auth';
-import { Text } from '@/ui/text';
-import { Input } from '@/ui/input';
-import { Avatar } from '@/ui/avatar';
-import { FileButton, Submit } from '@/ui/button';
-import { ErrorMessage, Field, FieldGroup, Fieldset, Label, Legend } from '@/ui/fieldset';
-import { GitHubIcon, LinkedInIcon } from '@/ui/icons/social-icons';
-import { Select } from '@/ui/select';
+import { Text } from '@/components/text';
+import { Input } from '@/components/input';
+import { Avatar } from '@/components/avatar';
+import { FileButton, Submit } from '@/components/button';
+import { ErrorMessage, Field, FieldGroup, Fieldset, Label, Legend } from '@/components/fieldset';
+import { GitHubIcon, LinkedInIcon } from '@/components/icons/social-icons';
+import { Select } from '@/components/select';
 import { US_STATES } from '@/entities/locale/state';
 import { updateProfile } from '@/app/(authenticated)/un/settings/actions';
-import { NotificationDispatchContext } from '@/ui/notifications/notification';
+import { NotificationDispatchContext } from '@/components/notifications/notification';
 
 export interface FormState {
   status: 'new' | 'pending' | 'error' | 'success';

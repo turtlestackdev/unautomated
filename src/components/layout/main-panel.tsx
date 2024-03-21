@@ -5,8 +5,8 @@ import {
   NotificationDispatchContext,
   NotificationPanel,
   notificationReducer,
-} from '@/ui/notifications/notification';
-import { SessionNav } from '@/ui/layout/session-nav';
+} from '@/components/notifications/notification';
+import { SessionNav } from '@/components/layout/session-nav';
 
 export interface MainPanelProps {
   children?: React.ReactNode;

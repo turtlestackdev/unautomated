@@ -6,8 +6,8 @@ import { clsx } from 'clsx';
 import React, { forwardRef, type ReactElement } from 'react';
 import { UserIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
-import { TouchTarget } from '@/ui/button';
-import { Link } from '@/ui/link';
+import { TouchTarget } from '@/components/button';
+import { Link } from '@/components/link';
 
 interface AvatarProps {
   src?: string | null;

@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
-import { Button } from '@/ui/button';
-import { GitHubIcon } from '@/ui/icons/social-icons';
+import { Button } from '@/components/button';
+import { GitHubIcon } from '@/components/icons/social-icons';
 
 export default function Page(): ReactElement {
   return (

@@ -1,11 +1,11 @@
 import type { ReactElement } from 'react';
 import React, { useState } from 'react';
 import { PlusIcon, TrashIcon } from '@heroicons/react/16/solid';
-import { Field, FieldGroup, Fieldset, Label, Legend } from '@/ui/fieldset';
-import { Button } from '@/ui/button';
+import { Field, FieldGroup, Fieldset, Label, Legend } from '@/components/fieldset';
+import { Button } from '@/components/button';
 import type { SessionUser } from '@/lib/auth';
 import type { ResumeData } from '@/entities/resume-data';
-import { Input } from '@/ui/input';
+import { Input } from '@/components/input';
 import type { Education } from '@/entities/education/types';
 import type { Employment } from '@/entities/employment/types';
 import { EducationForm } from '@/entities/education/forms';

@@ -1,17 +1,17 @@
 'use client';
 import { type ReactElement, type ReactNode, useReducer } from 'react';
 import type { Session } from 'lucia';
-import { SessionNav } from '@/ui/layout/session-nav';
-import { PageHeader } from '@/ui/layout/page-header';
+import { SessionNav } from '@/components/layout/session-nav';
+import { PageHeader } from '@/components/layout/page-header';
 import {
   NotificationContext,
   NotificationDispatchContext,
   notificationReducer,
   NotificationPanel,
-} from '@/ui/notifications/notification';
+} from '@/components/notifications/notification';
 import type { SessionUser } from '@/lib/auth';
 import { SessionContext } from '@/context/session-context';
-import { ClientBoundary } from '@/ui/client-boundary';
+import { ClientBoundary } from '@/components/client-boundary';
 
 export interface ApplicationShellProps {
   user: SessionUser;

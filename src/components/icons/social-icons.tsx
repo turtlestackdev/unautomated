@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import { Link } from '@/ui/link';
+import { Link } from '@/components/link';
 
 export function GoogleIcon(props: React.ComponentPropsWithoutRef<'svg'>): ReactElement {
   return (

@@ -5,12 +5,12 @@ import type { Education, Degree } from '@/entities/education/types';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import { educationSchema } from '@/entities/education/validation';
 import { saveEducation } from '@/entities/education/actions';
-import { Field, FieldGroup, Fieldset, Label, Legend } from '@/ui/fieldset';
-import { Button } from '@/ui/button';
-import { Input } from '@/ui/input';
-import { Combobox } from '@/ui/combobox';
-import { DatePicker } from '@/ui/date-picker';
-import { ListField } from '@/ui/form-elements/list-field';
+import { Field, FieldGroup, Fieldset, Label, Legend } from '@/components/fieldset';
+import { Button } from '@/components/button';
+import { Input } from '@/components/input';
+import { Combobox } from '@/components/combobox';
+import { DatePicker } from '@/components/date-picker';
+import { ListField } from '@/components/form-elements/list-field';
 
 interface EducationFormProps {
   education?: Education;

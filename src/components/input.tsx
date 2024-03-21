@@ -2,7 +2,7 @@ import { Input as HeadlessInput, type InputProps as HeadlessInputProps } from '@
 import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 import { forwardRef } from 'react';
-import { ErrorMessage } from '@/ui/fieldset';
+import { ErrorMessage } from '@/components/fieldset';
 
 const dateTypes = ['date', 'datetime-local', 'month', 'time', 'week'] as const;
 type DateType = (typeof dateTypes)[number];

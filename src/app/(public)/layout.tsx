@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import '../globals.css';
 import type { ReactElement } from 'react';
-import { PublicNav } from '@/ui/layout/public-nav';
+import { PublicNav } from '@/components/layout/public-nav';
 import { validateRequest } from '@/lib/auth';
 
 const inter = Inter({ subsets: ['latin'] });

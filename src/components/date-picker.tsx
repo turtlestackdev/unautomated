@@ -2,8 +2,8 @@ import { forwardRef } from 'react';
 import { CalendarIcon } from '@heroicons/react/24/solid';
 import { type InputProps as HeadlessInputProps, Popover, Transition } from '@headlessui/react';
 import { format } from 'date-fns/fp';
-import { Input } from '@/ui/input';
-import { Calendar } from '@/ui/calendar';
+import { Input } from '@/components/input';
+import { Calendar } from '@/components/calendar';
 import { useControllable } from '@/hooks/use-controllable';
 import { useEvent } from '@/hooks/use-event';
 

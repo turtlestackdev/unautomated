@@ -4,9 +4,9 @@ import { Disclosure } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import type { ReactElement } from 'react';
 import { usePathname } from 'next/navigation';
-import { UserMenu, UserMobileMenu } from '@/ui/layout/user-menu';
-import { Logo } from '@/ui/branding/logo';
-import { Link } from '@/ui/link';
+import { UserMenu, UserMobileMenu } from '@/components/layout/user-menu';
+import { Logo } from '@/components/branding/logo';
+import { Link } from '@/components/link';
 import { useSession } from '@/hooks/use-session';
 
 const navigation = [

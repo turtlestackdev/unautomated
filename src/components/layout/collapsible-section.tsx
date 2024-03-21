@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { clsx } from 'clsx';
-import { H3 } from '@/ui/text';
-import { VisibilityToggle } from '@/ui/actions/visibility-toggle';
-import { Collapsible } from '@/ui/transitions/collapsible';
+import { H3 } from '@/components/text';
+import { VisibilityToggle } from '@/components/actions/visibility-toggle';
+import { Collapsible } from '@/components/transitions/collapsible';
 
 export function CollapsibleSection({
   title,

@@ -3,9 +3,9 @@ import { Disclosure } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { usePathname } from 'next/navigation';
 import type { ReactElement } from 'react';
-import { Logo } from '@/ui/branding/logo';
-import { Link } from '@/ui/link';
-import { UserMenu, UserMobileMenu } from '@/ui/layout/user-menu';
+import { Logo } from '@/components/branding/logo';
+import { Link } from '@/components/link';
+import { UserMenu, UserMobileMenu } from '@/components/layout/user-menu';
 import type { SessionUser } from '@/lib/auth';
 
 export interface NavProps {

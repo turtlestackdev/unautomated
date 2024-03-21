@@ -6,7 +6,7 @@ import {
 import { clsx } from 'clsx';
 import React, { forwardRef, type ReactElement } from 'react';
 import { useFormStatus } from 'react-dom';
-import { Link } from '@/ui/link';
+import { Link } from '@/components/link';
 
 const styles = {
   base: [

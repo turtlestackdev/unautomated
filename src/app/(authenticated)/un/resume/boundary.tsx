@@ -3,14 +3,14 @@ import { useState } from 'react';
 import type { ReactElement } from 'react';
 import type { Session } from 'lucia';
 import { DocumentArrowUpIcon } from '@heroicons/react/24/outline';
-import { MainPanel } from '@/ui/layout/main-panel';
-import { Button } from '@/ui/button';
+import { MainPanel } from '@/components/layout/main-panel';
+import { Button } from '@/components/button';
 import type { SessionUser } from '@/lib/auth';
 import type { ResumeData } from '@/entities/resume-data';
-import { VerticalNav } from '@/ui/navigation/vertical-nav';
+import { VerticalNav } from '@/components/navigation/vertical-nav';
 import { ObjectivePanel } from '@/entities/objective/components';
 import { UploadResumeForm } from '@/entities/resume/forms';
-import { ClientBoundary } from '@/ui/client-boundary';
+import { ClientBoundary } from '@/components/client-boundary';
 
 export function Boundary({
   user,
