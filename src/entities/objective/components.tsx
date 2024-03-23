@@ -1,10 +1,9 @@
 import React, { type ReactNode, useState } from 'react';
-import { Field as HeadlessField } from '@headlessui/react';
 import type { Selectable } from 'kysely';
 import { clsx } from 'clsx';
 import { EyeIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
 import { PlusIcon, TrashIcon } from '@heroicons/react/16/solid';
-import { XMarkIcon } from '@heroicons/react/20/solid';
+import type { z } from 'zod';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import { objectiveSchema } from '@/entities/objective/validation';
 import { useSession } from '@/hooks/use-session';
@@ -14,8 +13,6 @@ import { Switch, SwitchField } from '@/components/switch';
 import type { ResumeObjective } from '@/database/schema';
 import { deleteObjective, saveObjective } from '@/entities/objective/actions';
 import { Button, Submit } from '@/components/button';
-import { EnabledIcon, SaveIcon } from '@/components/icons/action-icons';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
 import { H3, Text } from '@/components/text';
 import { CollapsibleSection } from '@/components/layout/collapsible-section';
 import { TwoColumn } from '@/components/layout/two-column';
@@ -30,200 +27,32 @@ import { Input } from '@/components/input';
 import { Badge } from '@/components/badge';
 
 type ObjectiveFormProps = Partial<Selectable<ResumeObjective>> & {
-  autoSave?: boolean;
   onSave?: (objective: Selectable<ResumeObjective>) => void;
+  className?: string;
 };
 
 export function ObjectiveForm({
-  autoSave = false,
   onSave,
+  className,
   ...objective
 }: ObjectiveFormProps): React.JSX.Element {
   const { user } = useSession();
-  const { formRef, action, submit, setShouldSubmit, errors } = useFormValidation({
+  const { formRef, action, errors } = useFormValidation({
     schema: objectiveSchema,
     action: saveObjective.bind(null, user.id),
     onSuccess: onSave,
   });
 
   return (
-    <form action={action} ref={formRef}>
-      {objective.id ? <input name="id" type="hidden" value={objective.id} /> : null}
-      <Fieldset>
-        <FieldGroup>
-          <Field>
-            <Label>Objective</Label>
-            <Textarea
-              defaultValue={objective.objective}
-              errors={errors?.fieldErrors.objective}
-              name="objective"
-              onBlur={(event) => {
-                if (autoSave && event.target.value !== objective.objective) {
-                  submit();
-                }
-              }}
-              rows={10}
-            />
-          </Field>
-          <div className="flex place-content-end items-center">
-            <HeadlessField className="flex place-content-end items-center gap-4">
-              <Label>Default</Label>
-              <Switch
-                defaultChecked={objective.is_default}
-                name="is_default_objective"
-                onChange={() => {
-                  if (autoSave) {
-                    setShouldSubmit(true);
-                  }
-                }}
-              />
-            </HeadlessField>
-            {!autoSave ? (
-              <div className="grow text-right">
-                <Submit color="brand" title="save">
-                  Save
-                  <SaveIcon className="h-5 w-5" />
-                </Submit>
-              </div>
-            ) : null}
-          </div>
-        </FieldGroup>
-      </Fieldset>
+    <form action={action} ref={formRef} className={clsx(className, 'space-y-8')}>
+      <span className="text-lg text-zinc-950">
+        {objective.id ? 'Edit objective' : 'New objective'}
+      </span>
+      <ObjectiveFormFields objective={objective} errors={errors?.fieldErrors} />
+      <div className="text-right">
+        <Submit color="brand">Save</Submit>
+      </div>
     </form>
-  );
-}
-
-export function ObjectiveTable({
-  objectives = [],
-  onEdit,
-  onDelete,
-}: {
-  objectives?: Selectable<ResumeObjective>[];
-  onEdit?: (objective: Selectable<ResumeObjective>) => void;
-  onDelete?: (id: string) => void;
-}): React.JSX.Element {
-  return (
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableHeader>Objective</TableHeader>
-          <TableHeader>Default</TableHeader>
-          <TableHeader>
-            <span className="sr-only">Actions</span>
-          </TableHeader>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {objectives.map((objective) => (
-          <ObjectiveRow
-            key={JSON.stringify(objective)}
-            objective={objective}
-            onDelete={onDelete}
-            onEdit={onEdit}
-          />
-        ))}
-      </TableBody>
-    </Table>
-  );
-}
-
-function ObjectiveRow({
-  objective,
-  onDelete,
-  onEdit,
-}: {
-  objective: Selectable<ResumeObjective>;
-  onEdit?: (objective: Selectable<ResumeObjective>) => void;
-  onDelete?: (id: string) => void;
-}): React.JSX.Element {
-  const { user } = useSession();
-  const { formRef, action, errors } = useFormValidation({
-    schema: objectiveSchema,
-    action: saveObjective.bind(null, user.id),
-    onSuccess: (updated: Selectable<ResumeObjective>) => {
-      onEdit?.(updated);
-    },
-  });
-  const [editing, setEditing] = useState(false);
-  const formId = `resume-objective-editing-${objective.id}`;
-
-  return (
-    <TableRow className={editing ? 'align-top' : ''}>
-      <TableCell className="w-full">
-        <Text className={clsx('max-w-prose truncate', !editing ? '' : 'hidden')}>
-          {objective.objective}
-        </Text>
-        <form action={action} ref={formRef} id={formId} className={clsx(editing ? '' : 'hidden')}>
-          <input type="hidden" name="id" value={objective.id} />
-          <Field>
-            <Label className="sr-only">Objective</Label>
-            <Textarea
-              defaultValue={objective.objective}
-              errors={errors?.fieldErrors.objective}
-              name="objective"
-              form={formId}
-              rows={10}
-            />
-          </Field>
-        </form>
-      </TableCell>
-      <TableCell>
-        <EnabledIcon className={clsx(!editing ? '' : 'hidden')} enabled={objective.is_default} />
-        <div className={editing ? ' sm:py-[calc(theme(spacing[1.5])-1px)]' : ''}>
-          <Switch
-            className={clsx(editing ? '' : 'hidden')}
-            defaultChecked={objective.is_default}
-            name="is_default_objective"
-            form={formId}
-          />
-        </div>
-      </TableCell>
-      <TableCell>
-        <div className="flex items-center">
-          <Button
-            plain
-            title="edit"
-            className={clsx(!editing ? '' : 'hidden')}
-            onClick={() => {
-              setEditing(true);
-            }}
-          >
-            <PencilSquareIcon />
-          </Button>
-
-          <Button
-            plain
-            title="save"
-            type="submit"
-            form={formId}
-            className={clsx(editing ? '' : 'hidden')}
-          >
-            <SaveIcon className="h-4 w-4" data-slot="icon" />
-          </Button>
-
-          <Button
-            plain
-            title="cancel"
-            onClick={() => {
-              formRef.current?.reset();
-              setEditing(false);
-            }}
-            form={formId}
-            className={clsx(editing ? '' : 'hidden')}
-          >
-            <XMarkIcon />
-          </Button>
-
-          <DeleteObjectiveForm
-            className={clsx(!editing ? '' : 'hidden')}
-            objectiveId={objective.id}
-            onDelete={() => {
-              onDelete?.(objective.id);
-            }}
-          />
-        </div>
-      </TableCell>
-    </TableRow>
   );
 }
 
@@ -264,6 +93,17 @@ export function ObjectivePanel({
   );
   const defaultObjective = objectives.find((objective) => objective.is_default);
 
+  const [dialogObjective, setDialogObjective] = useState<Selectable<ResumeObjective> | undefined>(
+    undefined
+  );
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'delete' | null>(null);
+
+  const [panelMode, setPanelMode] = useState<'view' | 'edit'>('edit');
+  const [panelObjective, setPanelObjective] = useState<Selectable<ResumeObjective> | undefined>(
+    undefined
+  );
+
   const onSave = (saved: Selectable<ResumeObjective>): void => {
     setObjectives([
       ...objectives.map((objective) => {
@@ -272,7 +112,7 @@ export function ObjectivePanel({
       saved,
     ]);
 
-    setActiveObjective(undefined);
+    setDialogObjective(undefined);
     setDialogIsOpen(false);
   };
 
@@ -287,41 +127,34 @@ export function ObjectivePanel({
       })
     );
 
-    setActiveObjective(undefined);
+    setDialogObjective(undefined);
     setDialogIsOpen(false);
   };
 
   const onDelete = (id: string): void => {
     setObjectives(objectives.filter((objective) => objective.id !== id));
 
-    setActiveObjective(undefined);
+    setDialogObjective(undefined);
     setDialogIsOpen(false);
   };
-
-  const [activeObjective, setActiveObjective] = useState<Selectable<ResumeObjective> | undefined>(
-    undefined
-  );
-
-  const [dialogIsOpen, setDialogIsOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'delete' | null>(null);
 
   const closeDialog = (): void => {
     setDialogIsOpen(false);
   };
 
-  const viewDialog = activeObjective ? (
+  const viewDialog = dialogObjective ? (
     <ObjectiveViewDialog
-      key={activeObjective.id}
-      objective={activeObjective}
+      key={dialogObjective.id}
+      objective={dialogObjective}
       open={dialogIsOpen}
       onClose={closeDialog}
     />
   ) : null;
 
-  const editDialog = activeObjective ? (
+  const editDialog = dialogObjective ? (
     <ObjectiveFormDialog
-      key={activeObjective.id}
-      objective={activeObjective}
+      key={dialogObjective.id}
+      objective={dialogObjective}
       onSuccess={onEdit}
       open={dialogIsOpen}
       onClose={closeDialog}
@@ -336,12 +169,12 @@ export function ObjectivePanel({
     />
   );
 
-  const deleteDialog = activeObjective ? (
+  const deleteDialog = dialogObjective ? (
     <DeleteObjectiveDialog
-      key={activeObjective.id}
-      objective={activeObjective}
+      key={dialogObjective.id}
+      objective={dialogObjective}
       onSuccess={() => {
-        onDelete(activeObjective.id);
+        onDelete(dialogObjective.id);
       }}
       open={dialogIsOpen}
       onClose={closeDialog}
@@ -363,74 +196,146 @@ export function ObjectivePanel({
 
   const dialog = getDialog();
 
+  const viewPanel = panelObjective ? (
+    <ObjectiveViewPanel key={panelObjective.id} objective={panelObjective} />
+  ) : null;
+
+  const editPanel = panelObjective ? (
+    <ObjectiveForm key={panelObjective.id} {...panelObjective} onSave={onEdit} />
+  ) : (
+    <ObjectiveForm
+      key={new Date().getTime()}
+      is_default={defaultObjective === undefined}
+      onSave={onSave}
+    />
+  );
+
+  const getPanel = (): ReactNode => {
+    switch (panelMode) {
+      case 'view':
+        return viewPanel;
+      case 'edit':
+        return editPanel;
+    }
+  };
+
+  const panel = getPanel();
+
   const showAddForm = (): void => {
-    setActiveObjective(undefined);
+    setDialogObjective(undefined);
     setDialogMode('edit');
     setDialogIsOpen(true);
   };
 
-  const showObjectiveDetails = (objective: Selectable<ResumeObjective>): void => {
-    setActiveObjective(objective);
+  const showObjectiveDialog = (objective: Selectable<ResumeObjective>): void => {
+    setDialogObjective(objective);
     setDialogMode('view');
     setDialogIsOpen(true);
   };
 
-  const showEditForm = (objective: Selectable<ResumeObjective>): void => {
-    setActiveObjective(objective);
+  const showObjectivePanel = (objective: Selectable<ResumeObjective>): void => {
+    setPanelObjective(objective);
+    setPanelMode('view');
+  };
+
+  const showEditDialog = (objective: Selectable<ResumeObjective>): void => {
+    setDialogObjective(objective);
     setDialogMode('edit');
     setDialogIsOpen(true);
   };
 
-  const showDeleteForm = (objective: Selectable<ResumeObjective>): void => {
-    setActiveObjective(objective);
+  const showEditPanel = (objective: Selectable<ResumeObjective>): void => {
+    setPanelObjective(objective);
+    setPanelMode('edit');
+  };
+
+  const showDeleteDialog = (objective: Selectable<ResumeObjective>): void => {
+    setDialogObjective(objective);
     setDialogMode('delete');
     setDialogIsOpen(true);
   };
 
   return (
     <CollapsibleSection title="Objectives" show={props.show ?? true}>
-      <TwoColumn className="flex grow flex-col ">
-        <TwoColumn.Primary>
-          <Button color="brand" className="w-full" onClick={showAddForm}>
-            <PlusIcon /> New Objective
-          </Button>
+      <TwoColumn className="flex grow flex-col">
+        <TwoColumn.Primary className="lg:w-1/2">
           {dialog}
+          <div className="hidden lg:block">{panel}</div>
+          <div className="lg:hidden">
+            <Button color="brand" className="w-full" onClick={showAddForm}>
+              <PlusIcon /> New Objective
+            </Button>
+          </div>
         </TwoColumn.Primary>
-        <TwoColumn.Secondary className="flex grow flex-col gap-2">
+        <TwoColumn.Secondary className="grow space-y-8  lg:grow-0">
+          <div className="text-right">
+            <Button color="zinc">
+              <PlusIcon />
+              New
+            </Button>
+          </div>
           <ul>
             {objectives.map((objective) => (
               <li key={objective.id} className="flex items-center gap-2">
                 <Text className="truncate text-left">{objective.name}</Text>
                 {objective.is_default ? <Badge color="amber">default</Badge> : null}
-                <span className="grow text-right">
-                  <Button
-                    plain
-                    title="view"
-                    onClick={() => {
-                      showObjectiveDetails(objective);
-                    }}
-                  >
-                    <EyeIcon />
-                  </Button>
-                  <Button
-                    plain
-                    title="edit"
-                    onClick={() => {
-                      showEditForm(objective);
-                    }}
-                  >
-                    <PencilSquareIcon />
-                  </Button>
-                  <Button
-                    plain
-                    title="delete"
-                    onClick={() => {
-                      showDeleteForm(objective);
-                    }}
-                  >
-                    <TrashIcon />
-                  </Button>
-                </span>
+                <div className="flex grow place-content-end text-right">
+                  <div className="lg:hidden">
+                    <Button
+                      plain
+                      title="view"
+                      onClick={() => {
+                        showObjectiveDialog(objective);
+                      }}
+                    >
+                      <EyeIcon />
+                    </Button>
+                  </div>
+                  <div className="hidden lg:block">
+                    <Button
+                      plain
+                      title="view"
+                      onClick={() => {
+                        showObjectivePanel(objective);
+                      }}
+                    >
+                      <EyeIcon />
+                    </Button>
+                  </div>
+                  <div className="lg:hidden">
+                    <Button
+                      plain
+                      title="edit"
+                      onClick={() => {
+                        showEditDialog(objective);
+                      }}
+                    >
+                      <PencilSquareIcon />
+                    </Button>
+                  </div>
+                  <div className="hidden lg:block">
+                    <Button
+                      plain
+                      title="edit"
+                      onClick={() => {
+                        showEditPanel(objective);
+                      }}
+                    >
+                      <PencilSquareIcon />
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      plain
+                      title="delete"
+                      onClick={() => {
+                        showDeleteDialog(objective);
+                      }}
+                    >
+                      <TrashIcon />
+                    </Button>
+                  </div>
+                </div>
               </li>
             ))}
           </ul>
@@ -467,6 +372,49 @@ function ObjectiveViewDialog({
   );
 }
 
+function ObjectiveViewPanel({
+  objective,
+}: {
+  objective: Selectable<ResumeObjective>;
+}): React.JSX.Element {
+  return <div>{objective.name}</div>;
+}
+
+function ObjectiveFormFields({
+  objective,
+  errors,
+}: {
+  objective?: Partial<Selectable<ResumeObjective>>;
+  errors?: z.inferFlattenedErrors<typeof objectiveSchema>['fieldErrors'];
+}): React.JSX.Element {
+  return (
+    <Fieldset>
+      {objective?.id ? <input name="id" type="hidden" value={objective.id} /> : null}
+      <FieldGroup>
+        <Field>
+          <Label>Name</Label>
+          <Input name="name" defaultValue={objective?.name} errors={errors?.name} />
+        </Field>
+        <Field>
+          <Label>Objective</Label>
+          <Textarea
+            defaultValue={objective?.objective}
+            errors={errors?.objective}
+            name="objective"
+            rows={8}
+          />
+        </Field>
+
+        <SwitchField>
+          <Label>Default</Label>
+          <Description>Make this the default objective in new resumes</Description>
+          <Switch defaultChecked={objective?.is_default} name="is_default_objective" />
+        </SwitchField>
+      </FieldGroup>
+    </Fieldset>
+  );
+}
+
 export function ObjectiveFormDialog({
   objective,
   ...props
@@ -491,34 +439,7 @@ export function ObjectiveFormDialog({
       <form action={action} ref={formRef}>
         <DialogTitle>{objective?.id ? 'Edit objective' : 'New objective'}</DialogTitle>
         <DialogBody>
-          {objective?.id ? <input name="id" type="hidden" value={objective.id} /> : null}
-          <Fieldset>
-            <FieldGroup>
-              <Field>
-                <Label>Name</Label>
-                <Input
-                  name="name"
-                  defaultValue={objective?.name}
-                  errors={errors?.fieldErrors.name}
-                />
-              </Field>
-              <Field>
-                <Label>Objective</Label>
-                <Textarea
-                  defaultValue={objective?.objective}
-                  errors={errors?.fieldErrors.objective}
-                  name="objective"
-                  rows={8}
-                />
-              </Field>
-
-              <SwitchField>
-                <Label>Default</Label>
-                <Description>Make this the default objective in new resumes</Description>
-                <Switch defaultChecked={objective?.is_default} name="is_default_objective" />
-              </SwitchField>
-            </FieldGroup>
-          </Fieldset>
+          <ObjectiveFormFields objective={objective} errors={errors?.fieldErrors} />
         </DialogBody>
         <DialogActions>
           <Button

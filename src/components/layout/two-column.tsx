@@ -22,7 +22,7 @@ export function PrimaryColumn({
   className?: string;
   children?: ReactNode;
 }): React.JSX.Element {
-  return <div className={clsx(className, 'xl:grow')}>{children}</div>;
+  return <div className={clsx(className, '')}>{children}</div>;
 }
 
 TwoColumn.Primary = PrimaryColumn;
@@ -38,7 +38,7 @@ export function SecondaryColumn({
     <div
       className={clsx(
         className,
-        'border-gray-300 xl:max-w-sm xl:flex-1 xl:shrink-0 xl:border-b-0 xl:border-l xl:pl-4'
+        'border-gray-300 xl:flex-1 xl:shrink-0 xl:border-b-0 xl:border-l xl:pl-4'
       )}
     >
       {children}
