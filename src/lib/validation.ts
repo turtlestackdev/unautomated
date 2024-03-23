@@ -138,3 +138,7 @@ export function formToObject(
 
   return data;
 }
+
+export const deleteSchema = z.object({
+  id: emptyStringIsUndefined.pipe(z.string({ required_error: 'id is missing' })),
+});

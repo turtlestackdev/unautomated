@@ -1,9 +1,8 @@
 import { type Selectable } from 'kysely';
-import type { ZodType, ZodTypeDef } from 'zod';
 import { type ResumeObjective } from '@/database/schema';
 import { ObjectiveCard } from '@/entities/objective/components/objective-card';
 import type { FormAction } from '@/entities/objective/components/form';
-import type { FormState } from '@/lib/validation';
+import { type DeleteAction } from '@/entities/objective/components/delete-dialog';
 
 export function ListView({
   objectives,
@@ -15,11 +14,8 @@ export function ListView({
   objectives: Selectable<ResumeObjective>[];
   saveAction: FormAction;
   onSave: (objective: Selectable<ResumeObjective>) => void;
-  deleteAction: (
-    prev: FormState<ZodType<null, ZodTypeDef, null>, null>,
-    data: FormData
-  ) => Promise<FormState<ZodType<null, ZodTypeDef, null>, null>>;
-  onDelete: () => void;
+  deleteAction: DeleteAction;
+  onDelete: (id: string) => void;
 }): React.JSX.Element {
   return (
     <div className="space-y-4">

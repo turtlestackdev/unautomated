@@ -21,7 +21,7 @@ export function ObjectiveCard({
     prev: FormState<ZodType<null, ZodTypeDef, null>, null>,
     data: FormData
   ) => Promise<FormState<ZodType<null, ZodTypeDef, null>, null>>;
-  onDelete: () => void;
+  onDelete: (id: string) => void;
 }): React.JSX.Element {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -29,12 +29,18 @@ export function ObjectiveCard({
 
   return (
     <>
-      <div className="flex w-[65ch] items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm">
+      <div className="flex w-full max-w-prose items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm">
         {isEditing ? (
           <Form
             objective={objective}
             action={props.editAction}
-            onSave={props.onEdit}
+            onSave={(model) => {
+              props.onEdit(model);
+              setIsEditing(false);
+            }}
+            onCancel={() => {
+              setIsEditing(false);
+            }}
             className="w-full"
           />
         ) : (
