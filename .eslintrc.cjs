@@ -13,7 +13,6 @@ const project = resolve(process.cwd(), 'tsconfig.json');
 
 const vercelStyles = [
   '@vercel/style-guide/eslint/browser',
-  //'@vercel/style-guide/eslint/node',
   '@vercel/style-guide/eslint/typescript',
   '@vercel/style-guide/eslint/react',
   '@vercel/style-guide/eslint/next',
@@ -56,7 +55,7 @@ module.exports = {
   overrides: [
     // Next.js needs default exports for pages and layouts.
     {
-      files: ['src/app/**/*/page.tsx', 'src/app/**/*/layout.tsx', 'next.config.mjs', 'tailwind.config.ts', 'vitest.config.ts'],
+      files: ['src/app/**/*/page.tsx', 'src/app/**/*/layout.tsx', 'next.config.mjs', 'tailwind.config.ts', 'vitest.config.ts', 'src/**/*.stories.@(ts|tsx)'],
       rules: {
         'import/no-default-export': 'off',
         'import/prefer-default-export': ['error', { target: 'any' }],

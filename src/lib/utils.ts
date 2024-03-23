@@ -11,3 +11,7 @@ export type UnSaved<T extends { user_id: string; id: string }> = Optional<T, 'us
 export function isServer(): boolean {
   return typeof window === 'undefined' || typeof document === 'undefined';
 }
+
+export function noop(): void {
+  Function.prototype();
+}

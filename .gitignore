@@ -42,3 +42,4 @@ src/database/enum.ts
 # Don't save any sqllite databases
 prisma/**/*.db
 prisma/**/*.db-journal
+*storybook.log
