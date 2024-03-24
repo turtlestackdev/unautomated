@@ -12,6 +12,7 @@ import { Form, type FormAction } from '@/entities/objective/components/form';
 
 export function ObjectiveCard({
   objective,
+  className,
   ...props
 }: {
   objective: Selectable<ResumeObjective>;
@@ -22,6 +23,7 @@ export function ObjectiveCard({
     data: FormData
   ) => Promise<FormState<ZodType<null, ZodTypeDef, null>, null>>;
   onDelete: (id: string) => void;
+  className?: string;
 }): React.JSX.Element {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -29,7 +31,13 @@ export function ObjectiveCard({
 
   return (
     <>
-      <div className="flex w-full max-w-prose items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm">
+      <div
+        className={clsx(
+          className,
+          isEditing ? 'row-span-4' : 'row-span-1',
+          'max-w-prose place-content-end items-start space-x-3 self-start rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm'
+        )}
+      >
         {isEditing ? (
           <Form
             objective={objective}

@@ -6,10 +6,10 @@ import type { ResumeObjective } from '@/database/schema';
 import { deleteObjective, saveObjective } from '@/entities/objective/actions';
 import { Button, Submit } from '@/components/button';
 import { CollapsibleSection } from '@/components/layout/collapsible-section';
-import { TwoColumn } from '@/components/layout/two-column';
 import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/dialog';
-import { ListView } from '@/entities/objective/components/list-view';
 import { Form } from '@/entities/objective/components/form';
+import { ObjectiveCard } from '@/entities/objective/components/objective-card';
+import { Text } from '@/components/text';
 
 export function ObjectivePanel({
   ...props
@@ -70,29 +70,46 @@ export function ObjectivePanel({
     <>
       {dialog}
       <CollapsibleSection title="Objectives" show={props.show ?? true}>
-        <TwoColumn className="relative flex">
-          <TwoColumn.Primary className="grow">
-            <ListView
-              objectives={objectives}
-              saveAction={saveObjective.bind(null, user.id)}
-              onSave={onEdit}
-              deleteAction={deleteObjective.bind(null, user.id)}
-              onDelete={onDelete}
-            />
-          </TwoColumn.Primary>
-          <TwoColumn.Secondary className="sticky bottom-0 space-y-8 lg:static lg:grow-0">
-            <Button
-              color="brand"
-              onClick={() => {
-                setDialogIsOpen(true);
-              }}
-              className="w-full lg:w-auto"
-            >
-              <PlusIcon />
-              New Objective
-            </Button>
-          </TwoColumn.Secondary>
-        </TwoColumn>
+        <div className="flex grow flex-col space-y-8">
+          <div className="grow space-y-8">
+            <div className="flex">
+              <Text className="max-w-prose">
+                Give a general sense of who you are and what you are looking for.
+              </Text>
+              <div className="hidden grow text-right sm:block">
+                <Button
+                  plain
+                  onClick={() => {
+                    setDialogIsOpen(true);
+                  }}
+                >
+                  <PlusIcon />
+                  Add
+                </Button>
+              </div>
+            </div>
+            <div className="grid grid-cols-4 gap-4 ">
+              {objectives.map((objective) => (
+                <ObjectiveCard
+                  key={objective.id}
+                  className="col-span-4 sm:col-span-2"
+                  objective={objective}
+                  editAction={saveObjective.bind(null, user.id)}
+                  onEdit={onEdit}
+                  deleteAction={deleteObjective.bind(null, user.id)}
+                  onDelete={onDelete}
+                />
+              ))}
+            </div>
+          </div>
+          <div className="sticky bottom-0 shrink sm:hidden">
+            <div className="h-full grow bg-green-200">
+              <Button color="brand" className="w-full">
+                <PlusIcon /> Add objective
+              </Button>
+            </div>
+          </div>
+        </div>
       </CollapsibleSection>
     </>
   );
