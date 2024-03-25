@@ -2,7 +2,7 @@ import React from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid';
 import { Button } from '@/components/button';
 
-export function VisibilityToggle({
+export function ExpandToggle({
   show,
   onToggle,
 }: {

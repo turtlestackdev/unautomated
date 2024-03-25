@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { clsx } from 'clsx';
 import { H3 } from '@/components/text';
-import { VisibilityToggle } from '@/components/actions/visibility-toggle';
-import { Collapsible } from '@/components/transitions/collapsible';
+import { ExpandToggle } from '@/components/actions/expand-toggle';
 
 export function CollapsibleSection({
   title,
@@ -18,12 +17,10 @@ export function CollapsibleSection({
       <div className="flex items-center border-b border-gray-200">
         <H3 className="grow">{title}</H3>
         <div className="flex shrink">
-          <VisibilityToggle show={show} onToggle={setShow} />
+          <ExpandToggle show={show} onToggle={setShow} />
         </div>
       </div>
-      <Collapsible show={show}>
-        <div className="flex grow flex-col space-y-8 ">{children}</div>
-      </Collapsible>
+      {show ? <div className="flex grow flex-col space-y-8 ">{children}</div> : null}
     </div>
   );
 }
