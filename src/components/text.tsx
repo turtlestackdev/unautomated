@@ -51,6 +51,24 @@ export function Code({
   );
 }
 
+export function H1({
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithoutRef<'h1'>): ReactElement {
+  return (
+    <h2
+      {...props}
+      className={clsx(
+        className,
+        'text-3xl font-semibold text-gray-800 sm:text-4xl dark:text-white'
+      )}
+    >
+      {children}
+    </h2>
+  );
+}
+
 export function H2({
   className,
   children,

@@ -1,3 +1,5 @@
+import { format } from 'date-fns/fp';
+
 export async function sleep(seconds: number): Promise<void> {
   await new Promise((resolve) => {
     setTimeout(resolve, seconds * 1000);
@@ -14,4 +16,19 @@ export function isServer(): boolean {
 
 export function noop(): void {
   Function.prototype();
+}
+
+export function shorthandDate(startDate: Date | null, endDate: Date | null): string {
+  if (!startDate && !endDate) {
+    return '';
+  }
+
+  const start = startDate ? format('MMM ’yy', startDate) : '';
+  if (!endDate) {
+    return `${start} / present`;
+  }
+
+  const end = format(' / MMM ’yy', endDate);
+
+  return `${start}${end}`;
 }

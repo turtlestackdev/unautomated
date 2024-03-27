@@ -1,6 +1,5 @@
 import type { Selectable } from 'kysely';
 import React from 'react';
-import type { ZodType, ZodTypeDef } from 'zod';
 import type { ResumeObjective } from '@/database/schema';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import { Dialog, DialogActions, DialogDescription, DialogTitle } from '@/components/dialog';
@@ -17,10 +16,7 @@ export function DeleteDialog({
   ...props
 }: {
   objective: Selectable<ResumeObjective>;
-  action: (
-    prev: FormState<ZodType<null, ZodTypeDef, null>, null>,
-    data: FormData
-  ) => Promise<FormState<ZodType<null, ZodTypeDef, null>, null>>;
+  action: DeleteAction;
   onSuccess: (id: string) => void;
   open: boolean;
   onClose: () => void;

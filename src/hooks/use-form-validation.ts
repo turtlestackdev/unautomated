@@ -36,11 +36,13 @@ export function useFormValidation<T extends ZodType, M>({
   submit: () => void;
   setShouldSubmit: (shouldSubmit: boolean) => void;
   errors: z.inferFlattenedErrors<T> | null;
+  deltaTime: Date;
 } {
   const formRef = useRef<HTMLFormElement>(null);
   const [errors, setErrors] = useState<z.inferFlattenedErrors<T> | null>(null);
   const [state, action] = useFormState(props.action, initialFormState);
   const [shouldSubmit, setShouldSubmit] = useState(false);
+  const [deltaTime, setDeltaTime] = useState(new Date());
 
   const submit = useCallback((): void => {
     const isValid = (): boolean => {
@@ -80,6 +82,7 @@ export function useFormValidation<T extends ZodType, M>({
     }
 
     if (state.status === 'success') {
+      setDeltaTime(new Date());
       if (onSuccess) {
         onSuccess(state.model);
       }
@@ -100,5 +103,5 @@ export function useFormValidation<T extends ZodType, M>({
     }
   }, [state, onError, onInit, onSuccess, props.action, shouldSubmit, submit]);
 
-  return { formRef, action, submit, setShouldSubmit, errors };
+  return { formRef, action, submit, setShouldSubmit, errors, deltaTime };
 }
