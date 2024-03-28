@@ -1,11 +1,11 @@
 'use server';
-import type { FormState } from '@/lib/validation';
+import type { FormResponse } from '@/lib/validation';
 import { formToObject } from '@/lib/validation';
 import { educationSchema } from '@/entities/education/validation';
 import * as education from '@/entities/education/data';
 import type { Education } from '@/entities/education/types';
 
-type EducationFormState = FormState<typeof educationSchema, Education>;
+type EducationFormState = FormResponse<typeof educationSchema, Education>;
 
 export async function saveEducation(
   userId: string,

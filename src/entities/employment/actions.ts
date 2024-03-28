@@ -1,18 +1,18 @@
 'use server';
 
-import type { FormState } from '@/lib/validation';
-import { formToObject } from '@/lib/validation';
+import {
+  type DeleteEntityState,
+  deleteSchema,
+  type FormResponse,
+  formToObject,
+} from '@/lib/validation';
 import type { Employment } from '@/entities/employment/types';
 import * as employment from '@/entities/employment/data';
 import { employmentSchema } from '@/entities/employment/validation';
 
-type EmploymentFormState = FormState<typeof employmentSchema, Employment>;
+type EmploymentFormState = FormResponse<typeof employmentSchema, Employment>;
 
-export async function saveEmployment(
-  userId: string,
-  _prevState: EmploymentFormState,
-  data: FormData
-): Promise<EmploymentFormState> {
+export async function saveEmployment(userId: string, data: FormData): Promise<EmploymentFormState> {
   const request = employmentSchema.safeParse(formToObject(data));
   if (!request.success) {
     return { status: 'error', errors: request.error.flatten() };
@@ -32,6 +32,23 @@ export async function saveEmployment(
         formErrors: [],
         fieldErrors: {},
       },
+    };
+  }
+}
+
+export async function deleteEmployment(userId: string, data: FormData): Promise<DeleteEntityState> {
+  const request = deleteSchema.safeParse(Object.fromEntries(data.entries()));
+  if (!request.success) {
+    return { status: 'error', errors: request.error.flatten() };
+  }
+  try {
+    await employment.deleteEmployment({ employmentId: request.data.id, userId });
+    return { status: 'success', model: request.data.id };
+  } catch (error) {
+    console.warn('could not delete objective, error');
+    return {
+      status: 'error',
+      errors: { formErrors: ['Could not delete objective'], fieldErrors: {} },
     };
   }
 }

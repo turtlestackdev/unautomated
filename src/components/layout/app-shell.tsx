@@ -109,7 +109,9 @@ export function AppShellSideBar({ children }: { children?: ReactNode }): React.J
 AppShell.SideBar = AppShellSideBar;
 
 export function AppShellMain({ children }: { children?: ReactNode }): React.JSX.Element {
-  return <main className="flex w-full max-w-full grow flex-col lg:block">{children}</main>;
+  return (
+    <main className="flex w-full max-w-full grow flex-col space-y-8 lg:block">{children}</main>
+  );
 }
 
 AppShell.Main = AppShellMain;

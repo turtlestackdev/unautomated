@@ -1,13 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import type { ZodType, ZodTypeDef } from 'zod';
 import { EmploymentPanel } from '@/entities/employment/components/panel';
 import { type Employment } from '@/entities/employment/types';
-import type { FormState } from '@/lib/validation';
 import {
-  type DeleteEmploymentAction,
-  type SaveEmploymentAction,
-} from '@/entities/employment/components/form';
-import { type employmentSchema } from '@/entities/employment/validation';
+  type deleteSchema,
+  type FormAction,
+  type FormResponse,
+  formToObject,
+} from '@/lib/validation';
+import { employmentSchema } from '@/entities/employment/validation';
+import { isString } from '@/lib/type-guards';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -29,20 +30,45 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const saveAction: SaveEmploymentAction = (_prev, _data) => {
-  return new Promise<FormState<typeof employmentSchema, Employment>>((resolve) => {
-    resolve({ status: 'new' });
+const saveAction: FormAction<typeof employmentSchema, Employment> = (data) => {
+  return new Promise<FormResponse<typeof employmentSchema, Employment>>((resolve) => {
+    const request = employmentSchema.safeParse(formToObject(data));
+    if (!request.success) {
+      resolve({ status: 'error', errors: request.error.flatten() });
+    } else {
+      const model = request.data;
+      const id = model.id ?? '123';
+      resolve({
+        status: 'success',
+        model: {
+          ...model,
+          id,
+          start_date: model.start_date ? new Date(model.start_date) : null,
+          end_date: model.end_date ? new Date(model.end_date) : null,
+          user_id: '123',
+          highlights: model.highlights.map((highlight, index) => {
+            return { description: highlight, job_id: id, id, index };
+          }),
+        },
+      });
+    }
   });
 };
 
-const deleteAction: DeleteEmploymentAction = (_prev, _data) => {
-  return new Promise<FormState<ZodType<null, ZodTypeDef, null>, null>>((resolve) => {
-    resolve({ status: 'new' });
+const deleteAction: FormAction<typeof deleteSchema, string> = (data) => {
+  return new Promise<FormResponse<typeof deleteSchema, string>>((resolve) => {
+    const id = data.get('id');
+    if (isString(id)) {
+      resolve({ status: 'success', model: id });
+    } else {
+      resolve({ status: 'error', errors: { formErrors: [], fieldErrors: { id: ['bad id'] } } });
+    }
   });
 };
 
 export const EmptyState: Story = {
   args: {
+    employment: [],
     saveAction,
     deleteAction,
   },

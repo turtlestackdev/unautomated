@@ -9,16 +9,11 @@ import { Description, Field, FieldGroup, Fieldset, Label } from '@/components/fi
 import { Input } from '@/components/input';
 import { Textarea } from '@/components/textarea';
 import { Switch, SwitchField } from '@/components/switch';
-import type { FormState } from '@/lib/validation';
-
-export type FormAction = (
-  prev: FormState<typeof objectiveSchema, Selectable<ResumeObjective>>,
-  data: FormData
-) => Promise<FormState<typeof objectiveSchema, Selectable<ResumeObjective>>>;
+import type { FormAction } from '@/lib/validation';
 
 type FormProps = {
   objective: Partial<Selectable<ResumeObjective>>;
-  action: FormAction;
+  action: FormAction<typeof objectiveSchema, Selectable<ResumeObjective>>;
   onSave: (objective: Selectable<ResumeObjective>) => void;
   onCancel?: () => void;
   includeActions?: boolean;
@@ -33,18 +28,14 @@ export function Form({
   includeActions = true,
   ...props
 }: FormProps): React.JSX.Element {
-  const {
-    formRef,
-    action: save,
-    errors,
-  } = useFormValidation({
+  const { ref, onSubmit, errors } = useFormValidation({
     schema: objectiveSchema,
     action,
     onSuccess: onSave,
   });
 
   return (
-    <form action={save} ref={formRef} className={clsx(className, 'space-y-8')} {...props}>
+    <form ref={ref} onSubmit={onSubmit} className={clsx(className, 'space-y-8')} {...props}>
       <Fieldset>
         <FieldGroup>
           <Field>

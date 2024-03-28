@@ -7,53 +7,28 @@ import type { Employment } from '@/entities/employment/types';
 import { H1, Text } from '@/components/text';
 import { Button } from '@/components/button';
 import {
-  type SaveEmploymentAction,
-  EmploymentFormDialog,
   DeleteEmploymentDialog,
-  type DeleteEmploymentAction,
+  EmploymentFormDialog,
 } from '@/entities/employment/components/form';
 import { EntityCard } from '@/components/cards/entity-card';
 import { noop, shorthandDate } from '@/lib/utils';
 import { Badge } from '@/components/badge';
 import { Card } from '@/components/cards/card';
+import { useFormValidation } from '@/hooks/use-form-validation';
+import { employmentSchema } from '@/entities/employment/validation';
+import { deleteSchema, type FormAction } from '@/lib/validation';
 
-export function EmploymentPanel({
-  show = true,
-  employment = [],
-  saveAction,
-  deleteAction,
-}: {
-  employment?: Employment[];
-  saveAction: SaveEmploymentAction;
-  deleteAction: DeleteEmploymentAction;
-  show?: boolean;
-}): React.JSX.Element {
-  return (
-    <CollapsibleSection title="Employment" show={show}>
-      <EmploymentInnerPanel
-        employment={employment}
-        saveAction={saveAction}
-        deleteAction={deleteAction}
-      />
-    </CollapsibleSection>
-  );
-}
-
-function EmploymentInnerPanel(props: {
+export function EmploymentPanel(props: {
   employment: Employment[];
-  saveAction: SaveEmploymentAction;
-  deleteAction: DeleteEmploymentAction;
+  saveAction: FormAction<typeof employmentSchema, Employment>;
+  deleteAction: FormAction<typeof deleteSchema, string>;
+  show?: boolean;
 }): React.JSX.Element {
   const [employment, setEmployment] = useState(props.employment);
   const [showForm, setShowForm] = useState(false);
-  const [formRecord, setFormRecord] = useState<Employment | undefined>(undefined);
+  const [editRecord, setEditRecord] = useState<Employment | undefined>(undefined);
   const [showDelete, setShowDelete] = useState(false);
   const [deleteRecord, setDeleteRecord] = useState<Employment | undefined>(undefined);
-
-  const closeForm = (): void => {
-    setShowForm(false);
-    setFormRecord(undefined);
-  };
 
   const onCreate = (job: Employment): void => {
     setEmployment([...employment, job]);
@@ -67,21 +42,41 @@ function EmploymentInnerPanel(props: {
     setEmployment(employment.filter((job) => job.id !== id));
   };
 
-  const employmentDialog = (
+  const saveValidation = useFormValidation({
+    schema: employmentSchema,
+    action: props.saveAction,
+    onSuccess: (job: Employment) => {
+      setShowForm(false);
+      editRecord ? onEdit(job) : onCreate(job);
+      setEditRecord(undefined);
+    },
+  });
+
+  const saveDialog = (
     <EmploymentFormDialog
-      employment={formRecord}
-      action={props.saveAction}
-      onSave={formRecord ? onEdit : onCreate}
+      employment={editRecord}
+      {...saveValidation}
       open={showForm}
-      onClose={closeForm}
+      onClose={() => {
+        setShowForm(false);
+      }}
     />
   );
+
+  const deleteValidation = useFormValidation({
+    schema: deleteSchema,
+    action: props.deleteAction,
+    onSuccess: (id) => {
+      setShowDelete(false);
+      onDelete(id);
+      setDeleteRecord(undefined);
+    },
+  });
 
   const deleteDialog = deleteRecord ? (
     <DeleteEmploymentDialog
       job={deleteRecord}
-      action={props.deleteAction}
-      onSuccess={onDelete}
+      {...deleteValidation}
       open={showDelete}
       onClose={() => {
         setShowDelete(false);
@@ -89,62 +84,82 @@ function EmploymentInnerPanel(props: {
     />
   ) : null;
 
-  if (employment.length === 0) {
+  return (
+    <CollapsibleSection title="Employment" show={props.show}>
+      <EmploymentInnerPanel
+        employment={employment}
+        onClickAdd={() => {
+          setEditRecord(undefined);
+          setShowForm(true);
+        }}
+        onClickEdit={(job) => {
+          setEditRecord(job);
+          setShowForm(true);
+        }}
+        onClickDelete={(job) => {
+          setDeleteRecord(job);
+          setShowDelete(true);
+        }}
+      />
+      {saveDialog}
+      {deleteDialog}
+    </CollapsibleSection>
+  );
+}
+
+function EmploymentInnerPanel(props: {
+  employment: Employment[];
+  onClickAdd: () => void;
+  onClickEdit: (job: Employment) => void;
+  onClickDelete: (job: Employment) => void;
+}): React.JSX.Element {
+  if (props.employment.length === 0) {
     return (
-      <>
-        <EmploymentEmptyState
-          onAdd={() => {
-            setShowForm(true);
-          }}
-        />
-        {employmentDialog}
-      </>
+      <EmploymentEmptyState
+        onAdd={() => {
+          props.onClickAdd();
+        }}
+      />
     );
   }
 
   return (
-    <>
-      <div className="flex grow flex-col space-y-8">
-        <div className="grow space-y-8">
-          <div className="flex items-center gap-4">
-            <Text className="max-w-prose">
-              List all your previous jobs and internships which may be relevant to your search.
-            </Text>
-            <div className="hidden grow text-right sm:block">
-              <Button plain>
-                <PlusIcon />
-                Add
-              </Button>
-            </div>
-          </div>
-          <div className="grid grid-cols-4 gap-4 ">
-            {employment.map((job) => (
-              <EmploymentItem
-                key={job.id}
-                job={job}
-                onEdit={() => {
-                  setFormRecord(job);
-                  setShowForm(true);
-                }}
-                onDelete={() => {
-                  setDeleteRecord(job);
-                  setShowDelete(true);
-                }}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="sticky bottom-0 shrink sm:hidden">
-          <div className="h-full grow bg-green-200">
-            <Button color="brand" className="w-full">
-              <PlusIcon /> Add objective
+    <div className="flex grow flex-col space-y-8">
+      <div className="grow space-y-8">
+        <div className="flex items-center gap-4">
+          <Text className="max-w-prose">
+            List all your previous jobs and internships which may be relevant to your search.
+          </Text>
+          <div className="hidden grow text-right sm:block">
+            <Button plain onClick={props.onClickAdd}>
+              <PlusIcon />
+              Add
             </Button>
           </div>
         </div>
+        <div className="grid grid-cols-4 gap-4 ">
+          {props.employment.map((job) => (
+            <EmploymentItem
+              key={job.id}
+              job={job}
+              onEdit={() => {
+                props.onClickEdit(job);
+              }}
+              onDelete={() => {
+                props.onClickDelete(job);
+              }}
+            />
+          ))}
+        </div>
       </div>
-      {employmentDialog}
-      {deleteDialog}
-    </>
+      <div className="sticky bottom-0 shrink sm:hidden">
+        <div className="h-full grow bg-green-200">
+          <Button color="brand" className="w-full" onClick={props.onClickAdd}>
+            <PlusIcon /> Add employment
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -220,7 +235,7 @@ function EmploymentItem({
 
   return (
     <EntityCard
-      className="col-span-2"
+      className="col-span-4 sm:col-span-2"
       badge={job.is_current_position ? <Badge color="green">current</Badge> : undefined}
       id={job.id}
       title={job.company}

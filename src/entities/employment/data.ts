@@ -68,3 +68,17 @@ export async function getUserEmployment(userId: string): Promise<Employment[]> {
   });
   return [...jobs.values()];
 }
+
+export async function deleteEmployment({
+  userId,
+  employmentId,
+}: {
+  userId: string;
+  employmentId: string;
+}): Promise<void> {
+  await db
+    .deleteFrom('job_details')
+    .where('id', '=', employmentId)
+    .where('user_id', '=', userId)
+    .execute();
+}

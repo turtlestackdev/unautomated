@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import type { ReactElement } from 'react';
 import type { Session } from 'lucia';
 import { DocumentArrowUpIcon } from '@heroicons/react/24/outline';
@@ -10,6 +10,8 @@ import { VerticalNav } from '@/components/navigation/vertical-nav';
 import { ObjectivePanel } from '@/entities/objective/components';
 import { UploadResumeForm } from '@/entities/resume/forms';
 import { AppShell } from '@/components/layout/app-shell';
+import { EmploymentPanel } from '@/entities/employment/components/panel';
+import { deleteEmployment, saveEmployment } from '@/entities/employment/actions';
 
 export function Boundary({
   user,
@@ -79,6 +81,11 @@ export function Boundary({
         </AppShell.SideBar>
         <AppShell.Main>
           <ObjectivePanel objectives={resumeData.objectives} />
+          <EmploymentPanel
+            employment={resumeData.employment}
+            saveAction={saveEmployment.bind(null, user.id)}
+            deleteAction={deleteEmployment.bind(null, user.id)}
+          />
         </AppShell.Main>
       </AppShell.Content>
     </AppShell>

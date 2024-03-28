@@ -21,13 +21,13 @@ export function UploadResumeForm({
   setIsOpen: (open: boolean) => void;
 }): React.JSX.Element {
   const { user } = useSession();
-  const { formRef, action } = useFormValidation({
+  const { ref, onSubmit } = useFormValidation({
     action: uploadResume.bind(null, user.id),
   });
 
   return (
     <Dialog onClose={setIsOpen} open={open}>
-      <form action={action} ref={formRef}>
+      <form onSubmit={onSubmit} ref={ref}>
         <ResumeUploadInner
           close={() => {
             setIsOpen(false);

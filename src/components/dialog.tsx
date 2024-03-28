@@ -37,7 +37,7 @@ export function Dialog({
 } & HeadlessDialogProps): ReactElement {
   return (
     <HeadlessTransition appear as={Fragment} show={open} {...props}>
-      <HeadlessDialog onClose={onClose}>
+      <HeadlessDialog onClose={onClose} className="relative z-20">
         <HeadlessTransitionChild
           as={Fragment}
           enter="ease-out duration-100"

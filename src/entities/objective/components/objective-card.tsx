@@ -2,13 +2,13 @@ import type { Selectable } from 'kysely';
 import React, { useState } from 'react';
 import { EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/20/solid';
 import { clsx } from 'clsx';
-import type { ZodType, ZodTypeDef } from 'zod';
 import type { ResumeObjective } from '@/database/schema';
 import { Badge } from '@/components/badge';
 import { Button } from '@/components/button';
-import type { FormState } from '@/lib/validation';
+import { type deleteSchema, type FormAction } from '@/lib/validation';
 import { DeleteDialog } from '@/entities/objective/components/delete-dialog';
-import { Form, type FormAction } from '@/entities/objective/components/form';
+import { Form } from '@/entities/objective/components/form';
+import { type objectiveSchema } from '@/entities/objective/validation';
 
 export function ObjectiveCard({
   objective,
@@ -16,12 +16,9 @@ export function ObjectiveCard({
   ...props
 }: {
   objective: Selectable<ResumeObjective>;
-  editAction: FormAction;
+  editAction: FormAction<typeof objectiveSchema, Selectable<ResumeObjective>>;
   onEdit: (updated: Selectable<ResumeObjective>) => void;
-  deleteAction: (
-    prev: FormState<ZodType<null, ZodTypeDef, null>, null>,
-    data: FormData
-  ) => Promise<FormState<ZodType<null, ZodTypeDef, null>, null>>;
+  deleteAction: FormAction<typeof deleteSchema, string>;
   onDelete: (id: string) => void;
   className?: string;
 }): React.JSX.Element {

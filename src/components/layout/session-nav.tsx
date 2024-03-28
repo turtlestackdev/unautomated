@@ -11,7 +11,7 @@ import { useSession } from '@/hooks/use-session';
 
 const navigation = [
   { name: 'Dashboard', href: '/un/dashboard' },
-  { name: 'Resume', href: '/un/resume' },
+  { name: 'Employment Profile', href: '/un/profile' },
   { name: 'Lead Tracker', href: '/un/leads' },
 ];
 

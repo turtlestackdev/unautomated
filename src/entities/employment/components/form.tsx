@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { clsx } from 'clsx';
 import { Field as HeadlessField } from '@headlessui/react';
-import type { deleteSchema, FormState } from '@/lib/validation';
-import { employmentSchema } from '@/entities/employment/validation';
+import type { z } from 'zod';
+import type { deleteSchema, FormResponse } from '@/lib/validation';
+import { type employmentSchema } from '@/entities/employment/validation';
 import { type Employment } from '@/entities/employment/types';
-import { useFormValidation } from '@/hooks/use-form-validation';
 import { Field, FieldGroup, Label } from '@/components/fieldset';
 import { Input } from '@/components/input';
 import { DatePicker } from '@/components/date-picker';
@@ -12,54 +12,32 @@ import { Switch } from '@/components/switch';
 import { Textarea } from '@/components/textarea';
 import { ListField } from '@/components/form-elements/list-field';
 import { Button, Submit } from '@/components/button';
-import {
-  Dialog,
-  DialogActions,
-  DialogBody,
-  DialogDescription,
-  DialogTitle,
-} from '@/components/dialog';
+import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/dialog';
+import { Strong, Text } from '@/components/text';
 
 export type SaveEmploymentAction = (
-  prev: FormState<typeof employmentSchema, Employment>,
+  prev: FormResponse<typeof employmentSchema, Employment>,
   data: FormData
-) => Promise<FormState<typeof employmentSchema, Employment>>;
+) => Promise<FormResponse<typeof employmentSchema, Employment>>;
 
 type FormProps = {
   employment?: Employment;
-  action: SaveEmploymentAction;
-  onSave: (employment: Employment) => void;
+  onSubmit: (event: React.FormEvent) => void;
+  errors: z.inferFlattenedErrors<typeof employmentSchema> | null;
   onCancel?: () => void;
   includeActions?: boolean;
 } & Omit<React.ComponentPropsWithoutRef<'form'>, 'action'>;
 
-export function EmploymentForm({
-  employment,
-  action,
-  onSave,
-  onCancel,
-  includeActions = true,
-  className,
-  ...props
-}: FormProps): React.JSX.Element {
-  const {
-    formRef,
-    action: save,
-    errors,
-    deltaTime,
-  } = useFormValidation({
-    schema: employmentSchema,
-    action,
-    onSuccess: onSave,
-  });
-
+export const EmploymentForm = forwardRef(function EmploymentForm(
+  { employment, onSubmit, errors, onCancel, includeActions = true, className, ...props }: FormProps,
+  ref: React.ForwardedRef<HTMLFormElement>
+): React.JSX.Element {
   const highlights = employment?.highlights.map((highlight) => highlight.description) ?? [];
 
   return (
     <form
-      key={deltaTime.getTime()}
-      action={save}
-      ref={formRef}
+      onSubmit={onSubmit}
+      ref={ref}
       className={clsx(
         className,
         'space-y-8 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm'
@@ -136,23 +114,26 @@ export function EmploymentForm({
       </FieldGroup>
     </form>
   );
-}
+});
 
-export function EmploymentFormDialog({
-  open,
-  onClose,
-  ...props
-}: Omit<FormProps, 'includeActions'> & {
-  open: boolean;
-  onClose: () => void;
-}): React.JSX.Element {
+export const EmploymentFormDialog = forwardRef(function EmploymentFormDialog(
+  {
+    open,
+    onClose,
+    ...props
+  }: Omit<FormProps, 'includeActions'> & {
+    open: boolean;
+    onClose: () => void;
+  },
+  ref: React.ForwardedRef<HTMLFormElement>
+): React.JSX.Element {
   const formId = `employment-form-dialog-${props.employment?.id ?? 'new'}`;
 
   return (
     <Dialog open={open} onClose={onClose} size="xl">
       <DialogTitle>{props.employment ? 'Edit Employment' : 'Add Employment'}</DialogTitle>
       <DialogBody>
-        <EmploymentForm {...props} includeActions={false} id={formId} />
+        <EmploymentForm ref={ref} {...props} includeActions={false} id={formId} />
         <DialogActions>
           <Button plain onClick={onClose}>
             Cancel
@@ -164,42 +145,38 @@ export function EmploymentFormDialog({
       </DialogBody>
     </Dialog>
   );
-}
+});
 
 export type DeleteEmploymentAction = (
-  prev: FormState<typeof deleteSchema, null>,
+  prev: FormResponse<typeof deleteSchema, null>,
   data: FormData
-) => Promise<FormState<typeof deleteSchema, null>>;
+) => Promise<FormResponse<typeof deleteSchema, null>>;
 
-export function DeleteEmploymentDialog({
-  job,
-  ...props
-}: {
-  job: Employment;
-  action: DeleteEmploymentAction;
-  onSuccess: (id: string) => void;
-  open: boolean;
-  onClose: () => void;
-}): React.JSX.Element {
-  const { formRef, action, deltaTime } = useFormValidation({
-    action: props.action,
-    onSuccess: () => {
-      props.onSuccess(job.id);
-    },
-  });
-
+export const DeleteEmploymentDialog = forwardRef(function DeleteEmploymentDialog(
+  {
+    job,
+    ...props
+  }: {
+    job: Employment;
+    onSubmit: (event: React.FormEvent) => void;
+    errors: z.inferFlattenedErrors<typeof deleteSchema> | null;
+    open: boolean;
+    onClose: () => void;
+  },
+  ref: React.ForwardedRef<HTMLFormElement>
+): React.JSX.Element {
   return (
     <Dialog open={props.open} onClose={props.onClose}>
-      <form key={deltaTime.getTime()} action={action} ref={formRef}>
+      <form ref={ref} onSubmit={props.onSubmit}>
         <input type="hidden" name="id" value={job.id} />
         <DialogTitle>Delete objective</DialogTitle>
-        <DialogDescription>
-          <p>Are you sure you want to delete the job:</p>
-          <p className="font-semibold">
+        <DialogBody className="leading-loose">
+          <Text>Are you sure you want to delete the job:</Text>
+          <Strong className="font-semibold">
             {job.title} - {job.company}
-          </p>
-          <p>This action cannot be undone.</p>
-        </DialogDescription>
+          </Strong>
+          <Text>This action cannot be undone.</Text>
+        </DialogBody>
         <DialogActions>
           <Button plain onClick={props.onClose}>
             Cancel
@@ -209,4 +186,4 @@ export function DeleteEmploymentDialog({
       </form>
     </Dialog>
   );
-}
+});

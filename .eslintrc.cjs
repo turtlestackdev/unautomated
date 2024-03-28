@@ -50,7 +50,7 @@ module.exports = {
   rules: {
     'curly': 'error',
     '@typescript-eslint/consistent-type-imports': 'error',
-    'no-console': 'warn',
+    'no-console': 'off',
   },
   overrides: [
     // Next.js needs default exports for pages and layouts.

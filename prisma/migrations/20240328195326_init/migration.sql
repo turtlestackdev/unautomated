@@ -217,13 +217,13 @@ ALTER TABLE "resume_objectives" ADD CONSTRAINT "resume_objectives_user_id_fkey" 
 ALTER TABLE "job_details" ADD CONSTRAINT "job_details_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "job_highlights" ADD CONSTRAINT "job_highlights_job_id_fkey" FOREIGN KEY ("job_id") REFERENCES "job_details"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "job_highlights" ADD CONSTRAINT "job_highlights_job_id_fkey" FOREIGN KEY ("job_id") REFERENCES "job_details"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "school_enrollment" ADD CONSTRAINT "school_enrollment_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "scholastic_highlights" ADD CONSTRAINT "scholastic_highlights_enrollment_id_fkey" FOREIGN KEY ("enrollment_id") REFERENCES "school_enrollment"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "scholastic_highlights" ADD CONSTRAINT "scholastic_highlights_enrollment_id_fkey" FOREIGN KEY ("enrollment_id") REFERENCES "school_enrollment"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "skills" ADD CONSTRAINT "skills_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

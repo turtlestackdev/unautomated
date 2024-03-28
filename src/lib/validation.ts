@@ -1,8 +1,8 @@
 import { type ZodType, z, type ZodEffects, type ZodString } from 'zod';
 import { isObject } from '@/lib/type-guards';
 
-export type FormState<T extends ZodType, M> =
-  | { status: 'new'; errors?: never; model?: never }
+export type FormAction<T extends ZodType, M> = (data: FormData) => Promise<FormResponse<T, M>>;
+export type FormResponse<T extends ZodType, M> =
   | {
       status: 'success';
       errors?: never;
@@ -13,8 +13,6 @@ export type FormState<T extends ZodType, M> =
       errors: z.inferFlattenedErrors<T>;
       model?: never;
     };
-
-export const initialFormState = { status: 'new' } as const;
 
 export function emptyStringToUndefined(arg: unknown): unknown {
   if (arg === '') {
@@ -142,3 +140,5 @@ export function formToObject(
 export const deleteSchema = z.object({
   id: emptyStringIsUndefined.pipe(z.string({ required_error: 'id is missing' })),
 });
+
+export type DeleteEntityState = FormResponse<typeof deleteSchema, string>;

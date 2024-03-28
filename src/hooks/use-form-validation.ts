@@ -1,21 +1,25 @@
 import type { z, ZodType } from 'zod';
-import { useFormState } from 'react-dom';
-import type { RefObject } from 'react';
-import { useCallback, useState, useEffect, useRef } from 'react';
-import type { FormState } from '@/lib/validation';
-import { formToObject, initialFormState } from '@/lib/validation';
+import { type RefObject, useTransition, useCallback, useState, useRef } from 'react';
+import { type FormAction, formToObject } from '@/lib/validation';
 
 interface FormValidationProps<T extends ZodType, M> {
+  // the server function to use, any binding should be done prior to calling the hook
+  action: FormAction<T, M>;
   // the Zod schema to validate against
   schema?: T;
-  // the server function to use, any binding should be done prior to calling the hook
-  action: (prev: FormState<T, M>, data: FormData) => Promise<FormState<T, M>>;
+
   // What to do when the form is created, e.g., open a panel
   onInit?: () => void;
   // What to do when the form submits successfully, e.g., close a panel and add the new model to the DOM
   onSuccess?: (model: M) => void;
   // What to do when the form returns an error, e.g., show a notification.
   onError?: (errors: z.inferFlattenedErrors<T>) => void;
+}
+
+export interface FormValidation<T extends ZodType> {
+  ref: RefObject<HTMLFormElement>;
+  onSubmit: (event: React.FormEvent) => void;
+  errors: z.inferFlattenedErrors<T> | null;
 }
 
 /**
@@ -26,82 +30,51 @@ interface FormValidationProps<T extends ZodType, M> {
  */
 export function useFormValidation<T extends ZodType, M>({
   schema,
-  onError,
-  onInit,
-  onSuccess,
   ...props
-}: FormValidationProps<T, M>): {
-  formRef: RefObject<HTMLFormElement>;
-  action: (payload: FormData) => void;
-  submit: () => void;
-  setShouldSubmit: (shouldSubmit: boolean) => void;
-  errors: z.inferFlattenedErrors<T> | null;
-  deltaTime: Date;
-} {
-  const formRef = useRef<HTMLFormElement>(null);
+}: FormValidationProps<T, M>): FormValidation<T> {
+  const [isPending, startTransaction] = useTransition();
+  const ref = useRef<HTMLFormElement>(null);
   const [errors, setErrors] = useState<z.inferFlattenedErrors<T> | null>(null);
-  const [state, action] = useFormState(props.action, initialFormState);
-  const [shouldSubmit, setShouldSubmit] = useState(false);
-  const [deltaTime, setDeltaTime] = useState(new Date());
 
-  const submit = useCallback((): void => {
-    const isValid = (): boolean => {
-      if (!formRef.current) {
-        return false;
-      }
+  const onSubmit = useCallback(
+    (event: React.FormEvent): void => {
+      event.preventDefault();
+      if (ref.current) {
+        const data = new FormData(ref.current);
+        if (schema) {
+          const request = schema.safeParse(formToObject(data));
+          if (!request.success) {
+            const errorList = request.error.flatten();
+            if (props.onError) {
+              props.onError(errorList);
+            }
 
-      // if no schema is passed, do not apply front end validation.
-      if (!schema) {
-        return true;
-      }
+            setErrors(errorList);
 
-      const data = new FormData(formRef.current);
-      const request = schema.safeParse(formToObject(data));
-      if (!request.success) {
-        const errorList = request.error.flatten();
-        if (onError) {
-          onError(errorList);
+            return;
+          }
         }
 
-        setErrors(errorList);
+        if (!isPending) {
+          startTransaction(async () => {
+            const state = await props.action(data);
+            if (state.status === 'success') {
+              if (props.onSuccess) {
+                props.onSuccess(state.model);
+              }
+            }
 
-        return false;
+            if (state.status === 'error') {
+              if (props.onError) {
+                props.onError(state.errors);
+              }
+            }
+          });
+        }
       }
+    },
+    [schema, props, isPending]
+  );
 
-      return true;
-    };
-
-    if (isValid()) {
-      formRef.current?.requestSubmit();
-    }
-  }, [schema, onError]);
-
-  useEffect(() => {
-    if (state.status === 'new' && onInit) {
-      onInit();
-    }
-
-    if (state.status === 'success') {
-      setDeltaTime(new Date());
-      if (onSuccess) {
-        onSuccess(state.model);
-      }
-      setErrors(null);
-    }
-
-    if (state.status === 'error') {
-      if (onError) {
-        onError(state.errors);
-      }
-      setErrors(state.errors);
-    }
-
-    if (shouldSubmit) {
-      // used for submissions that are dependent on DOM update changes.
-      submit();
-      setShouldSubmit(false);
-    }
-  }, [state, onError, onInit, onSuccess, props.action, shouldSubmit, submit]);
-
-  return { formRef, action, submit, setShouldSubmit, errors, deltaTime };
+  return { ref, onSubmit, errors };
 }

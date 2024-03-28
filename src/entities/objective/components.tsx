@@ -105,7 +105,7 @@ export function ObjectivePanel({
           <div className="sticky bottom-0 shrink sm:hidden">
             <div className="h-full grow bg-green-200">
               <Button color="brand" className="w-full">
-                <PlusIcon /> Add objective
+                Add objective
               </Button>
             </div>
           </div>

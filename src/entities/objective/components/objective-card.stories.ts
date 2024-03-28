@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { type Selectable } from 'kysely';
-import type { ZodType, ZodTypeDef } from 'zod';
 import { ObjectiveCard } from '@/entities/objective/components/objective-card';
 import { type ResumeObjective } from '@/database/schema';
-import { type FormState } from '@/lib/validation';
+import { type deleteSchema, type FormResponse } from '@/lib/validation';
 import { type objectiveSchema } from '@/entities/objective/validation';
 import { noop } from '@/lib/utils';
+import { isString } from '@/lib/type-guards';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -37,17 +37,22 @@ const objective: Selectable<ResumeObjective> = {
 export const Primary: Story = {
   args: {
     objective,
-    editAction: (_prev, _data) => {
-      return new Promise<FormState<typeof objectiveSchema, Selectable<ResumeObjective>>>(
+    editAction: (_data) => {
+      return new Promise<FormResponse<typeof objectiveSchema, Selectable<ResumeObjective>>>(
         (resolve) => {
-          resolve({ status: 'new' });
+          resolve({ status: 'success', model: objective });
         }
       );
     },
     onEdit: noop,
-    deleteAction: (_prev, _data) => {
-      return new Promise<FormState<ZodType<null, ZodTypeDef, null>, null>>((resolve) => {
-        resolve({ status: 'new' });
+    deleteAction: (data) => {
+      return new Promise<FormResponse<typeof deleteSchema, string>>((resolve) => {
+        const id = data.get('id');
+        if (isString(id)) {
+          resolve({ status: 'success', model: id });
+        } else {
+          resolve({ status: 'error', errors: { formErrors: [], fieldErrors: { id: ['bad id'] } } });
+        }
       });
     },
     onDelete: noop,

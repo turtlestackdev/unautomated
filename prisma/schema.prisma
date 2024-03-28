@@ -135,7 +135,7 @@ model JobDetails {
 model JobHighlight {
   id          String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   job_id      String     @db.Uuid
-  job         JobDetails @relation(fields: [job_id], references: [id])
+  job         JobDetails @relation(fields: [job_id], references: [id], onDelete: Cascade)
   description String
 
   @@map("job_highlights")
@@ -170,7 +170,7 @@ model SchoolEnrollment {
 model ScholasticHighlight {
   id            String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   enrollment_id String           @db.Uuid
-  enrollment    SchoolEnrollment @relation(fields: [enrollment_id], references: [id])
+  enrollment    SchoolEnrollment @relation(fields: [enrollment_id], references: [id], onDelete: Cascade)
   description   String
 
   @@index([description])

@@ -43,7 +43,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
     });
 
     return (
-      <Popover className="relative" data-slot="control">
+      <Popover className="relative z-20" data-slot="control">
         <input
           defaultValue={value ? format('yyyy-MM-dd', value) : undefined}
           name={name}

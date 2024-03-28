@@ -1,23 +1,11 @@
-import React, { useState } from 'react';
-import { PlusIcon } from '@heroicons/react/16/solid';
-import { useSession } from '@/hooks/use-session';
 import type { Education, Degree } from '@/entities/education/types';
-import { useFormValidation } from '@/hooks/use-form-validation';
-import { educationSchema } from '@/entities/education/validation';
-import { saveEducation } from '@/entities/education/actions';
-import { Field, FieldGroup, Fieldset, Label, Legend } from '@/components/fieldset';
-import { Button } from '@/components/button';
-import { Input } from '@/components/input';
-import { Combobox } from '@/components/combobox';
-import { DatePicker } from '@/components/date-picker';
-import { ListField } from '@/components/form-elements/list-field';
 
-interface EducationFormProps {
+export interface EducationFormProps {
   education?: Education;
   degrees: Degree[];
 }
 
-export function EducationForm({ education, degrees }: EducationFormProps): React.JSX.Element {
+/*export function EducationForm({ education, degrees }: EducationFormProps): React.JSX.Element {
   const { user } = useSession();
   const { formRef, action, submit, setShouldSubmit, errors } = useFormValidation({
     schema: educationSchema,
@@ -159,3 +147,4 @@ export function EducationForm({ education, degrees }: EducationFormProps): React
     </form>
   );
 }
+*/
