@@ -1,7 +1,7 @@
 import React from 'react';
 import { clsx } from 'clsx';
 import type { Selectable } from 'kysely';
-import { useFormValidation } from '@/hooks/use-form-validation';
+import { useFormSubmit } from '@/hooks/use-form-submit';
 import { objectiveSchema } from '@/entities/objective/validation';
 import { Button, Submit } from '@/components/button';
 import type { ResumeObjective } from '@/database/schema';
@@ -28,14 +28,14 @@ export function Form({
   includeActions = true,
   ...props
 }: FormProps): React.JSX.Element {
-  const { ref, onSubmit, errors } = useFormValidation({
+  const { onSubmit, errors } = useFormSubmit({
     schema: objectiveSchema,
     action,
     onSuccess: onSave,
   });
 
   return (
-    <form ref={ref} onSubmit={onSubmit} className={clsx(className, 'space-y-8')} {...props}>
+    <form onSubmit={onSubmit} className={clsx(className, 'space-y-8')} {...props}>
       <Fieldset>
         <FieldGroup>
           <Field>

@@ -10,7 +10,7 @@ import {
 } from '@/components/dialog';
 import { LoadingIcon } from '@/components/icons/loading-icon';
 import { Button, FileButton } from '@/components/button';
-import { useFormValidation } from '@/hooks/use-form-validation';
+import { useFormSubmit } from '@/hooks/use-form-submit';
 import { uploadResume } from '@/entities/resume/actions';
 
 export function UploadResumeForm({
@@ -21,13 +21,13 @@ export function UploadResumeForm({
   setIsOpen: (open: boolean) => void;
 }): React.JSX.Element {
   const { user } = useSession();
-  const { ref, onSubmit } = useFormValidation({
+  const { onSubmit } = useFormSubmit({
     action: uploadResume.bind(null, user.id),
   });
 
   return (
     <Dialog onClose={setIsOpen} open={open}>
-      <form onSubmit={onSubmit} ref={ref}>
+      <form onSubmit={onSubmit}>
         <ResumeUploadInner
           close={() => {
             setIsOpen(false);

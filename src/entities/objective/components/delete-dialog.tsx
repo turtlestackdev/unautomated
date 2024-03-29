@@ -1,7 +1,7 @@
 import type { Selectable } from 'kysely';
 import React from 'react';
 import type { ResumeObjective } from '@/database/schema';
-import { useFormValidation } from '@/hooks/use-form-validation';
+import { useFormSubmit } from '@/hooks/use-form-submit';
 import { Dialog, DialogActions, DialogDescription, DialogTitle } from '@/components/dialog';
 import { Button, Submit } from '@/components/button';
 import type { deleteSchema, FormAction } from '@/lib/validation';
@@ -18,7 +18,7 @@ export function DeleteDialog({
   open: boolean;
   onClose: () => void;
 }): React.JSX.Element {
-  const { ref, onSubmit } = useFormValidation({
+  const { onSubmit } = useFormSubmit({
     action: props.action,
     onSuccess: () => {
       props.onSuccess(objective.id);
@@ -27,7 +27,7 @@ export function DeleteDialog({
 
   return (
     <Dialog open={props.open} onClose={props.onClose}>
-      <form onSubmit={onSubmit} ref={ref}>
+      <form onSubmit={onSubmit}>
         <input type="hidden" name="id" value={objective.id} />
         <DialogTitle>Delete objective</DialogTitle>
         <DialogDescription>

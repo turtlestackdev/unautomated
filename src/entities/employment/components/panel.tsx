@@ -14,7 +14,7 @@ import { EntityCard } from '@/components/cards/entity-card';
 import { noop, shorthandDate } from '@/lib/utils';
 import { Badge } from '@/components/badge';
 import { Card } from '@/components/cards/card';
-import { useFormValidation } from '@/hooks/use-form-validation';
+import { useFormSubmit } from '@/hooks/use-form-submit';
 import { employmentSchema } from '@/entities/employment/validation';
 import { deleteSchema, type FormAction } from '@/lib/validation';
 
@@ -42,7 +42,7 @@ export function EmploymentPanel(props: {
     setEmployment(employment.filter((job) => job.id !== id));
   };
 
-  const saveValidation = useFormValidation({
+  const saveValidation = useFormSubmit({
     schema: employmentSchema,
     action: props.saveAction,
     onSuccess: (job: Employment) => {
@@ -63,7 +63,7 @@ export function EmploymentPanel(props: {
     />
   );
 
-  const deleteValidation = useFormValidation({
+  const deleteValidation = useFormSubmit({
     schema: deleteSchema,
     action: props.deleteAction,
     onSuccess: (id) => {

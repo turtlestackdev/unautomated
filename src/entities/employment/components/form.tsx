@@ -1,8 +1,8 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { clsx } from 'clsx';
 import { Field as HeadlessField } from '@headlessui/react';
 import type { z } from 'zod';
-import type { deleteSchema, FormResponse } from '@/lib/validation';
+import type { deleteSchema } from '@/lib/validation';
 import { type employmentSchema } from '@/entities/employment/validation';
 import { type Employment } from '@/entities/employment/types';
 import { Field, FieldGroup, Label } from '@/components/fieldset';
@@ -15,29 +15,28 @@ import { Button, Submit } from '@/components/button';
 import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/dialog';
 import { Strong, Text } from '@/components/text';
 
-export type SaveEmploymentAction = (
-  prev: FormResponse<typeof employmentSchema, Employment>,
-  data: FormData
-) => Promise<FormResponse<typeof employmentSchema, Employment>>;
-
 type FormProps = {
   employment?: Employment;
-  onSubmit: (event: React.FormEvent) => void;
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   errors: z.inferFlattenedErrors<typeof employmentSchema> | null;
   onCancel?: () => void;
   includeActions?: boolean;
 } & Omit<React.ComponentPropsWithoutRef<'form'>, 'action'>;
 
-export const EmploymentForm = forwardRef(function EmploymentForm(
-  { employment, onSubmit, errors, onCancel, includeActions = true, className, ...props }: FormProps,
-  ref: React.ForwardedRef<HTMLFormElement>
-): React.JSX.Element {
+export function EmploymentForm({
+  employment,
+  onSubmit,
+  errors,
+  onCancel,
+  includeActions = true,
+  className,
+  ...props
+}: FormProps): React.JSX.Element {
   const highlights = employment?.highlights.map((highlight) => highlight.description) ?? [];
 
   return (
     <form
       onSubmit={onSubmit}
-      ref={ref}
       className={clsx(
         className,
         'space-y-8 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm'
@@ -114,26 +113,23 @@ export const EmploymentForm = forwardRef(function EmploymentForm(
       </FieldGroup>
     </form>
   );
-});
+}
 
-export const EmploymentFormDialog = forwardRef(function EmploymentFormDialog(
-  {
-    open,
-    onClose,
-    ...props
-  }: Omit<FormProps, 'includeActions'> & {
-    open: boolean;
-    onClose: () => void;
-  },
-  ref: React.ForwardedRef<HTMLFormElement>
-): React.JSX.Element {
+export function EmploymentFormDialog({
+  open,
+  onClose,
+  ...props
+}: Omit<FormProps, 'includeActions'> & {
+  open: boolean;
+  onClose: () => void;
+}): React.JSX.Element {
   const formId = `employment-form-dialog-${props.employment?.id ?? 'new'}`;
 
   return (
     <Dialog open={open} onClose={onClose} size="xl">
       <DialogTitle>{props.employment ? 'Edit Employment' : 'Add Employment'}</DialogTitle>
       <DialogBody>
-        <EmploymentForm ref={ref} {...props} includeActions={false} id={formId} />
+        <EmploymentForm {...props} includeActions={false} id={formId} />
         <DialogActions>
           <Button plain onClick={onClose}>
             Cancel
@@ -145,29 +141,21 @@ export const EmploymentFormDialog = forwardRef(function EmploymentFormDialog(
       </DialogBody>
     </Dialog>
   );
-});
+}
 
-export type DeleteEmploymentAction = (
-  prev: FormResponse<typeof deleteSchema, null>,
-  data: FormData
-) => Promise<FormResponse<typeof deleteSchema, null>>;
-
-export const DeleteEmploymentDialog = forwardRef(function DeleteEmploymentDialog(
-  {
-    job,
-    ...props
-  }: {
-    job: Employment;
-    onSubmit: (event: React.FormEvent) => void;
-    errors: z.inferFlattenedErrors<typeof deleteSchema> | null;
-    open: boolean;
-    onClose: () => void;
-  },
-  ref: React.ForwardedRef<HTMLFormElement>
-): React.JSX.Element {
+export function DeleteEmploymentDialog({
+  job,
+  ...props
+}: {
+  job: Employment;
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  errors: z.inferFlattenedErrors<typeof deleteSchema> | null;
+  open: boolean;
+  onClose: () => void;
+}): React.JSX.Element {
   return (
     <Dialog open={props.open} onClose={props.onClose}>
-      <form ref={ref} onSubmit={props.onSubmit}>
+      <form onSubmit={props.onSubmit}>
         <input type="hidden" name="id" value={job.id} />
         <DialogTitle>Delete objective</DialogTitle>
         <DialogBody className="leading-loose">
@@ -186,4 +174,4 @@ export const DeleteEmploymentDialog = forwardRef(function DeleteEmploymentDialog
       </form>
     </Dialog>
   );
-});
+}
