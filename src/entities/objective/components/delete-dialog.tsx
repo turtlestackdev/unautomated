@@ -4,9 +4,7 @@ import type { ResumeObjective } from '@/database/schema';
 import { useFormSubmit } from '@/hooks/use-form-submit';
 import { Dialog, DialogActions, DialogDescription, DialogTitle } from '@/components/dialog';
 import { Button, Submit } from '@/components/button';
-import type { deleteSchema, FormAction } from '@/lib/validation';
-
-export type DeleteAction = FormAction<typeof deleteSchema, string>;
+import type { DeleteAction } from '@/lib/validation';
 
 export function DeleteDialog({
   objective,

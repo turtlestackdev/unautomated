@@ -1,6 +1,6 @@
 'use server';
 import type { Selectable } from 'kysely';
-import { deleteSchema, type FormResponse } from '@/lib/validation';
+import { type DeleteResponse, deleteSchema, type FormResponse } from '@/lib/validation';
 import { objectiveSchema } from '@/entities/objective/validation';
 import type { ResumeObjective } from '@/database/schema';
 import * as objectives from '@/entities/objective/data';
@@ -36,19 +36,14 @@ export async function saveObjective(userId: string, data: FormData): Promise<Obj
   }
 }
 
-type DeleteObjectiveState = FormResponse<typeof deleteSchema, string>;
-
-export async function deleteObjective(
-  userId: string,
-  data: FormData
-): Promise<DeleteObjectiveState> {
+export async function deleteObjective(userId: string, data: FormData): Promise<DeleteResponse> {
   const request = deleteSchema.safeParse(Object.fromEntries(data.entries()));
   if (!request.success) {
     return { status: 'error', errors: request.error.flatten() };
   }
   try {
     await objectives.deleteObjective({ objectiveId: request.data.id, userId });
-    return { status: 'success', model: request.data.id };
+    return { status: 'success', model: { id: request.data.id } };
   } catch (error) {
     console.warn('could not delete objective, error');
     return {

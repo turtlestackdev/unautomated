@@ -1,7 +1,7 @@
 'use server';
 
 import {
-  type DeleteEntityState,
+  type DeleteResponse,
   deleteSchema,
   type FormResponse,
   formToObject,
@@ -36,14 +36,14 @@ export async function saveEmployment(userId: string, data: FormData): Promise<Em
   }
 }
 
-export async function deleteEmployment(userId: string, data: FormData): Promise<DeleteEntityState> {
+export async function deleteEmployment(userId: string, data: FormData): Promise<DeleteResponse> {
   const request = deleteSchema.safeParse(Object.fromEntries(data.entries()));
   if (!request.success) {
     return { status: 'error', errors: request.error.flatten() };
   }
   try {
     await employment.deleteEmployment({ employmentId: request.data.id, userId });
-    return { status: 'success', model: request.data.id };
+    return { status: 'success', model: { id: request.data.id } };
   } catch (error) {
     console.warn('could not delete objective, error');
     return {

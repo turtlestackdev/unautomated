@@ -1,188 +1,94 @@
-import { PlusIcon } from '@heroicons/react/16/solid';
 import React, { useState } from 'react';
 import { BriefcaseIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/20/solid';
-import { CollapsibleSection } from '@/components/layout/collapsible-section';
 import type { Employment } from '@/entities/employment/types';
-import { H1, Text } from '@/components/text';
+import { Strong, Text } from '@/components/text';
 import { Button } from '@/components/button';
-import {
-  DeleteEmploymentDialog,
-  EmploymentFormDialog,
-} from '@/entities/employment/components/form';
+import { EmploymentFormDialog } from '@/entities/employment/components/form';
 import { EntityCard } from '@/components/cards/entity-card';
 import { noop, shorthandDate } from '@/lib/utils';
 import { Badge } from '@/components/badge';
 import { Card } from '@/components/cards/card';
-import { useFormSubmit } from '@/hooks/use-form-submit';
 import { employmentSchema } from '@/entities/employment/validation';
-import { deleteSchema, type FormAction } from '@/lib/validation';
+import { type DeleteAction, type FormAction } from '@/lib/validation';
+import { EntityPanel } from '@/components/entities/entity-panel';
+import { DeleteDialog } from '@/components/entities/delete-dialog';
 
 export function EmploymentPanel(props: {
   employment: Employment[];
   saveAction: FormAction<typeof employmentSchema, Employment>;
-  deleteAction: FormAction<typeof deleteSchema, string>;
+  deleteAction: DeleteAction;
   show?: boolean;
 }): React.JSX.Element {
-  const [employment, setEmployment] = useState(props.employment);
-  const [showForm, setShowForm] = useState(false);
-  const [editRecord, setEditRecord] = useState<Employment | undefined>(undefined);
-  const [showDelete, setShowDelete] = useState(false);
-  const [deleteRecord, setDeleteRecord] = useState<Employment | undefined>(undefined);
-
-  const onCreate = (job: Employment): void => {
-    setEmployment([...employment, job]);
-  };
-
-  const onEdit = (updated: Employment): void => {
-    setEmployment(employment.map((job) => (job.id === updated.id ? updated : job)));
-  };
-
-  const onDelete = (id: string): void => {
-    setEmployment(employment.filter((job) => job.id !== id));
-  };
-
-  const saveValidation = useFormSubmit({
-    schema: employmentSchema,
-    action: props.saveAction,
-    onSuccess: (job: Employment) => {
-      setShowForm(false);
-      editRecord ? onEdit(job) : onCreate(job);
-      setEditRecord(undefined);
-    },
-  });
-
-  const saveDialog = (
-    <EmploymentFormDialog
-      employment={editRecord}
-      {...saveValidation}
-      open={showForm}
-      onClose={() => {
-        setShowForm(false);
-      }}
-    />
-  );
-
-  const deleteValidation = useFormSubmit({
-    schema: deleteSchema,
-    action: props.deleteAction,
-    onSuccess: (id) => {
-      setShowDelete(false);
-      onDelete(id);
-      setDeleteRecord(undefined);
-    },
-  });
-
-  const deleteDialog = deleteRecord ? (
-    <DeleteEmploymentDialog
-      job={deleteRecord}
-      {...deleteValidation}
-      open={showDelete}
-      onClose={() => {
-        setShowDelete(false);
-      }}
-    />
-  ) : null;
-
   return (
-    <CollapsibleSection title="Employment" show={props.show}>
-      <EmploymentInnerPanel
-        employment={employment}
-        onClickAdd={() => {
-          setEditRecord(undefined);
-          setShowForm(true);
-        }}
-        onClickEdit={(job) => {
-          setEditRecord(job);
-          setShowForm(true);
-        }}
-        onClickDelete={(job) => {
-          setDeleteRecord(job);
-          setShowDelete(true);
-        }}
-      />
-      {saveDialog}
-      {deleteDialog}
-    </CollapsibleSection>
-  );
-}
-
-function EmploymentInnerPanel(props: {
-  employment: Employment[];
-  onClickAdd: () => void;
-  onClickEdit: (job: Employment) => void;
-  onClickDelete: (job: Employment) => void;
-}): React.JSX.Element {
-  if (props.employment.length === 0) {
-    return (
-      <EmploymentEmptyState
-        onAdd={() => {
-          props.onClickAdd();
-        }}
-      />
-    );
-  }
-
-  return (
-    <div className="flex grow flex-col space-y-8">
-      <div className="grow space-y-8">
-        <div className="flex items-center gap-4">
-          <Text className="max-w-prose">
-            List all your previous jobs and internships which may be relevant to your search.
-          </Text>
-          <div className="hidden grow text-right sm:block">
-            <Button plain onClick={props.onClickAdd}>
-              <PlusIcon />
-              Add
-            </Button>
-          </div>
-        </div>
-        <div className="grid grid-cols-4 gap-4 ">
-          {props.employment.map((job) => (
-            <EmploymentItem
-              key={job.id}
-              job={job}
-              onEdit={() => {
-                props.onClickEdit(job);
-              }}
-              onDelete={() => {
-                props.onClickDelete(job);
-              }}
-            />
-          ))}
-        </div>
-      </div>
-      <div className="sticky bottom-0 shrink sm:hidden">
-        <div className="h-full grow bg-green-200">
-          <Button color="brand" className="w-full" onClick={props.onClickAdd}>
-            <PlusIcon /> Add employment
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function EmploymentEmptyState({ onAdd }: { onAdd: () => void }): React.JSX.Element {
-  return (
-    <div className="relative w-full overflow-hidden py-16">
-      <div className=" relative z-10 max-w-fit space-y-12">
-        <div>
-          <H1 className="mb-4  text-balance">Add your work history</H1>
-          <p className="max-w-80 text-lg/6 text-zinc-700 ">
-            Add as much detail as possible.
-            <br />
-            Then fine tune individual resumes.
-          </p>
-        </div>
-        <Button color="brand" onClick={onAdd}>
-          Add Employment
-        </Button>
-      </div>
-      <div className="absolute left-16 top-1/2 z-0 -translate-y-1/2 lg:left-64">
-        <BriefcaseIcon className="h-96 w-96 text-gray-200" />
-      </div>
-    </div>
+    <EntityPanel
+      records={props.employment}
+      schema={employmentSchema}
+      saveAction={props.saveAction}
+      deleteAction={props.deleteAction}
+      title="Employment"
+    >
+      {(panelProps) => (
+        <>
+          {panelProps.isEmpty ? (
+            <EntityPanel.EmptySate
+              headline="Add your work history"
+              onAdd={panelProps.onClickAdd}
+              btnText="Add employment"
+              Icon={BriefcaseIcon}
+            >
+              Add as much detail as possible.
+              <br />
+              Then fine tune individual resumes.
+            </EntityPanel.EmptySate>
+          ) : (
+            <EntityPanel.Content
+              description="List all your previous jobs and internships which may be relevant to your search."
+              onClickAdd={panelProps.onClickAdd}
+              addBtnText="Add employment"
+            >
+              {panelProps.records.map((job) => (
+                <EmploymentItem
+                  key={job.id}
+                  job={job}
+                  onEdit={() => {
+                    panelProps.onClickEdit(job);
+                  }}
+                  onDelete={() => {
+                    panelProps.onClickDelete(job);
+                  }}
+                />
+              ))}
+            </EntityPanel.Content>
+          )}
+          <EmploymentFormDialog
+            employment={panelProps.recordToSave}
+            onSubmit={panelProps.submitSave}
+            errors={panelProps.saveErrors}
+            open={panelProps.isSaveDialogOpen}
+            onClose={panelProps.onCloseSaveDialog}
+          />
+          {/*
+            recordToDelete should always be set when the dialog is open.
+            Conditional rendering causes the transition to be skipped.
+            */}
+          <DeleteDialog
+            title="Delete employment"
+            record={panelProps.recordToDelete ?? { id: '' }}
+            open={panelProps.isDeleteDialogOpen}
+            onClose={panelProps.onCloseDeleteDialog}
+            onSubmit={panelProps.submitDelete}
+            errors={panelProps.deleteErrors !== null}
+          >
+            <Text>Are you sure you want to delete the job:</Text>
+            <Strong className="font-semibold">
+              {panelProps.recordToDelete?.title} - {panelProps.recordToDelete?.company}
+            </Strong>
+            <Text>This action cannot be undone.</Text>
+          </DeleteDialog>
+        </>
+      )}
+    </EntityPanel>
   );
 }
 

@@ -1,5 +1,6 @@
 import { type ZodType, z, type ZodEffects, type ZodString } from 'zod';
 import { isObject } from '@/lib/type-guards';
+import { type Entity } from '@/entities/types';
 
 export type FormAction<T extends ZodType, M> = (data: FormData) => Promise<FormResponse<T, M>>;
 export type FormResponse<T extends ZodType, M> =
@@ -141,4 +142,5 @@ export const deleteSchema = z.object({
   id: emptyStringIsUndefined.pipe(z.string({ required_error: 'id is missing' })),
 });
 
-export type DeleteEntityState = FormResponse<typeof deleteSchema, string>;
+export type DeleteAction = FormAction<typeof deleteSchema, Entity>;
+export type DeleteResponse = FormResponse<typeof deleteSchema, Entity>;

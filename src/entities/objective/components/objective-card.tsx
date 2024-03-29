@@ -5,7 +5,7 @@ import { clsx } from 'clsx';
 import type { ResumeObjective } from '@/database/schema';
 import { Badge } from '@/components/badge';
 import { Button } from '@/components/button';
-import { type deleteSchema, type FormAction } from '@/lib/validation';
+import { type DeleteAction, type FormAction } from '@/lib/validation';
 import { DeleteDialog } from '@/entities/objective/components/delete-dialog';
 import { Form } from '@/entities/objective/components/form';
 import { type objectiveSchema } from '@/entities/objective/validation';
@@ -18,7 +18,7 @@ export function ObjectiveCard({
   objective: Selectable<ResumeObjective>;
   editAction: FormAction<typeof objectiveSchema, Selectable<ResumeObjective>>;
   onEdit: (updated: Selectable<ResumeObjective>) => void;
-  deleteAction: FormAction<typeof deleteSchema, string>;
+  deleteAction: DeleteAction;
   onDelete: (id: string) => void;
   className?: string;
 }): React.JSX.Element {

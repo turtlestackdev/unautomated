@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { EmploymentPanel } from '@/entities/employment/components/panel';
 import { type Employment } from '@/entities/employment/types';
 import {
-  type deleteSchema,
+  type DeleteAction,
+  type DeleteResponse,
   type FormAction,
   type FormResponse,
   formToObject,
@@ -55,11 +56,11 @@ const saveAction: FormAction<typeof employmentSchema, Employment> = (data) => {
   });
 };
 
-const deleteAction: FormAction<typeof deleteSchema, string> = (data) => {
-  return new Promise<FormResponse<typeof deleteSchema, string>>((resolve) => {
+const deleteAction: DeleteAction = (data) => {
+  return new Promise<DeleteResponse>((resolve) => {
     const id = data.get('id');
     if (isString(id)) {
-      resolve({ status: 'success', model: id });
+      resolve({ status: 'success', model: { id } });
     } else {
       resolve({ status: 'error', errors: { formErrors: [], fieldErrors: { id: ['bad id'] } } });
     }

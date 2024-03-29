@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { type Selectable } from 'kysely';
 import { ObjectiveCard } from '@/entities/objective/components/objective-card';
 import { type ResumeObjective } from '@/database/schema';
-import { type deleteSchema, type FormResponse } from '@/lib/validation';
+import { type DeleteResponse, type FormResponse } from '@/lib/validation';
 import { type objectiveSchema } from '@/entities/objective/validation';
 import { noop } from '@/lib/utils';
 import { isString } from '@/lib/type-guards';
@@ -46,10 +46,10 @@ export const Primary: Story = {
     },
     onEdit: noop,
     deleteAction: (data) => {
-      return new Promise<FormResponse<typeof deleteSchema, string>>((resolve) => {
+      return new Promise<DeleteResponse>((resolve) => {
         const id = data.get('id');
         if (isString(id)) {
-          resolve({ status: 'success', model: id });
+          resolve({ status: 'success', model: { id } });
         } else {
           resolve({ status: 'error', errors: { formErrors: [], fieldErrors: { id: ['bad id'] } } });
         }
