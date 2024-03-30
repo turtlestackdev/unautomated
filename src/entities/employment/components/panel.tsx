@@ -35,7 +35,7 @@ export function EmploymentPanel(props: {
               headline="Add your work history"
               onAdd={panelProps.onClickAdd}
               btnText="Add employment"
-              Icon={BriefcaseIcon}
+              Icon={<BriefcaseIcon />}
             >
               Add as much detail as possible.
               <br />

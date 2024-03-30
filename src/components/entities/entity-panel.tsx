@@ -1,5 +1,5 @@
 import type { z, ZodType } from 'zod';
-import React, { type ReactNode, useState } from 'react';
+import React, { cloneElement, type ReactElement, type ReactNode, useState } from 'react';
 import { PlusIcon } from '@heroicons/react/16/solid';
 import { type DeleteAction, deleteSchema, type FormAction } from '@/lib/validation';
 import type { Entity } from '@/entities/types';
@@ -131,12 +131,17 @@ interface EmptyPanelProps {
   children: ReactNode;
   btnText: string;
   onAdd: () => void;
-  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  Icon: ReactElement<React.SVGProps<SVGSVGElement> & { primary?: string; secondary?: string }>;
 }
 
 export function EntityPanelEmptyState(props: EmptyPanelProps): React.JSX.Element {
+  const Icon = cloneElement(props.Icon, {
+    className: 'h-96 w-96 text-gray-200',
+    primary: 'fill-gray-200',
+    secondary: 'fill-transparent stroke-gray-200',
+  });
   return (
-    <div className="relative w-full overflow-hidden py-16">
+    <div className="relative w-full overflow-hidden py-20">
       <div className=" relative z-10 max-w-fit space-y-12">
         <div>
           <H1 className="mb-4  text-balance">{props.headline}</H1>
@@ -146,9 +151,7 @@ export function EntityPanelEmptyState(props: EmptyPanelProps): React.JSX.Element
           {props.btnText}
         </Button>
       </div>
-      <div className="absolute left-16 top-1/2 z-0 -translate-y-1/2 lg:left-64">
-        <props.Icon className="h-96 w-96 text-gray-200" />
-      </div>
+      <div className="absolute left-16 top-1/2 z-0 -translate-y-1/2 lg:left-64">{Icon}</div>
     </div>
   );
 }
