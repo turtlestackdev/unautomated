@@ -13,6 +13,8 @@ import { AppShell } from '@/components/layout/app-shell';
 import { EmploymentPanel } from '@/entities/employment/components/panel';
 import { deleteEmployment, saveEmployment } from '@/entities/employment/actions';
 import { deleteObjective, saveObjective } from '@/entities/objective/actions';
+import { deleteEducation, saveEducation } from '@/entities/education/actions';
+import { EducationPanel } from '@/entities/education/components/panel';
 
 export function Boundary({
   user,
@@ -90,6 +92,12 @@ export function Boundary({
             employment={resumeData.employment}
             saveAction={saveEmployment.bind(null, user.id)}
             deleteAction={deleteEmployment.bind(null, user.id)}
+          />
+          <EducationPanel
+            education={resumeData.education}
+            degrees={resumeData.formOptions.degrees}
+            saveAction={saveEducation.bind(null, user.id)}
+            deleteAction={deleteEducation.bind(null, user.id)}
           />
         </AppShell.Main>
       </AppShell.Content>

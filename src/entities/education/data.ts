@@ -156,3 +156,17 @@ export async function saveEducation(
     return { ...education, highlights: eduHighlights };
   });
 }
+
+export async function deleteEducation({
+  userId,
+  educationId,
+}: {
+  userId: string;
+  educationId: string;
+}): Promise<void> {
+  await db
+    .deleteFrom('school_enrollment')
+    .where('id', '=', educationId)
+    .where('user_id', '=', userId)
+    .execute();
+}

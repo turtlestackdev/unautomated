@@ -27,14 +27,7 @@ export function EmploymentForm({
   const highlights = record?.highlights.map((highlight) => highlight.description) ?? [];
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className={clsx(
-        className,
-        'space-y-8 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm'
-      )}
-      {...props}
-    >
+    <form onSubmit={onSubmit} className={clsx(className, 'space-y-8')} {...props}>
       <FieldGroup>
         <Field>
           <Label>Company</Label>
