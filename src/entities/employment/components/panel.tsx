@@ -62,7 +62,7 @@ export function EmploymentPanel(props: {
             </EntityPanel.Content>
           )}
           <EmploymentFormDialog
-            employment={panelProps.recordToSave}
+            record={panelProps.recordToSave}
             onSubmit={panelProps.submitSave}
             errors={panelProps.saveErrors}
             open={panelProps.isSaveDialogOpen}

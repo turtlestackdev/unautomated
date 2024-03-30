@@ -13,6 +13,7 @@ export type EntityCardProps = React.PropsWithChildren<{
   onHide: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  expand?: boolean;
 }>;
 
 export function EntityCard(props: EntityCardProps): React.JSX.Element {
@@ -23,6 +24,7 @@ export function EntityCard(props: EntityCardProps): React.JSX.Element {
         subTitle={props.subTitle}
         badge={props.badge}
         onView={props.onView}
+        expand={props.expand}
       >
         {props.children}
       </EntityCardHeading>
@@ -60,6 +62,7 @@ export function EntityCardHeading(
     subTitle: string;
     badge?: ReactElement;
     onView: () => void;
+    expand?: boolean;
   }>
 ): React.JSX.Element {
   return (
@@ -74,7 +77,9 @@ export function EntityCardHeading(
           <h3 className="truncate text-sm font-medium text-gray-900">{props.title}</h3>
           {props.badge ? props.badge : null}
         </div>
-        <p className="mt-1 truncate text-sm text-gray-500">{props.subTitle}</p>
+        <p className={clsx(props.expand ? '' : 'truncate', 'mt-1 text-sm text-gray-500')}>
+          {props.subTitle}
+        </p>
       </div>
       {props.children ? <div className="truncate">{props.children}</div> : null}
     </button>

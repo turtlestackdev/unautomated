@@ -104,7 +104,7 @@ export function EntityPanel<T extends ZodType, M extends Entity>(
   });
 
   return (
-    <CollapsibleSection title="Employment" show={props.show}>
+    <CollapsibleSection title={props.title} show={props.show}>
       {props.children({
         isEmpty: records.length === 0,
         records,

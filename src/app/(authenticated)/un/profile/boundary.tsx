@@ -7,11 +7,12 @@ import { Button } from '@/components/button';
 import type { SessionUser } from '@/lib/auth';
 import type { ResumeData } from '@/entities/resume-data';
 import { VerticalNav } from '@/components/navigation/vertical-nav';
-import { ObjectivePanel } from '@/entities/objective/components';
+import { ObjectivePanel } from '@/entities/objective/components/panel';
 import { UploadResumeForm } from '@/entities/resume/forms';
 import { AppShell } from '@/components/layout/app-shell';
 import { EmploymentPanel } from '@/entities/employment/components/panel';
 import { deleteEmployment, saveEmployment } from '@/entities/employment/actions';
+import { deleteObjective, saveObjective } from '@/entities/objective/actions';
 
 export function Boundary({
   user,
@@ -80,7 +81,11 @@ export function Boundary({
           </VerticalNav>
         </AppShell.SideBar>
         <AppShell.Main>
-          <ObjectivePanel objectives={resumeData.objectives} />
+          <ObjectivePanel
+            objectives={resumeData.objectives}
+            saveAction={saveObjective.bind(null, user.id)}
+            deleteAction={deleteObjective.bind(null, user.id)}
+          />
           <EmploymentPanel
             employment={resumeData.employment}
             saveAction={saveEmployment.bind(null, user.id)}

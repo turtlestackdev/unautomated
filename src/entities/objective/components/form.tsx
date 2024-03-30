@@ -1,51 +1,37 @@
 import React from 'react';
 import { clsx } from 'clsx';
 import type { Selectable } from 'kysely';
-import { useFormSubmit } from '@/hooks/use-form-submit';
-import { objectiveSchema } from '@/entities/objective/validation';
+import { type objectiveSchema } from '@/entities/objective/validation';
 import { Button, Submit } from '@/components/button';
 import type { ResumeObjective } from '@/database/schema';
 import { Description, Field, FieldGroup, Fieldset, Label } from '@/components/fieldset';
 import { Input } from '@/components/input';
 import { Textarea } from '@/components/textarea';
 import { Switch, SwitchField } from '@/components/switch';
-import type { FormAction } from '@/lib/validation';
+import type { FormProps } from '@/lib/validation';
+import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/dialog';
 
-type FormProps = {
-  objective: Partial<Selectable<ResumeObjective>>;
-  action: FormAction<typeof objectiveSchema, Selectable<ResumeObjective>>;
-  onSave: (objective: Selectable<ResumeObjective>) => void;
-  onCancel?: () => void;
-  includeActions?: boolean;
-} & Omit<React.ComponentPropsWithoutRef<'form'>, 'action'>;
-
-export function Form({
-  onSave,
+export function ObjectiveForm({
+  onSubmit,
   className,
-  objective,
-  action,
+  record,
+  errors,
   onCancel,
   includeActions = true,
   ...props
-}: FormProps): React.JSX.Element {
-  const { onSubmit, errors } = useFormSubmit({
-    schema: objectiveSchema,
-    action,
-    onSuccess: onSave,
-  });
-
+}: FormProps<typeof objectiveSchema, Selectable<ResumeObjective>>): React.JSX.Element {
   return (
     <form onSubmit={onSubmit} className={clsx(className, 'space-y-8')} {...props}>
       <Fieldset>
         <FieldGroup>
           <Field>
             <Label>Name</Label>
-            <Input name="name" defaultValue={objective.name} errors={errors?.fieldErrors.name} />
+            <Input name="name" defaultValue={record?.name} errors={errors?.fieldErrors.name} />
           </Field>
           <Field>
             <Label>Objective</Label>
             <Textarea
-              defaultValue={objective.objective}
+              defaultValue={record?.objective}
               errors={errors?.fieldErrors.objective}
               name="objective"
               rows={8}
@@ -55,10 +41,10 @@ export function Form({
           <SwitchField>
             <Label>Default</Label>
             <Description>Make this the default objective in new resumes</Description>
-            <Switch defaultChecked={objective.is_default} name="is_default_objective" />
+            <Switch defaultChecked={record?.is_default} name="is_default_objective" />
           </SwitchField>
         </FieldGroup>
-        {objective.id !== undefined ? <input name="id" type="hidden" value={objective.id} /> : null}
+        {record?.id ? <input name="id" type="hidden" value={record.id} /> : null}
       </Fieldset>
 
       {includeActions ? (
@@ -72,5 +58,33 @@ export function Form({
         </div>
       ) : null}
     </form>
+  );
+}
+
+export function ObjectiveFormDialog({
+  open,
+  onClose,
+  ...props
+}: Omit<FormProps<typeof objectiveSchema, Selectable<ResumeObjective>>, 'includeActions'> & {
+  open: boolean;
+  onClose: () => void;
+}): React.JSX.Element {
+  const formId = `employment-form-dialog-${props.record?.id ?? 'new'}`;
+
+  return (
+    <Dialog open={open} onClose={onClose} size="xl">
+      <DialogTitle>{props.record ? 'Edit Objective' : 'Add Objective'}</DialogTitle>
+      <DialogBody>
+        <ObjectiveForm {...props} includeActions={false} id={formId} />
+        <DialogActions>
+          <Button plain onClick={onClose}>
+            Cancel
+          </Button>
+          <Submit color="brand" form={formId}>
+            Save
+          </Submit>
+        </DialogActions>
+      </DialogBody>
+    </Dialog>
   );
 }

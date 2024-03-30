@@ -1,8 +1,16 @@
 import { type ZodType, z, type ZodEffects, type ZodString } from 'zod';
+import type React from 'react';
 import { isObject } from '@/lib/type-guards';
 import { type Entity } from '@/entities/types';
 
 export type FormAction<T extends ZodType, M> = (data: FormData) => Promise<FormResponse<T, M>>;
+export type FormProps<T extends ZodType, M> = {
+  record?: M;
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  errors: z.inferFlattenedErrors<T> | null;
+  onCancel?: () => void;
+  includeActions?: boolean;
+} & Omit<React.ComponentPropsWithoutRef<'form'>, 'action'>;
 export type FormResponse<T extends ZodType, M> =
   | {
       status: 'success';
