@@ -38,8 +38,9 @@ export function useFormSubmit<T extends ZodType, M>({
       const form = event.currentTarget;
 
       const data = new FormData(form);
+      const dataObject = formToObject(data);
       if (schema) {
-        const request = schema.safeParse(formToObject(data));
+        const request = schema.safeParse(dataObject);
         if (!request.success) {
           const errorList = request.error.flatten();
           if (props.onError) {

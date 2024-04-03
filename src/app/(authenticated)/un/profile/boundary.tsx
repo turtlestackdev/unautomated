@@ -15,6 +15,8 @@ import { deleteEmployment, saveEmployment } from '@/entities/employment/actions'
 import { deleteObjective, saveObjective } from '@/entities/objective/actions';
 import { deleteEducation, saveEducation } from '@/entities/education/actions';
 import { EducationPanel } from '@/entities/education/components/panel';
+import { SkillPanel } from '@/entities/skill/panel';
+import { deleteSkillCategory, saveSkillCategory } from '@/entities/skill/actions';
 
 export function Boundary({
   user,
@@ -98,6 +100,11 @@ export function Boundary({
             degrees={resumeData.formOptions.degrees}
             saveAction={saveEducation.bind(null, user.id)}
             deleteAction={deleteEducation.bind(null, user.id)}
+          />
+          <SkillPanel
+            skillCategories={resumeData.skillCategories}
+            saveAction={saveSkillCategory.bind(null, user.id)}
+            deleteAction={deleteSkillCategory.bind(null, user.id)}
           />
         </AppShell.Main>
       </AppShell.Content>

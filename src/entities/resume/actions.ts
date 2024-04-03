@@ -21,6 +21,7 @@ export async function uploadResume(userId: string, data: FormData): Promise<Uplo
       objectives: [],
       employment: [],
       education: [],
+      skillCategories: [],
       formOptions: { degrees: degreeTypes },
     },
   };

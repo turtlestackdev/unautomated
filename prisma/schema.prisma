@@ -36,7 +36,7 @@ model User {
   resume_title       ResumeTitle[]
   resume_objective   ResumeObjective[]
   employment_history JobDetails[]
-  skills             Skills[]
+  skill_categories   SkillCategory[]
   schhol_enrollment  SchoolEnrollment[]
   sessions           Session[]
   file_upload        FileUpload[]       @relation("UploadedBy")
@@ -177,12 +177,26 @@ model ScholasticHighlight {
   @@map("scholastic_highlights")
 }
 
-model Skills {
-  id          String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id     String @db.Uuid
-  user        User   @relation(fields: [user_id], references: [id])
-  description String
-  level       Int    @default(3)
+model SkillCategory {
+  id      String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id String  @db.Uuid
+  user    User    @relation(fields: [user_id], references: [id])
+  name    String
+  Skill   Skill[]
 
+  @@unique([user_id, name])
+  @@map("skill_categories")
+}
+
+model Skill {
+  id          String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  category_id String        @db.Uuid
+  category    SkillCategory @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  name        String
+  level       Int           @default(3)
+  sort_order  Int
+
+  @@unique([name, category_id])
+  @@unique([sort_order, category_id])
   @@map("skills")
 }

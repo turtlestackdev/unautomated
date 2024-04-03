@@ -147,11 +147,21 @@ CREATE TABLE "scholastic_highlights" (
 );
 
 -- CreateTable
-CREATE TABLE "skills" (
+CREATE TABLE "skill_categories" (
     "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "user_id" UUID NOT NULL,
-    "description" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+
+    CONSTRAINT "skill_categories_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "skills" (
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
+    "category_id" UUID NOT NULL,
+    "name" TEXT NOT NULL,
     "level" INTEGER NOT NULL DEFAULT 3,
+    "sort_order" INTEGER NOT NULL,
 
     CONSTRAINT "skills_pkey" PRIMARY KEY ("id")
 );
@@ -195,6 +205,15 @@ CREATE INDEX "school_enrollment_end_date_idx" ON "school_enrollment"("end_date")
 -- CreateIndex
 CREATE INDEX "scholastic_highlights_description_idx" ON "scholastic_highlights"("description");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "skill_categories_user_id_name_key" ON "skill_categories"("user_id", "name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "skills_name_category_id_key" ON "skills"("name", "category_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "skills_sort_order_category_id_key" ON "skills"("sort_order", "category_id");
+
 -- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_avatar_id_fkey" FOREIGN KEY ("avatar_id") REFERENCES "file_uploads"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -226,4 +245,7 @@ ALTER TABLE "school_enrollment" ADD CONSTRAINT "school_enrollment_user_id_fkey" 
 ALTER TABLE "scholastic_highlights" ADD CONSTRAINT "scholastic_highlights_enrollment_id_fkey" FOREIGN KEY ("enrollment_id") REFERENCES "school_enrollment"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "skills" ADD CONSTRAINT "skills_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "skill_categories" ADD CONSTRAINT "skill_categories_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "skills" ADD CONSTRAINT "skills_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "skill_categories"("id") ON DELETE CASCADE ON UPDATE CASCADE;

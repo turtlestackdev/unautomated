@@ -17,6 +17,9 @@ const config: Config = {
       colors: {
         brand: colors.amber,
       },
+      boxShadow: {
+        well: '0 2px 0 hsla(0, 0%, 50%, .15), inset 0 1px 2px hsla(0, 0%, 0%, 0.1)',
+      },
     },
   },
   plugins: [],

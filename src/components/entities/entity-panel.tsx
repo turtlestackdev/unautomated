@@ -91,6 +91,9 @@ export function EntityPanel<T extends ZodType, M extends Entity>(
       recordToSave ? onEdit(record) : onCreate(record);
       setRecordToSave(undefined);
     },
+    onError: (errors) => {
+      console.log('SUBMIT ERROR', errors);
+    },
   });
 
   const { onSubmit: submitDelete, errors: deleteErrors } = useFormSubmit({
@@ -100,6 +103,9 @@ export function EntityPanel<T extends ZodType, M extends Entity>(
       setIsDeleteDialogOpen(false);
       onDelete(record);
       setRecordToDelete(undefined);
+    },
+    onError: (errors) => {
+      console.log('SUBMIT ERROR', errors);
     },
   });
 

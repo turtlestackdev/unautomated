@@ -13,6 +13,71 @@ import { type Degree, type Education } from '@/entities/education/types';
 import { educationSchema } from '@/entities/education/validation';
 import { EducationFormDialog } from '@/entities/education/components/form';
 
+function EducationItem({
+  degree,
+  onEdit,
+  onDelete,
+}: {
+  degree: Education;
+  onEdit: () => void;
+  onDelete: () => void;
+}): React.JSX.Element {
+  const [viewing, setViewing] = useState(false);
+
+  if (viewing) {
+    return (
+      <Card className="col-span-4 space-y-6 p-6">
+        <div className="flex w-full items-baseline justify-between text-left">
+          <div className="flex-1 truncate">
+            <div className="flex items-center space-x-3">
+              <h3 className="truncate text-sm font-medium text-gray-900">{degree.degree}</h3>
+            </div>
+            <p className="mt-1 truncate text-sm text-gray-500">{degree.school}</p>
+            <p className="mt-2 truncate text-sm text-gray-400">
+              {shorthandDate(degree.start_date, degree.end_date)}
+            </p>
+          </div>
+          <Button
+            onClick={() => {
+              setViewing(false);
+            }}
+            plain
+          >
+            <XMarkIcon />
+          </Button>
+        </div>
+
+        {degree.highlights.length > 0 ? (
+          <ul className="ml-4 max-w-prose list-disc space-y-4 text-gray-800">
+            {degree.highlights.map((highlight) => (
+              <li key={highlight.id}>{highlight.description}</li>
+            ))}
+          </ul>
+        ) : null}
+      </Card>
+    );
+  }
+
+  return (
+    <EntityCard
+      className="col-span-4 sm:col-span-2"
+      id={degree.id}
+      title={degree.degree}
+      subTitle={degree.school}
+      onView={() => {
+        setViewing(true);
+      }}
+      onHide={noop}
+      onEdit={onEdit}
+      onDelete={onDelete}
+    >
+      <p className="truncate text-sm text-gray-400">
+        {shorthandDate(degree.start_date, degree.end_date)}
+      </p>
+    </EntityCard>
+  );
+}
+
 export function EducationPanel(props: {
   education: Education[];
   degrees: Degree[];
@@ -86,70 +151,5 @@ export function EducationPanel(props: {
         </>
       )}
     </EntityPanel>
-  );
-}
-
-function EducationItem({
-  degree,
-  onEdit,
-  onDelete,
-}: {
-  degree: Education;
-  onEdit: () => void;
-  onDelete: () => void;
-}): React.JSX.Element {
-  const [viewing, setViewing] = useState(false);
-
-  if (viewing) {
-    return (
-      <Card className="col-span-4 space-y-6 p-6">
-        <div className="flex w-full items-baseline justify-between text-left">
-          <div className="flex-1 truncate">
-            <div className="flex items-center space-x-3">
-              <h3 className="truncate text-sm font-medium text-gray-900">{degree.degree}</h3>
-            </div>
-            <p className="mt-1 truncate text-sm text-gray-500">{degree.school}</p>
-            <p className="mt-2 truncate text-sm text-gray-400">
-              {shorthandDate(degree.start_date, degree.end_date)}
-            </p>
-          </div>
-          <Button
-            onClick={() => {
-              setViewing(false);
-            }}
-            plain
-          >
-            <XMarkIcon />
-          </Button>
-        </div>
-
-        {degree.highlights.length > 0 ? (
-          <ul className="ml-4 max-w-prose list-disc space-y-4 text-gray-800">
-            {degree.highlights.map((highlight) => (
-              <li key={highlight.id}>{highlight.description}</li>
-            ))}
-          </ul>
-        ) : null}
-      </Card>
-    );
-  }
-
-  return (
-    <EntityCard
-      className="col-span-4 sm:col-span-2"
-      id={degree.id}
-      title={degree.degree}
-      subTitle={degree.school}
-      onView={() => {
-        setViewing(true);
-      }}
-      onHide={noop}
-      onEdit={onEdit}
-      onDelete={onDelete}
-    >
-      <p className="truncate text-sm text-gray-400">
-        {shorthandDate(degree.start_date, degree.end_date)}
-      </p>
-    </EntityCard>
   );
 }
